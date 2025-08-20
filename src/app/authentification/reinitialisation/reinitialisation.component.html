@@ -1,0 +1,163 @@
+<div class="account-pages my-5 pt-sm-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-md-8 col-lg-6 col-xl-5 ">
+        <div class="card overflow-hidden ">
+          <div class="bg-soft bg-primary ">
+            <div class="row">
+              <div class="col-7">
+                <div class="text-primary p-4">
+                  <h5 class="text-primary"> Nouveau mot de passe.</h5>
+                  <p>Réinitialiser le mot de passe</p>
+                </div>
+              </div>
+              <div class="col-5 align-self-end">
+                <img src="assets/images/profile-img.png" alt="" class="img-fluid">
+              </div>
+            </div>
+          </div>
+          <div class="card-body pt-0 bg-rouge-onip-clair">
+            <div>
+              <a routerLink="/">
+                <div class="avatar-md profile-user-wid mb-4">
+                                    <span class="avatar-title rounded-circle bg-light">
+                                        <img src="assets/images/logo.png" alt="jil-ms" class="rounded-circle"
+                                             height="34">
+                                    </span>
+                </div>
+              </a>
+            </div>
+
+            <ng-container *ngIf="response|async as reponse" [ngSwitch]="reponse.dataState">
+
+              <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+                <div class="alert alert-info" role="alert">
+                  {{dataStateEnum.CHARGEMENT}}
+                </div>
+              </ng-container>
+
+              <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+                <div class="alert alert-danger" role="alert">
+                  Code d'erreur : {{reponse.errorStatus}} {{reponse.errorMessage}}
+                </div>
+              </ng-container>
+
+              <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+                <div class="alert alert-success" role="alert">
+                  {{reponse.data.message}}
+                </div>
+              </ng-container>
+
+            </ng-container>
+
+            <div *ngIf="motDePasseToken">
+              <!-- Le token n'est pas encore utilisé -->
+              <div *ngIf="!utilise">
+
+                <form class="needs-validation" name="resetForm" [formGroup]="resetForm"
+                      (ngSubmit)="onReinitialiseLeMotDePasse()" novalidate>
+
+                  <div class="mb-3">
+                    <label for="motdepasse" class="blanc">Mot de passe</label>
+                    <div class="input-group input-group-merge">
+                      <input [type]="showPassword?'text':'password'" formControlName="motdepasse"
+                             class="form-control"
+                             [ngClass]="{ 'is-invalid': resetForm.get('motdepasse')?.touched && resetForm.get('motdepasse')?.errors }"
+                             id="password-field" placeholder="Veuillez saisir le mot de passe" />
+                      <div class="input-group-text">
+                        <i alt="show" class="far fa-eye eye-show"
+                           (click)="showPassword = !showPassword"
+                           [class.hide]="showPassword"></i>
+                        <i alt="hide" class="far fa-eye-slash eye-hide"
+                           (click)="showPassword = !showPassword"
+                           [class.hide]="!showPassword"></i>
+                      </div>
+                    </div>
+
+                    <div *ngIf="resetForm.get('motdepasse')?.touched && resetForm.get('motdepasse')?.errors"
+                         class="alert alert-warning">
+                      <div *ngIf="resetForm.get('motdepasse')?.errors">Le mot de passe est
+                        obligatoire</div>
+                      <div *ngIf="resetForm.get('motdepasse')?.errors?.['pattern']">Le mot de passe n'est pas
+                        valide.
+                        Minimum huit caractères, au moins une lettre majuscule, une lettre
+                        minuscule, un chiffre et un caractère spécial. </div>
+                    </div>
+
+                  </div>
+
+                  <div class="mb-3">
+                    <label for="confirmationdemotdepasse" class="blanc"> Confirmation de mot de
+                      passe</label>
+                    <div class="input-group input-group-merge">
+                      <input [type]="showConfirmPassword?'text':'password'"
+                             formControlName="confirmationdemotdepasse" class="form-control"
+                             [ngClass]="{ 'is-invalid': resetForm.get('confirmationdemotdepasse')?.touched  && resetForm.get('confirmationdemotdepasse')?.errors}"
+                             id="password-field" placeholder="Veuillez saisir la confirmation du mot de passe" />
+                      <div class="input-group-text">
+                        <i alt="show" class="far fa-eye eye-show"
+                           (click)="showConfirmPassword = !showConfirmPassword"
+                           [class.hide]="showConfirmPassword"></i>
+                        <i alt="hide" class="far fa-eye-slash eye-hide"
+                           (click)="showConfirmPassword = !showConfirmPassword"
+                           [class.hide]="!showConfirmPassword"></i>
+                      </div>
+                    </div>
+
+                    <div *ngIf="resetForm.get('confirmationdemotdepasse')?.touched  &&resetForm.get('confirmationdemotdepasse')?.errors"
+                         class="alert alert-warning">
+                      <div *ngIf="resetForm.get('confirmationdemotdepasse')?.errors">La confirmation du
+                        mot de
+                        passe est obligatoire</div>
+                      <div *ngIf="resetForm.get('confirmationdemotdepasse')?.errors?.['pattern']">Le mot de passe
+                        n'est pas valide. Minimum huit caractères, au moins une lettre
+                        majuscule, une
+                        lettre
+                        minuscule, un chiffre et un caractère spécial. </div>
+                    </div>
+
+                  </div>
+                  <div class="text-end">
+                    <button class="btn btn-primary w-md blue-lanation" type="submit"
+                            [disabled]="resetForm.get('motdepasse')?.errors || resetForm.get('confirmationdemotdepasse')?.errors">Réinitialiser</button>
+                  </div>
+                </form>
+
+                <!--div class="mt-4 text-center blanc">
+                    <a routerLink="/" class="blanc"><i class="mdi mdi-lock mr-1"></i>Vous voulez vous
+                        connecter
+                        ?</a>
+                </div-->
+              </div>
+              <!--div *ngIf="utilise">
+                  Mot de passe réinitialiser avec succès.
+              </div-->
+
+            </div>
+
+            <!--div *ngIf="!motDePasseToken" class="alert alert-warning">
+                Le token n'est plus valide.
+            </div-->
+
+            <div class="mt-4 text-center blanc">
+              <a routerLink="/" class="blanc"><i class="mdi mdi-lock mr-1"></i>Vous voulez vous connecter
+                ?</a>
+            </div>
+
+          </div> <!-- end card-body-->
+        </div>
+        <!-- end card -->
+        <div class="mt-5 text-center noir">
+          <!--p>Don't have an account ? <a routerLink="/account/signup" class="fw-medium text-primary"> Signup
+now
+</a> </p-->
+          <p>© {{year}} <i class="mdi mdi-heart text-danger"></i> JILMS </p>
+        </div>
+
+      </div> <!-- end col -->
+    </div>
+    <!-- end row -->
+  </div>
+  <!-- end container -->
+</div>
+<!-- end page -->

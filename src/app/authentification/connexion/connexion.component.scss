@@ -1,0 +1,84 @@
+/* Fond bleu très clair */
+.login-wrap{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#eaf3ff;
+  padding:24px;
+}
+
+/* Carte : étroite + longue */
+.login-card{
+   text-align: center;          /* centre les textes (Bienvenue + sous-titre) */
+  display: flex;               /* permet l’alignement vertical du contenu */
+  flex-direction: column;      /* empile proprement logo, titres, formulaire */
+  justify-content: center;  
+  width:100%;
+  max-width:380px;
+  background:#fff;
+  border-radius:14px;
+  padding:40px 30px 44px;
+  min-height:560px;
+  box-shadow:
+    0 30px 90px rgba(30,64,175,.18),
+    0 10px 34px rgba(15,23,42,.07);
+  /* Espace vertical unique pour tout le contenu de la carte */
+  --sp: 18px;                 /* 👈 règle TOUTES les marges verticales */
+}
+
+/* Utilitaire de “stack” : ajoute un espace fixe entre chaque enfant */
+.stack > * + *{ margin-top: var(--sp); }
+
+/* Logo dans un rond bleu (logo blanc grâce au filtre) */
+.logo-circle{
+  width:72px; height:72px;
+  margin:0 auto 14px;
+  display:grid; place-items:center;
+  /* pas de background ni de bordure */
+}
+.logo-circle img{
+  width:70px; height:70px; object-fit:contain;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,.14)); /* lisible même sans fond */
+}
+
+/* Titres (espacements gérés par .stack) */
+.title{ font-size:30px; font-weight:700; color:#0b1225; }
+.subtitle{ color:#475569; }
+
+/* Champs */
+.input{
+  width:100%;
+  height:52px;
+  border-radius:12px;
+  border:1px solid #e2e8f0;
+  padding:0 14px;
+  font-size:15px;
+  transition:border-color .15s, box-shadow .15s;
+}
+.input:focus{
+  outline:none;
+  border-color:#2563eb;
+  box-shadow:0 0 0 3px rgba(37,99,235,.15);
+}
+
+/* Bouton */
+.primary-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  height:52px; width:100%;
+  border-radius:12px;
+  background:#0b5bd3; color:#fff; border:1px solid #0b5bd3;
+  font-weight:700; letter-spacing:.2px;
+}
+.primary-btn:disabled{ opacity:.6; cursor:not-allowed; }
+
+/* Lien aide */
+.text-end{ text-align:right; }
+.help-link{ color:#2563eb; text-decoration:none; font-weight:600; }
+.help-link:hover{ text-decoration:underline; }
+
+/* Mobile */
+@media (max-width:480px){
+  .login-card{ max-width:94%; padding:28px 22px 32px; min-height:auto; }
+  .title{ font-size:26px; }
+}

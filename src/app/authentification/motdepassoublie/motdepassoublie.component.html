@@ -1,0 +1,99 @@
+<div>
+  <div class="container-fluid p-0">
+    <div class="row g-0">
+
+      <div class="col-xl-8 order-xl-2">
+        <div class="img p-md-5 p-4" style="background-image: url('assets/securite-informatique-cadenas-login-mot-passe.jpg'); background-size: cover; background-position: center; height: 100vh;"></div>
+      </div>
+      <!-- end col -->
+
+      <div class="col-xl-4 order-xl-1">
+        <div class="auth-full-page-content p-md-5 p-4">
+          <div class="w-100">
+
+            <div class="d-flex flex-column h-100">
+              <div class="mb-4 mb-md-5">
+                <a routerLink="/" class="d-block auth-logo">
+                  <img src="assets/Jilmonde%20ERP%20LOGO.png" alt="" height="100" class="auth-logo-dark">
+
+                </a>
+              </div>
+              <div class="my-auto">
+                <div>
+                  <h5 class="text-primary"> Mot de passe oublié ?</h5>
+                  <p>Réinitialiser le mot de passe</p>
+                </div>
+
+                <div class="mt-4">
+                  <div class="alert alert-success text-center mb-4" role="alert">
+                    Entrez votre e-mail et des instructions vous seront envoyées !                  </div>
+                  <ng-container *ngIf="response|async as reponse" [ngSwitch]="reponse.dataState">
+
+                    <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+                      <div class="alert alert-info" role="alert">
+                        {{dataStateEnum.CHARGEMENT}}
+                      </div>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+                      <div class="alert alert-danger" role="alert">
+                        Code d'erreur : {{reponse.errorStatus}} {{reponse.errorMessage}}
+                      </div>
+                    </ng-container>
+
+                    <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+                      <div class="alert alert-success" role="alert">
+                        {{reponse.data.message}}
+                      </div>
+                    </ng-container>
+
+                  </ng-container>
+
+
+                  <form class="needs-validation" name="resetForm" [formGroup]="resetForm" (ngSubmit)="onReinitialiseLeMotDePasse()"
+                        novalidate>
+
+
+                    <div class="mb-3">
+                      <label for="email" class="blanc">Email</label>
+
+                      <input type="email" formControlName="email" class="form-control"
+                             [ngClass]="{ 'is-invalid': resetForm.get('email')?.touched && resetForm.get('email')?.invalid }" id="email"
+                             placeholder="Veuillez saisir votre adresse mail"/>
+
+                      <div *ngIf="resetForm.get('email')?.touched && resetForm.get('email')?.invalid" class="invalid-feedback">
+                        <div *ngIf="resetForm.get('email')?.errors" class="blanc">Email is required</div>
+                        <div *ngIf="resetForm.get('email')?.errors" class="blanc">Vous devez renseigner une adresse mail valide</div>
+                      </div>
+                    </div>
+
+
+
+                    <div class="text-end">
+                      <button class="btn btn-primary w-md blue-lanation" type="submit" [disabled]="resetForm.invalid"  >Valider</button>
+                    </div>
+                  </form>
+                  <div class="mt-5 text-center">
+                    <p>Vous voulez vous connecter
+                      ? <a [routerLink]=
+                             "'/connexion'"  class="fw-medium text-primary"> Se Connecter Ici</a> </p>
+                  </div>
+                </div>
+              </div>
+              <div class="mt-5 text-center">
+                <div class="mt-4 mt-md-5 text-center">
+                  <p class="mb-0">
+                    {{year}} © JILMS <i class="mdi mdi-heart text-danger"></i>
+                    Design & Develop by Jilmonde Dev Teams</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- end col -->
+    </div>
+    <!-- end row -->
+  </div>
+  <!-- end container-fluid -->
+</div>

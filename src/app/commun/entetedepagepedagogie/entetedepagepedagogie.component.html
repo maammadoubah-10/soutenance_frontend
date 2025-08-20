@@ -1,0 +1,538 @@
+<header id="page-topbar" >
+  <div class="navbar-header ">
+    <div class="d-flex" >
+      <!-- LOGO -->
+      <div class="navbar-brand-box  parent" >
+        <a  class="logo logo-dark">
+          <span class="logo-sm">
+            <img src="assets/Jilmonde%20ERP%20LOGO.png" alt="" height="22">
+          </span>
+          <span class="logo-lg">
+            <img src="assets/Jilmonde%20ERP%20LOGO.png" alt="" height="60">
+          </span>
+        </a>
+
+        <a  class="logo logo-light">
+          <span class="logo-sm">
+            <img src="assets/Jilmonde%20ERP%20LOGO.png" alt="" height="22">
+          </span>
+          <span class="logo-lg">
+            <img src="assets/Jilmonde%20ERP%20LOGO.png" alt="" height="19">
+          </span>
+        </a>
+      </div>
+
+      <button type="button" class="btn btn-sm px-3 font-size-16 header-item" id="vertical-menu-btn"
+              (click)="toggleMobileMenu($event)">
+        <i class="fa fa-fw fa-bars"></i>
+      </button>
+
+
+      <!-- App Search-->
+      <form class="app-search d-none d-xl-block">
+        <div class="position-relative">
+          <input type="text" class="form-control" placeholder="Rechercher">
+          <span class="bx bx-search-alt"></span>
+        </div>
+      </form>
+
+
+      <!--div class="dropdown-mega d-none d-lg-block ms-2" ngbDropdown>
+        <button type="button" class="btn header-item" ngbDropdownToggle data-toggle="dropdown" aria-haspopup="false"
+          aria-expanded="false">
+          {{ 'MEGA_MENU' }}
+          <i class="mdi mdi-chevron-down"></i>
+        </button>
+        <div class="dropdown-menu dropdown-megamenu" ngbDropdownMenu>
+          <div class="row">
+            <div class="col-sm-8">
+
+              <div class="row">
+                <div class="col-md-4">
+                  <h5 class="font-size-14 mt-0"> {{ 'TITLE' }}</h5>
+                  <ul class="list-unstyled megamenu-list">
+                    <li>
+                      <a href="javascript:void(0);">{{ 'LIGHTBOX' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'RANGE_SLIDER' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'SWEET_ALERT' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'RATING' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'FORMS' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'TABLES' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'CHARTS' }}</a>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="col-md-4">
+                  <h5 class="font-size-14 mt-0">{{ 'TITLE' }}</h5>
+                  <ul class="list-unstyled megamenu-list">
+                    <li>
+                      <a href="javascript:void(0);">{{ 'ECOMMERCE' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'CALENDAR' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'EMAIL' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'PROJECTS' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'TASKS' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'CONTACTS' }}</a>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="col-md-4">
+                  <h5 class="font-size-14 mt-0">{{ 'TITLE' }}</h5>
+                  <ul class="list-unstyled megamenu-list">
+                    <li>
+                      <a href="javascript:void(0);">{{ 'LIGHT_SIDEBAR' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'COMPACT_SIDEBAR' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'HORIZONTAL_LAYOUT' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'MAINTENANCE' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'COMING SOON' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'TIMELINE' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'FAQ' }}</a>
+                    </li>
+
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-4">
+              <div class="row">
+                <div class="col-sm-6">
+                  <h5 class="font-size-14 mt-0"> {{ 'TITLE' }}</h5>
+                  <ul class="list-unstyled megamenu-list">
+                    <li>
+                      <a href="javascript:void(0);">{{ 'LIGHTBOX' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'RANGE_SLIDER' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'SWEET_ALERT' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'RATING' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'FORMS' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'TABLES' }}</a>
+                    </li>
+                    <li>
+                      <a href="javascript:void(0);">{{ 'CHARTS' }}</a>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="col-sm-5">
+                  <div>
+                    <img src="assets/images/megamenu-img.png" alt="" class="img-fluid mx-auto d-block">
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div-->
+    </div>
+
+    <div class="d-flex">
+
+      <div class="dropdown d-inline-block d-lg-none ms-2" ngbDropdown>
+        <button type="button" class="btn header-item noti-icon" id="page-header-search-dropdown" data-toggle="dropdown"
+                aria-haspopup="true" ngbDropdownToggle aria-expanded="false">
+          <i class="mdi mdi-magnify"></i>
+        </button>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" ngbDropdownMenu
+             aria-labelledby="page-header-search-dropdown">
+
+          <form class="p-3">
+            <div class="m-0">
+              <div class="input-group">
+                <input type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
+                <div class="input-group-append">
+                  <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!--div class="dropdown d-inline-block" ngbDropdown>
+        <button type="button" class="btn header-item" id="page-header-user-dropdown" ngbDropdownToggle>
+          <img *ngIf="flagvalue !== undefined" src="{{flagvalue}}" alt="Header Language" height="16"> <span
+            class="ms-1">{{countryName}}</span>
+          <img *ngIf="flagvalue === undefined" src="{{valueset}}" alt="Header Language" height="16">
+          <span *ngIf="flagvalue === undefined" class="ms-1">English</span>
+        </button>
+        <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+
+          <a href="javascript:void(0);" class="dropdown-item notify-item" *ngFor="let item of listLang"
+            (click)="setLanguage(item.text, item.lang, item.flag)" [ngClass]="{'active': cookieValue === item.lang}">
+            <img src="{{item.flag}}" alt="user-image" class="me-1" height="12"> <span
+              class="align-middle">{{item.text}}</span>
+          </a>
+
+        </div>
+      </div-->
+
+      <!--      <div class="dropdown d-none d-lg-inline-block ms-1" ngbDropdown>-->
+      <!--        <button type="button" class="btn header-item noti-icon" ngbDropdownToggle>-->
+      <!--          <i class="bx bx-customize"></i>-->
+      <!--        </button>-->
+      <!--        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end" ngbDropdownMenu>-->
+      <!--          <div class="px-lg-2">-->
+      <!--            <div class="row no-gutters">-->
+      <!--              <div class="col">-->
+      <!--                <a class="dropdown-icon-item" href="javascript: void(0);">-->
+      <!--                  <img src="assets/images/brands/github.png" alt="Github">-->
+      <!--                  <span>GitHub</span>-->
+      <!--                </a>-->
+      <!--              </div>-->
+      <!--              <div class="col">-->
+      <!--                <a class="dropdown-icon-item" href="javascript: void(0);">-->
+      <!--                  <img src="assets/images/brands/bitbucket.png" alt="bitbucket">-->
+      <!--                  <span>Bitbucket</span>-->
+      <!--                </a>-->
+      <!--              </div>-->
+      <!--              <div class="col">-->
+      <!--                <a class="dropdown-icon-item" href="javascript: void(0);">-->
+      <!--                  <img src="assets/images/brands/dribbble.png" alt="dribbble">-->
+      <!--                  <span>Dribbble</span>-->
+      <!--                </a>-->
+      <!--              </div>-->
+      <!--            </div>-->
+
+      <!--            <div class="row no-gutters">-->
+      <!--              <div class="col">-->
+      <!--                <a class="dropdown-icon-item" href="javascript: void(0);">-->
+      <!--                  <img src="assets/images/brands/dropbox.png" alt="dropbox">-->
+      <!--                  <span>Dropbox</span>-->
+      <!--                </a>-->
+      <!--              </div>-->
+      <!--              <div class="col">-->
+      <!--                <a class="dropdown-icon-item" href="javascript: void(0);">-->
+      <!--                  <img src="assets/images/brands/mail_chimp.png" alt="mail_chimp">-->
+      <!--                  <span>Mail Chimp</span>-->
+      <!--                </a>-->
+      <!--              </div>-->
+      <!--              <div class="col">-->
+      <!--                <a class="dropdown-icon-item" href="javascript: void(0);">-->
+      <!--                  <img src="assets/images/brands/slack.png" alt="slack">-->
+      <!--                  <span>Slack</span>-->
+      <!--                </a>-->
+      <!--              </div>-->
+      <!--            </div>-->
+      <!--          </div>-->
+      <!--        </div>-->
+      <!--      </div>-->
+
+      <!--      <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end py-0">-->
+      <!--        &lt;!&ndash; Ici, vous pouvez ajouter le contenu de votre dropdown de notifications &ndash;&gt;-->
+      <!--        &lt;!&ndash; ... &ndash;&gt;-->
+      <!--      </div>-->
+
+      <div class="dropdown d-none d-lg-inline-block ms-1">
+        <button type="button" class="btn header-item noti-icon" data-toggle="fullscreen" (click)="fullscreen()">
+          <i class="bx bx-fullscreen"></i>
+        </button>
+      </div>
+
+      <div class="dropdown d-inline-block" ngbDropdown>
+        <button (click)="fetchNotifications(utilisateurAuthentifie?.personnel.rhPersonnel)" type="button" class="btn header-item noti-icon" id="page-header-notifications-dropdown" ngbDropdownToggle>
+          <i class="bx bx-bell bx-tada"></i><small class="badge bg-danger">{{ totalNotificationCountUnread  }}</small>
+        </button>
+        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" aria-labelledby="page-header-notifications-dropdown" ngbDropdownMenu>
+          <div class="p-3">
+            <div class="row align-items-center">
+              <div class="col">
+                <h6 class="m-0">{{ 'NOTIFICATIONS' }} </h6>
+              </div>
+            </div>
+          </div>
+          <ngx-simplebar style="position: relative; height: 230px;">
+            <a *ngFor="let notification of allNotifications" [href]="getNotificationLink(notification)" class="text-reset notification-item">
+
+              <!-- Vous devez ajuster le contenu ici en fonction de la structure de vos notifications -->
+              <div class="media">
+                <div class="avatar-xs me-3">
+                  <!-- Vous devez ajuster cette partie en fonction de la structure de vos notifications -->
+                  <span class="avatar-title bg-primary rounded-circle font-size-16">
+                            <i class="mdi mdi-bell"></i>
+                        </span>
+                </div>
+                <div class="media-body">
+                  <h6 class="mt-0 mb-1">{{ notification.type }}</h6>
+                  <div class="font-size-12 text-muted">
+                    <p class="mb-1"> {{ notification.message }}</p>
+                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i>Date: {{ notification.dateEnvoi |date:'dd MMMM yyyy':'?':'fr-FR' }}</p>
+                  </div>
+                </div>
+              </div>
+            </a>
+            <br>
+            <br>
+            <div class="text-center" *ngIf="allNotifications.length == 0">
+              <div>
+                <i style="color: #d9534f; font-size: xxx-large" class='bx bxs-data'></i>
+              </div>
+              <div>
+                <p style="font-size: large; padding-left: 2%; padding-right: 2%">Aucune notification disponible pour le moment!</p>
+              </div>
+            </div>
+          </ngx-simplebar>
+        </div>
+      </div>
+
+
+      <!--      NOTIFICATION ORIGINAL -->
+
+      <!--      <div class="dropdown d-inline-block" ngbDropdown>-->
+      <!--        <button type="button" class="btn header-item noti-icon" id="page-header-notifications-dropdown" ngbDropdownToggle>-->
+      <!--          <i class="bx bx-bell bx-tada"></i><small class="badge bg-danger">{{ notifications.length }}</small>-->
+      <!--        </button>-->
+      <!--        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" aria-labelledby="page-header-notifications-dropdown" ngbDropdownMenu>-->
+      <!--          <div class="p-3">-->
+      <!--            <div class="row align-items-center">-->
+      <!--              <div class="col">-->
+      <!--                <h6 class="m-0">{{ 'NOTIFICATIONS' }} </h6>-->
+      <!--              </div>-->
+      <!--&lt;!&ndash;              <div class="col-auto">&ndash;&gt;-->
+      <!--&lt;!&ndash;                <a href="javascript: void(0);" class="small">{{ 'NOTIFICATIONS.VIEW_ALL' }}</a>&ndash;&gt;-->
+      <!--&lt;!&ndash;              </div>&ndash;&gt;-->
+      <!--            </div>-->
+      <!--          </div>-->
+      <!--          <ngx-simplebar style="position: relative; height: 230px;">-->
+      <!--            <a *ngFor="let notification of notifications" href="javascript: void(0);" class="text-reset notification-item">-->
+      <!--              &lt;!&ndash; Vous devez ajuster le contenu ici en fonction de la structure de vos notifications &ndash;&gt;-->
+      <!--              <div class="media">-->
+      <!--                <div class="avatar-xs me-3">-->
+      <!--                  &lt;!&ndash; Vous devez ajuster cette partie en fonction de la structure de vos notifications &ndash;&gt;-->
+      <!--                  <span class="avatar-title bg-primary rounded-circle font-size-16">-->
+      <!--                    <i class="mdi mdi-bell"></i>-->
+      <!--            </span>-->
+      <!--                </div>-->
+      <!--                <div class="media-body">-->
+      <!--                  <h6 class="mt-0 mb-1">Type de demande :{{ notification.type }}</h6>-->
+      <!--                  <div class="font-size-12 text-muted">-->
+      <!--                    <p class="mb-1"> Message :{{ notification.message }}</p>-->
+      <!--                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i>Date: {{ notification.dateEnvoi |date:'dd MMMM yyyy':'?':'fr-FR' }}</p>-->
+      <!--                  </div>-->
+      <!--                </div>-->
+      <!--              </div>-->
+      <!--            </a>-->
+      <!--            <br>-->
+      <!--            <br>-->
+      <!--            <div class="text-center" *ngIf="notifications.length == 0">-->
+      <!--              <div>-->
+      <!--                <i style="color: #d9534f; font-size: xxx-large" class='bx bxs-data'></i>-->
+      <!--              </div>-->
+      <!--              <div>-->
+      <!--                <p style="font-size: large; padding-left: 2%; padding-right: 2%">Aucune notification disponible pour le moment!</p>-->
+      <!--              </div>-->
+      <!--            </div>-->
+      <!--          </ngx-simplebar>-->
+      <!--&lt;!&ndash;          <div class="p-2 border-top d-grid">&ndash;&gt;-->
+      <!--&lt;!&ndash;            <a class="btn btn-sm btn-link font-size-14 text-center" href="javascript:void(0)">&ndash;&gt;-->
+      <!--&lt;!&ndash;              <i class="mdi mdi-arrow-right-circle me-1"></i> <span key="t-view-more">{{ 'NOTIFICATIONS.LOAD_MORE' }}</span>&ndash;&gt;-->
+      <!--&lt;!&ndash;            </a>&ndash;&gt;-->
+      <!--&lt;!&ndash;          </div>&ndash;&gt;-->
+      <!--        </div>-->
+      <!--      </div>-->
+
+
+      <!--      <div class="dropdown d-inline-block" ngbDropdown>-->
+      <!--        <button type="button" class="btn header-item noti-icon" id="page-header-notifications-dropdown"-->
+      <!--          ngbDropdownToggle>-->
+      <!--          <i class="bx bx-bell bx-tada"></i><small class="badge bg-danger">3</small>-->
+      <!--        </button>-->
+      <!--        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0"-->
+      <!--          aria-labelledby="page-header-notifications-dropdown" ngbDropdownMenu>-->
+      <!--          <div class="p-3">-->
+      <!--            <div class="row align-items-center">-->
+      <!--              <div class="col">-->
+      <!--                <h6 class="m-0">{{ 'NOTIFICATIONS' }} </h6>-->
+      <!--              </div>-->
+      <!--              <div class="col-auto">-->
+      <!--                <a href="javascript: void(0);" class="small">{{ 'NOTIFICATIONS.VIEW_ALL' }}</a>-->
+      <!--              </div>-->
+      <!--            </div>-->
+      <!--          </div>-->
+      <!--          <ngx-simplebar style="position: relative; height: 230px;">-->
+      <!--            <a href="javascript: void(0);" class="text-reset notification-item">-->
+      <!--              <div class="media">-->
+      <!--                <div class="avatar-xs me-3">-->
+      <!--                  <span class="avatar-title bg-primary rounded-circle font-size-16">-->
+      <!--                    <i class="bx bx-cart"></i>-->
+      <!--                  </span>-->
+      <!--                </div>-->
+      <!--                <div class="media-body">-->
+      <!--                  <h6 class="mt-0 mb-1">{{ 'NOTIFICATIONS.FIRST' }}</h6>-->
+      <!--                  <div class="font-size-12 text-muted">-->
+      <!--                    <p class="mb-1">{{ 'NOTIFICATIONS.FIRST.TEXT' }}</p>-->
+      <!--                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i>-->
+      <!--                      {{ 'NOTIFICATIONS.FIRST.TIME' }}</p>-->
+      <!--                  </div>-->
+      <!--                </div>-->
+      <!--              </div>-->
+      <!--            </a>-->
+      <!--            <a href="javascript: void(0);" class="text-reset notification-item">-->
+      <!--              <div class="media">-->
+      <!--                <img src="assets/images/users/avatar-3.jpg" class="me-3 rounded-circle avatar-xs" alt="user-pic">-->
+      <!--                <div class="media-body">-->
+      <!--                  <h6 class="mt-0 mb-1">{{ 'NOTIFICATIONS.SECOND' }}</h6>-->
+      <!--                  <div class="font-size-12 text-muted">-->
+      <!--                    <p class="mb-1">{{ 'NOTIFICATIONS.SECOND.TEXT' }}</p>-->
+      <!--                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i>{{ 'NOTIFICATIONS.SECOND.TIME' |-->
+      <!--                      translate}}</p>-->
+      <!--                  </div>-->
+      <!--                </div>-->
+      <!--              </div>-->
+      <!--            </a>-->
+      <!--            <a href="javascript: void(0);" class="text-reset notification-item">-->
+      <!--              <div class="media">-->
+      <!--                <div class="avatar-xs me-3">-->
+      <!--                  <span class="avatar-title bg-success rounded-circle font-size-16">-->
+      <!--                    <i class="bx bx-badge-check"></i>-->
+      <!--                  </span>-->
+      <!--                </div>-->
+      <!--                <div class="media-body">-->
+      <!--                  <h6 class="mt-0 mb-1">{{ 'NOTIFICATIONS.THIRD' }}</h6>-->
+      <!--                  <div class="font-size-12 text-muted">-->
+      <!--                    <p class="mb-1">{{ 'NOTIFICATIONS.THIRD.TEXT' }}</p>-->
+      <!--                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i>{{ 'NOTIFICATIONS.THIRD.TIME' |-->
+      <!--                      translate}}</p>-->
+      <!--                  </div>-->
+      <!--                </div>-->
+      <!--              </div>-->
+      <!--            </a>-->
+      <!--            <a href="javascript: void(0);" class="text-reset notification-item">-->
+      <!--              <div class="media">-->
+      <!--                <img src="assets/images/users/avatar-4.jpg" class="me-3 rounded-circle avatar-xs" alt="user-pic">-->
+      <!--                <div class="media-body">-->
+      <!--                  <h6 class="mt-0 mb-1">{{ 'NOTIFICATIONS.FOUR' }}</h6>-->
+      <!--                  <div class="font-size-12 text-muted">-->
+      <!--                    <p class="mb-1">{{ 'NOTIFICATIONS.FOUR.TEXT' }}</p>-->
+      <!--                    <p class="mb-0"><i class="mdi mdi-clock-outline"></i>{{ 'NOTIFICATIONS.FOUR.TIME' |-->
+      <!--                      translate}}</p>-->
+      <!--                  </div>-->
+      <!--                </div>-->
+      <!--              </div>-->
+      <!--            </a>-->
+      <!--          </ngx-simplebar>-->
+      <!--          <div class="p-2 border-top d-grid">-->
+      <!--            <a class="btn btn-sm btn-link font-size-14 text-center" href="javascript:void(0)">-->
+      <!--              <i class="mdi mdi-arrow-right-circle me-1"></i> <span key="t-view-more">{{-->
+      <!--                'NOTIFICATIONS.LOAD_MORE' }}</span>-->
+      <!--            </a>-->
+      <!--          </div>-->
+      <!--        </div>-->
+      <!--      </div>-->
+
+      <div class="dropdown d-inline-block" style="top: 50%;">
+
+      </div>
+
+      <div class="dropdown d-inline-block" ngbDropdown>
+        <button type="button" class="btn header-item" ngbDropdownToggle id="page-header-user-dropdown">
+
+          <img *ngIf="profilSrc"  class="rounded-circle font-size-14 avatar-user-profil avatar-sm" [src]="profilSrc" alt="Avatar">
+
+          <span *ngIf="!profilSrc"  class="avatar-user-profil-title rounded-circle  text-white font-size-14 avatar-user-profil avatar-sm">
+            {{  requerant.prenom[0] }}  {{requerant.nom[0]}}
+          </span>
+
+          <!--          <span *ngIf="utilisateurAuthentifie" class="d-none d-xl-inline-block ms-1">{{utilisateurAuthentifie?.personnel?.prenom }} {{utilisateurAuthentifie?.personnel?.nom }} </span>-->
+          <span *ngIf=" requerant" class="d-none d-xl-inline-block ms-1">{{requerant.prenom }} {{requerant.nom }} </span>
+          <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
+        </button>
+        <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+          <!-- item-->
+          <a class="dropdown-item" routerLink="/moncomptepedagogie/profil"><i
+            class="bx bx-user font-size-16 align-middle me-1"></i>
+            Profil </a>
+          <a *ngIf="aPermission('pedagogie_voir_utilisateur')" class="dropdown-item" routerLink="/utilisateurPedagogie"><i
+            class="bx bx-user font-size-16 align-middle me-1"></i>
+            Utilisateur </a>
+          <a class="dropdown-item" routerLink="/motdepasseoublie-pedagogie">
+            <i class="bx bx-key font-size-16 align-middle me-1"></i>
+            Changer le Mot de Passe
+          </a>
+
+          <!--a class="dropdown-item" href="javascript: void(0);"><i
+              class="bx bx-wallet font-size-16 align-middle me-1"></i>{{ 'LOGIN.MY_WALLET' }}</a-->
+          <!--          <a class="dropdown-item d-block" routerLink="/moncompte/parametre">-->
+          <!--            &lt;!&ndash;span class="badge bg-success float-end">11</span&ndash;&gt;<i-->
+          <!--            class="bx bx-wrench font-size-16 align-middle me-1"></i>-->
+          <!--            Paramètres </a>-->
+          <!--          <a class="dropdown-item" routerLink="/moncompte/historique"><i-->
+          <!--            class="bx bx-lock-open font-size-16 align-middle me-1"></i>-->
+          <!--            Historique </a>-->
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item text-danger" (click)="deconnexion()"><i
+            class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i>
+            Déconnexion</a>
+        </div>
+      </div>
+
+      <ng-container *ngIf="utilisateurAuthentifieState$ | async as reponse" [ngSwitch]="reponse.dataState">
+
+        <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+          <!-- Ne rien afficher ici pour éviter le message de chargement -->
+        </ng-container>
+
+        <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+          <!-- Gérer les erreurs ici si nécessaire -->
+        </ng-container>
+
+        <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+          <!-- Le contenu que vous souhaitez afficher lorsque l'état est CHARGE -->
+        </ng-container>
+
+      </ng-container>
+
+
+
+      <!--div class="dropdown d-inline-block">
+          <button type="button" class="btn header-item noti-icon right-bar-toggle" (click)="toggleRightSidebar()">
+            <i class="bx bx-cog bx-spin"></i>
+          </button>
+        </div-->
+
+    </div>
+  </div>
+</header>

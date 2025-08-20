@@ -1,0 +1,434 @@
+[
+  {
+    "id": 1,
+    "designation": "archive",
+    "slug": "1676907791392",
+    "parentSlug": null,
+    "dateCreation": null,
+    "personnelCreateurDossier": null,
+    "personnelResponsable": null
+  },
+  {
+    "id": 39,
+    "designation": "constance",
+    "slug": "1676907968597",
+    "parentSlug": null,
+    "dateCreation": null,
+    "personnelCreateurDossier": {
+      "id": 4,
+      "nom": "ODJOUGBELE",
+      "prenom": "Constance",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 26,
+        "designation": "Rédacteur",
+        "service": {
+          "id": 18,
+          "sigle": "SR",
+          "designation": "Service Rédaction ",
+          "secretariat": false,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    },
+    "personnelResponsable": {
+      "id": 6,
+      "nom": "AZE",
+      "prenom": "charles",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 28,
+        "designation": "Graphiste",
+        "service": {
+          "id": 18,
+          "sigle": "SR",
+          "designation": "Service Rédaction ",
+          "secretariat": false,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    }
+  },
+  {
+    "id": 43,
+    "designation": "gerome",
+    "slug": "1676911664015",
+    "parentSlug": null,
+    "dateCreation": null,
+    "personnelCreateurDossier": {
+      "id": 4,
+      "nom": "ODJOUGBELE",
+      "prenom": "Constance",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 26,
+        "designation": "Rédacteur",
+        "service": {
+          "id": 18,
+          "sigle": "SR",
+          "designation": "Service Rédaction ",
+          "secretariat": false,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    },
+    "personnelResponsable": {
+      "id": 6,
+      "nom": "AZE",
+      "prenom": "charles",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 28,
+        "designation": "Graphiste",
+        "service": {
+          "id": 18,
+          "sigle": "SR",
+          "designation": "Service Rédaction ",
+          "secretariat": false,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    }
+  },
+  {
+    "id": 46,
+    "designation": "tny",
+    "slug": "1677164983749",
+    "parentSlug": null,
+    "dateCreation": null,
+    "personnelCreateurDossier": {
+      "id": 1,
+      "nom": "Admin",
+      "prenom": "Jil-Ms",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 1,
+        "designation": "Administrateur Système",
+        "service": {
+          "id": 1,
+          "sigle": "AS",
+          "designation": "Administration Système",
+          "secretariat": true,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    },
+    "personnelResponsable": {
+      "id": 1,
+      "nom": "Admin",
+      "prenom": "Jil-Ms",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 1,
+        "designation": "Administrateur Système",
+        "service": {
+          "id": 1,
+          "sigle": "AS",
+          "designation": "Administration Système",
+          "secretariat": true,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    }
+  },
+  {
+    "id": 47,
+    "designation": "joel",
+    "slug": "22",
+    "parentSlug": null,
+    "dateCreation": null,
+    "personnelCreateurDossier": {
+      "id": 1,
+      "nom": "Admin",
+      "prenom": "Jil-Ms",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 1,
+        "designation": "Administrateur Système",
+        "service": {
+          "id": 1,
+          "sigle": "AS",
+          "designation": "Administration Système",
+          "secretariat": true,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    },
+    "personnelResponsable": {
+      "id": 1,
+      "nom": "Admin",
+      "prenom": "Jil-Ms",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 1,
+        "designation": "Administrateur Système",
+        "service": {
+          "id": 1,
+          "sigle": "AS",
+          "designation": "Administration Système",
+          "secretariat": true,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    }
+  },
+  {
+    "id": 48,
+    "designation": "jo",
+    "slug": null,
+    "parentSlug": null,
+    "dateCreation": null,
+    "personnelCreateurDossier": {
+      "id": 1,
+      "nom": "Admin",
+      "prenom": "Jil-Ms",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 1,
+        "designation": "Administrateur Système",
+        "service": {
+          "id": 1,
+          "sigle": "AS",
+          "designation": "Administration Système",
+          "secretariat": true,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    },
+    "personnelResponsable": {
+      "id": 2,
+      "nom": "NOUMONZOUNDE",
+      "prenom": "Jildas",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 2,
+        "designation": "Directeur Général",
+        "service": {
+          "id": 2,
+          "sigle": "DG",
+          "designation": "Direction Générale",
+          "secretariat": true,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    }
+  },
+  {
+    "id": 50,
+    "designation": "shintaro",
+    "slug": "22",
+    "parentSlug": null,
+    "dateCreation": null,
+    "personnelCreateurDossier": {
+      "id": 1,
+      "nom": "Admin",
+      "prenom": "Jil-Ms",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 1,
+        "designation": "Administrateur Système",
+        "service": {
+          "id": 1,
+          "sigle": "AS",
+          "designation": "Administration Système",
+          "secretariat": true,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    },
+    "personnelResponsable": {
+      "id": 1,
+      "nom": "Admin",
+      "prenom": "Jil-Ms",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 1,
+        "designation": "Administrateur Système",
+        "service": {
+          "id": 1,
+          "sigle": "AS",
+          "designation": "Administration Système",
+          "secretariat": true,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    }
+  },
+  {
+    "id": 51,
+    "designation": "poli",
+    "slug": "22",
+    "parentSlug": null,
+    "dateCreation": null,
+    "personnelCreateurDossier": {
+      "id": 1,
+      "nom": "Admin",
+      "prenom": "Jil-Ms",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 1,
+        "designation": "Administrateur Système",
+        "service": {
+          "id": 1,
+          "sigle": "AS",
+          "designation": "Administration Système",
+          "secretariat": true,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    },
+    "personnelResponsable": {
+      "id": 1,
+      "nom": "Admin",
+      "prenom": "Jil-Ms",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 1,
+        "designation": "Administrateur Système",
+        "service": {
+          "id": 1,
+          "sigle": "AS",
+          "designation": "Administration Système",
+          "secretariat": true,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    }
+  },
+  {
+    "id": 52,
+    "designation": "gojo",
+    "slug": "66",
+    "parentSlug": null,
+    "dateCreation": null,
+    "personnelCreateurDossier": {
+      "id": 1,
+      "nom": "Admin",
+      "prenom": "Jil-Ms",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 1,
+        "designation": "Administrateur Système",
+        "service": {
+          "id": 1,
+          "sigle": "AS",
+          "designation": "Administration Système",
+          "secretariat": true,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    },
+    "personnelResponsable": {
+      "id": 1,
+      "nom": "Admin",
+      "prenom": "Jil-Ms",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 1,
+        "designation": "Administrateur Système",
+        "service": {
+          "id": 1,
+          "sigle": "AS",
+          "designation": "Administration Système",
+          "secretariat": true,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    }
+  },
+  {
+    "id": 53,
+    "designation": "jim",
+    "slug": "44",
+    "parentSlug": null,
+    "dateCreation": null,
+    "personnelCreateurDossier": {
+      "id": 1,
+      "nom": "Admin",
+      "prenom": "Jil-Ms",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 1,
+        "designation": "Administrateur Système",
+        "service": {
+          "id": 1,
+          "sigle": "AS",
+          "designation": "Administration Système",
+          "secretariat": true,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    },
+    "personnelResponsable": {
+      "id": 1,
+      "nom": "Admin",
+      "prenom": "Jil-Ms",
+      "dateDebauchage": null,
+      "debaucher": false,
+      "poste": {
+        "id": 1,
+        "designation": "Administrateur Système",
+        "service": {
+          "id": 1,
+          "sigle": "AS",
+          "designation": "Administration Système",
+          "secretariat": true,
+          "service": null
+        },
+        "poste": null
+      },
+      "nomPrenom": null
+    }
+  }
+]

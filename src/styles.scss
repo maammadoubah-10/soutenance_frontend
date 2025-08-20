@@ -1,0 +1,132 @@
+/* Importing Bootstrap SCSS file. */
+@import 'styles-onip.scss';
+
+/* You can add global styles to this file, and also import other style files */
+.modal-holder {
+  animation-name: example;
+  animation-duration: 0.3s;
+}
+
+@keyframes example {
+  0% {
+    transform: scale(0.5)
+  }
+
+  100% {
+    transform: scale(1)
+  }
+}
+
+.carousel-item {
+  transition: opacity 0.7s ease !important;
+  position: absolute !important;
+  display: block !important;
+  opacity: 0;
+}
+
+.carousel-item.active {
+  position: relative !important;
+  opacity: 1;
+}
+// regular style toast
+
+
+/* --------- global design tokens --------- */
+:root{
+  --bg:#f6f9ff;     /* fond type Socium */
+  --panel:#ffffff;
+  --primary:#1f6fff;
+  --muted:#6b7280;
+  --border:#e6eaf0;
+  --sidebar-text:#0b1f44;
+}
+
+html,body{ height:100%; }
+body{ margin:0; background:var(--bg); color:var(--sidebar-text); }
+
+.shell{ display:grid; grid-template-columns:260px 1fr; min-height:100vh; }
+.main{ display:flex; flex-direction:column; min-width:0; background:var(--bg); }  /* <— fond page */
+.page{ padding:16px 20px 24px; background:transparent; }                          /* <— pas de blanc ici */
+/* ===== Socium-like blue/white theme ===== */
+:root{
+  --sj-primary:#2563eb;      /* bleu */
+  --sj-primary-600:#1d4ed8;
+  --sj-primary-50:#eff6ff;
+  --sj-bg:#ffffff;
+  --sj-text:#0f172a;         /* gris très foncé */
+  --sj-muted:#64748b;        /* gris moyen */
+  --sj-border:#e2e8f0;       /* gris clair */
+  --sj-row:#f8fafc;
+}
+
+.sj-btn-primary{
+  background:var(--sj-primary);
+  border:1px solid var(--sj-primary);
+  color:#fff;
+  border-radius:.6rem;
+  padding:.55rem .9rem;
+  font-weight:600;
+}
+.sj-btn-primary:hover{ background:var(--sj-primary-600); border-color:var(--sj-primary-600); }
+
+.sj-card{
+  background:var(--sj-bg);
+  border:1px solid var(--sj-border);
+  border-radius:1rem;
+  box-shadow:0 2px 10px rgba(15,23,42,.06);
+}
+
+.sj-input{
+  border:1px solid var(--sj-border);
+  border-radius:.6rem;
+  padding:.55rem .8rem;
+  width:100%;
+}
+.sj-input:focus{
+  outline:none;
+  border-color:var(--sj-primary);
+  box-shadow:0 0 0 3px color-mix(in srgb, var(--sj-primary) 20%, transparent);
+}
+
+.sj-table{
+  width:100%;
+  border-collapse:separate;
+  border-spacing:0;
+}
+.sj-table thead th{
+  position:sticky; top:0;
+  background:#fff;
+  z-index:1;
+  font-weight:600;
+  color:var(--sj-muted);
+  border-bottom:1px solid var(--sj-border);
+  padding:.75rem .75rem;
+}
+.sj-table tbody td{
+  border-bottom:1px solid var(--sj-border);
+  padding:.75rem .75rem;
+}
+.sj-table tbody tr:hover{ background:var(--sj-row); }
+
+.sj-badge{
+  background:var(--sj-primary-50);
+  color:var(--sj-primary-600);
+  border:1px solid var(--sj-border);
+  border-radius:999px;
+  font-size:.8rem;
+  padding:.25rem .6rem;
+  font-weight:600;
+}
+
+.sj-toolbar{
+  display:flex; gap:.75rem; align-items:center; flex-wrap:wrap;
+}
+.sj-toolbar .spacer{ flex:1; }
+
+.sj-search{
+  position:relative; min-width:260px; flex:1;
+}
+.sj-search i{
+  position:absolute; left:.6rem; top:50%; transform:translateY(-50%); color:var(--sj-muted);
+}
+.sj-search input{ padding-left:2rem; }

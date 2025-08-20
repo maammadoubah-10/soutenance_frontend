@@ -1,0 +1,105 @@
+.header {
+  height: 64px;
+  background: #fff;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 0 20px;
+  position: sticky;
+  top: 0;
+  z-index: 30;
+
+  .actions {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .user {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 999px;
+      background: #ddd;
+    }
+    .name {
+      font-weight: 600;
+    }
+    .role {
+      color: var(--muted);
+    }
+  }
+
+  /* Bouton déconnexion */
+  .btn-logout {
+    background: #ed1c24;
+    border: none;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    cursor: pointer;
+    font-size: 14px;
+
+    &:hover {
+      background: #c5121a;
+    }
+  }
+}
+
+/* Sélecteur de langue */
+.custom-select {
+  position: relative;
+  width: 150px;
+
+  .select-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border: 1px solid #ccc;
+    cursor: pointer;
+    background: white;
+    width: 100%;
+  }
+
+  .select-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background: white;
+    border: 1px solid #ccc;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    z-index: 100;
+
+    li {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 5px 10px;
+      cursor: pointer;
+
+      &:hover {
+        background: #f0f0f0;
+      }
+    }
+  }
+
+  .flag {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    object-fit: cover;
+  }
+}

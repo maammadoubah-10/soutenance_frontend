@@ -1,0 +1,176 @@
+.background-image {
+  position: relative;
+  background-image: url('/assets/peda.jpg');
+  background-size: cover;
+  background-position: center;
+  background-color: rgba(0, 0, 0, 0.5); /* Couleur de fond avec opacité */
+  height: 100vh;
+  overflow: hidden;
+
+}
+
+.background-image::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5); /* Couleur de fond avec opacité */
+}
+
+
+.container-fluid {
+  position: relative; /* Permet de positionner les enfants par rapport à ce conteneur */
+  z-index: 1; /* Assure que les enfants sont empilés au-dessus de l'image de fond */
+  overflow: auto;
+}
+
+/// CALL BOUTON WHATSAPP AUSSI
+.contact-buttons {
+  position: fixed;
+  bottom: 40px;
+  right: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000; /* Assure que les boutons sont au-dessus du contenu */
+}
+
+.call-button, .whatsapp-button {
+  background-color: #ff0008; /* Couleur des boutons */
+  border-radius: 25px; /* Forme ovale */
+  padding: 10px 20px; /* Espacement intérieur pour le texte et l'icône */
+  display: flex;
+  flex-direction: column; /* Aligne les éléments en colonne */
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ombre */
+  color: white; /* Couleur du texte */
+  margin-right: 10px; /* Espacement entre les boutons */
+}
+
+.call-button a, .whatsapp-button a {
+  text-decoration: none;
+  color: white; /* Couleur du texte */
+  display: flex;
+  flex-direction: column; /* Aligne les éléments en colonne */
+  align-items: center;
+}
+
+.label {
+  font-size: 12px; /* Taille du texte "Assistance" */
+  margin-bottom: 5px; /* Espacement sous le texte "Assistance" */
+}
+
+.phone-info {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1; /* Permet au numéro de s'étirer pour occuper tout l'espace disponible */
+}
+
+.mdi {
+  font-size: 24px; /* Taille de l'icône */
+  margin-right: 10px; /* Espacement entre l'icône et le texte */
+}
+
+.whatsapp-button {
+  background-color: #25d366; /* Couleur WhatsApp */
+  border-radius: 50%; /* Pour rendre le bouton rond */
+  padding: 15px; /* Taille du bouton */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Ombre */
+}
+
+.whatsapp-button a {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  color: white;
+  font-size: 30px; /* Taille de l'icône */
+}
+
+@media (max-width: 600px) {
+  .contact-buttons {
+    bottom: 20px; /* Positionnement pour les écrans mobiles */
+  }
+}
+
+
+////////////
+.button-container {
+  display: none; /* Masque les boutons par défaut */
+}
+
+.action-buttonmob {
+  padding: 10px 20px;
+  background-color: #ff0008;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  margin: 5px; /* Ajoute un petit espacement entre les boutons */
+}
+
+.action-buttonmob a {
+  color: white;
+  text-decoration: none;
+}
+
+/* Styles pour les écrans de petite taille */
+@media (max-width: 600px) {
+  .button-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+  }
+
+  .action-buttonmob {
+    width: 100%;
+    margin: 10px 0; /* Ajoute un espacement vertical entre les boutons */
+  }
+}
+
+
+///////////
+.desktop-button-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.action-button {
+  padding: 10px 20px;
+  background-color: #ff0008;
+  color: white;
+  text-decoration: none;
+  border-radius: 5px;
+  font-size: 16px;
+  transition: background-color 0.3s ease;
+  margin: 5px; /* Ajouter un petit espacement entre les boutons */
+}
+
+.action-button a {
+  color: white;
+  text-decoration: none;
+}
+
+/* Masquer sur les écrans de petite taille (mobiles) */
+@media (max-width: 600px) {
+  .desktop-button-container {
+    display: none; /* Masquer sur mobile */
+  }
+}
+
+/* Style original */
+div[style=" display: flex; align-items: center; justify-content: center; text-align: center;"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}

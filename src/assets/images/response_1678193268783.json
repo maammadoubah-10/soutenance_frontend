@@ -1,0 +1,705 @@
+{
+  "content": [
+    {
+      "id": 39,
+      "montant": null,
+      "taux": 10,
+      "typeImpactSalarial": {
+        "id": 18,
+        "designation": "Indemnité de résidence",
+        "type": "PRIME"
+      },
+      "categories": [
+        {
+          "id": 14,
+          "categorie": "C4"
+        },
+        {
+          "id": 2,
+          "categorie": "E2"
+        },
+        {
+          "id": 15,
+          "categorie": "C5"
+        },
+        {
+          "id": 3,
+          "categorie": "E3"
+        },
+        {
+          "id": 4,
+          "categorie": "E4"
+        },
+        {
+          "id": 12,
+          "categorie": "C2"
+        },
+        {
+          "id": 1,
+          "categorie": "E1"
+        },
+        {
+          "id": 5,
+          "categorie": "E5"
+        },
+        {
+          "id": 10,
+          "categorie": "M4"
+        },
+        {
+          "id": 11,
+          "categorie": "C1"
+        },
+        {
+          "id": 9,
+          "categorie": "M3"
+        },
+        {
+          "id": 6,
+          "categorie": "E6"
+        },
+        {
+          "id": 7,
+          "categorie": "M1"
+        },
+        {
+          "id": 13,
+          "categorie": "C3"
+        },
+        {
+          "id": 8,
+          "categorie": "M2"
+        }
+      ],
+      "postes": []
+    },
+    {
+      "id": 38,
+      "montant": 5000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 9,
+        "designation": "Prime d'habillement",
+        "type": "PRIME"
+      },
+      "categories": [],
+      "postes": [
+        {
+          "id": 48,
+          "designation": "Agent Commercial Chargé(e) de Clientèle",
+          "service": {
+            "id": 9,
+            "sigle": "SC",
+            "designation": "Service Commercial"
+          }
+        },
+        {
+          "id": 42,
+          "designation": "Chef Section Informatique du Commercial",
+          "service": {
+            "id": 9,
+            "sigle": "SC",
+            "designation": "Service Commercial"
+          }
+        },
+        {
+          "id": 46,
+          "designation": "Chef Division Commercial Imprimerie",
+          "service": {
+            "id": 9,
+            "sigle": "SC",
+            "designation": "Service Commercial"
+          }
+        },
+        {
+          "id": 40,
+          "designation": "Chef Service Commercial",
+          "service": {
+            "id": 9,
+            "sigle": "SC",
+            "designation": "Service Commercial"
+          }
+        },
+        {
+          "id": 47,
+          "designation": "Chef Division Commercial du Journal",
+          "service": {
+            "id": 9,
+            "sigle": "SC",
+            "designation": "Service Commercial"
+          }
+        },
+        {
+          "id": 49,
+          "designation": "Employé au Service Commercial",
+          "service": {
+            "id": 9,
+            "sigle": "SC",
+            "designation": "Service Commercial"
+          }
+        },
+        {
+          "id": 53,
+          "designation": "Agent Commercial Chargé(e) du Suivi des Contrats",
+          "service": {
+            "id": 9,
+            "sigle": "SC",
+            "designation": "Service Commercial"
+          }
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "montant": null,
+      "taux": 3.6,
+      "typeImpactSalarial": {
+        "id": 16,
+        "designation": "Cotisation CNSS",
+        "type": "PRELEVEMENT"
+      },
+      "categories": [
+        {
+          "id": 14,
+          "categorie": "C4"
+        },
+        {
+          "id": 2,
+          "categorie": "E2"
+        },
+        {
+          "id": 15,
+          "categorie": "C5"
+        },
+        {
+          "id": 3,
+          "categorie": "E3"
+        },
+        {
+          "id": 4,
+          "categorie": "E4"
+        },
+        {
+          "id": 12,
+          "categorie": "C2"
+        },
+        {
+          "id": 1,
+          "categorie": "E1"
+        },
+        {
+          "id": 5,
+          "categorie": "E5"
+        },
+        {
+          "id": 10,
+          "categorie": "M4"
+        },
+        {
+          "id": 11,
+          "categorie": "C1"
+        },
+        {
+          "id": 9,
+          "categorie": "M3"
+        },
+        {
+          "id": 6,
+          "categorie": "E6"
+        },
+        {
+          "id": 7,
+          "categorie": "M1"
+        },
+        {
+          "id": 13,
+          "categorie": "C3"
+        },
+        {
+          "id": 8,
+          "categorie": "M2"
+        }
+      ],
+      "postes": []
+    },
+    {
+      "id": 33,
+      "montant": 10000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 13,
+        "designation": "Prime de recouvrement",
+        "type": "PRIME"
+      },
+      "categories": [],
+      "postes": [
+        {
+          "id": 39,
+          "designation": "Agent recouvreur",
+          "service": {
+            "id": 8,
+            "sigle": "SFC",
+            "designation": "Service Financier et Comptable"
+          }
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "montant": 6000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 12,
+        "designation": "Prime de risque (saturnisme)",
+        "type": "PRIME"
+      },
+      "categories": [
+        {
+          "id": 14,
+          "categorie": "C4"
+        },
+        {
+          "id": 2,
+          "categorie": "E2"
+        },
+        {
+          "id": 15,
+          "categorie": "C5"
+        },
+        {
+          "id": 3,
+          "categorie": "E3"
+        },
+        {
+          "id": 4,
+          "categorie": "E4"
+        },
+        {
+          "id": 12,
+          "categorie": "C2"
+        },
+        {
+          "id": 1,
+          "categorie": "E1"
+        },
+        {
+          "id": 5,
+          "categorie": "E5"
+        },
+        {
+          "id": 10,
+          "categorie": "M4"
+        },
+        {
+          "id": 11,
+          "categorie": "C1"
+        },
+        {
+          "id": 9,
+          "categorie": "M3"
+        },
+        {
+          "id": 6,
+          "categorie": "E6"
+        },
+        {
+          "id": 7,
+          "categorie": "M1"
+        },
+        {
+          "id": 13,
+          "categorie": "C3"
+        },
+        {
+          "id": 8,
+          "categorie": "M2"
+        }
+      ],
+      "postes": []
+    },
+    {
+      "id": 31,
+      "montant": 6000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 11,
+        "designation": "Prime de technicité",
+        "type": "PRIME"
+      },
+      "categories": [
+        {
+          "id": 1,
+          "categorie": "E1"
+        },
+        {
+          "id": 5,
+          "categorie": "E5"
+        },
+        {
+          "id": 2,
+          "categorie": "E2"
+        },
+        {
+          "id": 6,
+          "categorie": "E6"
+        },
+        {
+          "id": 3,
+          "categorie": "E3"
+        },
+        {
+          "id": 4,
+          "categorie": "E4"
+        }
+      ],
+      "postes": []
+    },
+    {
+      "id": 30,
+      "montant": 8000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 11,
+        "designation": "Prime de technicité",
+        "type": "PRIME"
+      },
+      "categories": [
+        {
+          "id": 10,
+          "categorie": "M4"
+        },
+        {
+          "id": 9,
+          "categorie": "M3"
+        },
+        {
+          "id": 7,
+          "categorie": "M1"
+        },
+        {
+          "id": 8,
+          "categorie": "M2"
+        }
+      ],
+      "postes": []
+    },
+    {
+      "id": 29,
+      "montant": 10000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 11,
+        "designation": "Prime de technicité",
+        "type": "PRIME"
+      },
+      "categories": [
+        {
+          "id": 14,
+          "categorie": "C4"
+        },
+        {
+          "id": 11,
+          "categorie": "C1"
+        },
+        {
+          "id": 15,
+          "categorie": "C5"
+        },
+        {
+          "id": 13,
+          "categorie": "C3"
+        },
+        {
+          "id": 12,
+          "categorie": "C2"
+        }
+      ],
+      "postes": []
+    },
+    {
+      "id": 28,
+      "montant": 20000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 10,
+        "designation": "Prime de tenue de caisse",
+        "type": "PRIME"
+      },
+      "categories": [],
+      "postes": [
+        {
+          "id": 38,
+          "designation": "Caissière",
+          "service": {
+            "id": 8,
+            "sigle": "SFC",
+            "designation": "Service Financier et Comptable"
+          }
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "montant": 5000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 9,
+        "designation": "Prime d'habillement",
+        "type": "PRIME"
+      },
+      "categories": [],
+      "postes": []
+    },
+    {
+      "id": 26,
+      "montant": 10000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 8,
+        "designation": "Prime de téléphone",
+        "type": "PRIME"
+      },
+      "categories": [],
+      "postes": []
+    },
+    {
+      "id": 25,
+      "montant": 20000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 8,
+        "designation": "Prime de téléphone",
+        "type": "PRIME"
+      },
+      "categories": [],
+      "postes": [
+        {
+          "id": 16,
+          "designation": "Directeur de l'imprimerie",
+          "service": {
+            "id": 4,
+            "sigle": "DI",
+            "designation": "Direction de l'Imprimerie"
+          }
+        },
+        {
+          "id": 4,
+          "designation": "Directeur de Publication",
+          "service": {
+            "id": 3,
+            "sigle": "DP",
+            "designation": "Direction de Publication"
+          }
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "montant": 40000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 8,
+        "designation": "Prime de téléphone",
+        "type": "PRIME"
+      },
+      "categories": [],
+      "postes": []
+    },
+    {
+      "id": 23,
+      "montant": 3000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 6,
+        "designation": "Prime d'endurance pour travaux de nuit",
+        "type": "PRIME"
+      },
+      "categories": [],
+      "postes": []
+    },
+    {
+      "id": 22,
+      "montant": 5000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 6,
+        "designation": "Prime d'endurance pour travaux de nuit",
+        "type": "PRIME"
+      },
+      "categories": [],
+      "postes": [
+        {
+          "id": 18,
+          "designation": "Chef Section Offset et Typo",
+          "service": {
+            "id": 11,
+            "sigle": "SETP",
+            "designation": "Service Etudes Techniques et Production"
+          }
+        }
+      ]
+    },
+    {
+      "id": 21,
+      "montant": 20000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 5,
+        "designation": "Prime d'amortissement et d'entretien de véhicules",
+        "type": "PRIME"
+      },
+      "categories": [],
+      "postes": [
+        {
+          "id": 4,
+          "designation": "Directeur de Publication",
+          "service": {
+            "id": 3,
+            "sigle": "DP",
+            "designation": "Direction de Publication"
+          }
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "montant": 15000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 4,
+        "designation": "Prime d'électricité et d'eau",
+        "type": "PRIME"
+      },
+      "categories": [],
+      "postes": [
+        {
+          "id": 16,
+          "designation": "Directeur de l'imprimerie",
+          "service": {
+            "id": 4,
+            "sigle": "DI",
+            "designation": "Direction de l'Imprimerie"
+          }
+        },
+        {
+          "id": 4,
+          "designation": "Directeur de Publication",
+          "service": {
+            "id": 3,
+            "sigle": "DP",
+            "designation": "Direction de Publication"
+          }
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "montant": 20000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 4,
+        "designation": "Prime d'électricité et d'eau",
+        "type": "PRIME"
+      },
+      "categories": [],
+      "postes": [
+        {
+          "id": 2,
+          "designation": "Directeur Général",
+          "service": {
+            "id": 2,
+            "sigle": "DG",
+            "designation": "Direction Générale"
+          }
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "montant": 8000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 3,
+        "designation": "Prime de logement",
+        "type": "PRIME"
+      },
+      "categories": [
+        {
+          "id": 1,
+          "categorie": "E1"
+        },
+        {
+          "id": 2,
+          "categorie": "E2"
+        },
+        {
+          "id": 3,
+          "categorie": "E3"
+        },
+        {
+          "id": 6,
+          "categorie": "E6"
+        },
+        {
+          "id": 4,
+          "categorie": "E4"
+        }
+      ],
+      "postes": []
+    },
+    {
+      "id": 17,
+      "montant": 10000,
+      "taux": null,
+      "typeImpactSalarial": {
+        "id": 3,
+        "designation": "Prime de logement",
+        "type": "PRIME"
+      },
+      "categories": [
+        {
+          "id": 10,
+          "categorie": "M4"
+        },
+        {
+          "id": 9,
+          "categorie": "M3"
+        },
+        {
+          "id": 7,
+          "categorie": "M1"
+        },
+        {
+          "id": 8,
+          "categorie": "M2"
+        }
+      ],
+      "postes": []
+    }
+  ],
+  "pageable": {
+    "sort": {
+      "empty": false,
+      "sorted": true,
+      "unsorted": false
+    },
+    "offset": 0,
+    "pageNumber": 0,
+    "pageSize": 20,
+    "paged": true,
+    "unpaged": false
+  },
+  "totalPages": 2,
+  "totalElements": 36,
+  "last": false,
+  "size": 20,
+  "number": 0,
+  "sort": {
+    "empty": false,
+    "sorted": true,
+    "unsorted": false
+  },
+  "first": true,
+  "numberOfElements": 20,
+  "empty": false
+}

@@ -1,0 +1,65 @@
+<div class="sj-card p-3 p-md-4">
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h4 class="m-0" style="color:var(--sj-text)">
+        Permissions du rôle <span class="text-primary" *ngIf="role">— {{ role!.nom }}</span>
+      </h4>
+      <div class="text-muted small">Déplace les permissions entre “Disponibles” et “Assignées”.</div>
+    </div>
+    <a class="btn btn-outline-secondary" [routerLink]="['/espacedetravail/roles']">Retour</a>
+  </div>
+
+  <div class="row g-3">
+    <!-- Col gauche -->
+    <div class="col-12 col-xl-5">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <div class="fw-semibold">Disponibles</div>
+        <div class="sj-search" style="max-width:280px">
+          <i class="bx bx-search"></i>
+          <input class="sj-input" placeholder="Filtrer…" [(ngModel)]="qLeft" />
+        </div>
+      </div>
+
+      <div class="border rounded-3" style="max-height:380px; overflow:auto">
+        <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                style="border:0; border-bottom:1px solid var(--sj-border);"
+                *ngFor="let p of left" (click)="moveToRight(p)">
+          <span><i class="bx bx-lock-alt me-2 text-muted"></i>{{ p.code }}</span>
+          <i class="bx bx-chevron-right text-primary"></i>
+        </button>
+        <div class="p-3 text-muted" *ngIf="left.length===0">Aucun résultat</div>
+      </div>
+    </div>
+
+    <div class="col-12 col-xl-2 d-flex justify-content-center align-items-center">
+      <i class="bx bx-transfer-alt fs-1 text-secondary"></i>
+    </div>
+
+    <!-- Col droite -->
+    <div class="col-12 col-xl-5">
+      <div class="d-flex align-items-center justify-content-between mb-2">
+        <div class="fw-semibold">Assignées <span class="sj-badge">{{ right.length }}</span></div>
+        <div class="sj-search" style="max-width:280px">
+          <i class="bx bx-search"></i>
+          <input class="sj-input" placeholder="Filtrer…" [(ngModel)]="qRight" />
+        </div>
+      </div>
+
+      <div class="border rounded-3" style="max-height:380px; overflow:auto">
+        <button class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                style="border:0; border-bottom:1px solid var(--sj-border);"
+                *ngFor="let p of right" (click)="moveToLeft(p)">
+          <span><i class="bx bx-check-shield me-2 text-success"></i>{{ p.code }}</span>
+          <i class="bx bx-x text-danger"></i>
+        </button>
+        <div class="p-3 text-muted" *ngIf="right.length===0">Aucune permission</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end mt-3">
+    <button class="sj-btn-primary" (click)="save()" [disabled]="saving">
+      <i class="bx bx-save me-1"></i> Enregistrer
+    </button>
+  </div>
+</div>

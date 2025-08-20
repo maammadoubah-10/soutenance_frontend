@@ -1,0 +1,440 @@
+<div class="container-fluid p-0">
+  <div class="row g-0">
+
+    <div class="col-xl-4 order-xl-1 sub-container">
+      <div class="auth-full-page-content p-md-5 p-4">
+        <div class="w-100">
+
+          <div class="d-flex flex-column h-100">
+            <div class="mb-4 mb-md-5" *ngIf="showLoginForm">
+              <a routerLink="/" class="d-block auth-logo">
+                <img src="assets/Jilmonde%20ERP%20LOGO.png" alt="" height="100"    class="auth-logo-dark">
+              </a>
+            </div>
+            <div class="my-auto">
+              <div *ngIf="showLoginForm">
+                <h5 class="text-primary" style="text-transform: uppercase;">Content de vous revoir !</h5>
+                <p class="text-muted" style="text-transform: uppercase;">Bienvenue à l'école inter-état de medecine
+                  vétérinaire {{ of }} <span class="text-info" style="text-transform: none;"> {{ entreprise }}</span>.
+                </p>
+              </div>
+              <div *ngIf="showLoginForm">
+
+                <div class="mt-4">
+                  <form [formGroup]="formulaireDossierConnexion" (ngSubmit)="onSubmitConnexion()">
+                    <div class="mb-3">
+                      <label for="loginEmail" class="form-label">Adresse email</label>
+                      <input type="email" class="form-control" id="loginEmail" formControlName="email"
+                             placeholder="Entrez votre email">
+                      <div
+                        *ngIf="formulaireDossierConnexion.get('email')?.invalid && (formulaireDossierConnexion.get('email')?.dirty || formulaireDossierConnexion.get('email')?.touched)"
+                        class="text-danger">
+                        <div *ngIf="formulaireDossierConnexion.get('email')?.errors?.['required']">
+                          L'email est requis.
+                        </div>
+                        <div *ngIf="formulaireDossierConnexion.get('email')?.errors?.['required']">
+                          L'email doit être au format valide.
+                        </div>
+                      </div>
+                    </div>
+                    <div class="mb-3">
+                      <label for="loginPassword" class="form-label">Mot de passe</label>
+                      <div class="input-group">
+                        <input type="password" class="form-control" id="loginPassword" formControlName="motdepasse"
+                               placeholder="Entrez votre mot de passe">
+                        <button class="btn btn-outline-secondary" type="button" (click)="togglePasswordVisibility()">
+                          <span class="mdi mdi-eye"></span>
+                        </button>
+                      </div>
+                      <div
+                        *ngIf="formulaireDossierConnexion.get('motdepasse')?.invalid && (formulaireDossierConnexion.get('motdepasse')?.dirty || formulaireDossierConnexion.get('motdepasse')?.touched)"
+                        class="text-danger">
+                        <div *ngIf="formulaireDossierConnexion.get('motdepasse')?.errors?.['required']">
+                          Le mot de passe est requis.
+                        </div>
+                      </div>
+                    </div>
+
+
+                    <button type="submit" [disabled]="!formulaireDossierConnexion.valid" class="btn btn-primary w-100">
+                      Se connecter
+                    </button>
+                    <p class="text-center mt-3">Vous n'avez pas de compte ?
+                      <button class="btn btn-link" (click)="toggleRegisterForm()">Inscrivez-vous ici</button>
+                    </p>
+                    <p class="text-center">
+                      <i class="mdi mdi-lock-reset"></i>
+                      <a [routerLink]="'/motdepasseoublie-pedagogie'">Avez-vous oublié votre mot de passe ? Cliquez
+                        ici</a>
+                    </p>
+                  </form>
+
+                </div>
+              </div>
+              <div *ngIf="showRegisterForm">
+                <div class="desktop-button-container">
+                  <button class="action-button">
+                    <a (click)="openModalVisualiser(content)">Voir le guide d'utilisation</a>
+                  </button>
+
+                  <button class="action-button">
+                    <a (click)="openModalVisualisers(contents)">Voir les conditions d'admission</a>
+                  </button>
+                </div>
+
+                <div class="button-container">
+                  <button class="action-buttonmob">
+                    <a (click)="openModalVisualiser(content)">Voir le guide d'utilisation</a>
+                  </button>
+
+                  <button class="action-buttonmob">
+                    <a (click)="openModalVisualisers(contents)">Voir les conditions d'admission</a>
+                  </button>
+                </div>
+
+                <div class="mt-4">
+
+                  <h5 class="card-title text-center">Inscription</h5>
+                  <form [formGroup]="formulaire" (ngSubmit)="formulaire.valid && onSubmit()">
+                    <div class="row">
+                      <div class="col-lg-12" >
+                        <div class="mb-3"
+                             [ngClass]="{'has-error': formulaire.get('fonction')?.invalid && (formulaire.get('fonction')?.dirty || formulaire.get('fonction')?.touched)}">
+                          <label for="registerFunction" class="form-label">Fonction</label>
+                          <select class="form-select" id="registerFunction" formControlName="fonction"
+                                  (change)="updatePoste()">
+                            <option value="" disabled selected>Choisissez votre fonction</option>
+                            <option *ngFor="let typeFonction of listeFonction" [value]="typeFonction">
+                              {{ typeFonction }}
+                            </option>
+                          </select>
+                          <div
+                            *ngIf="formulaire.get('fonction')?.invalid && (formulaire.get('fonction')?.dirty || formulaire.get('fonction')?.touched)"
+                            class="text-danger">
+                            <div *ngIf="formulaire.get('fonction')?.errors?.['required']">
+                              La fonction est requise.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-lg-6" *ngIf="formulaire.get('fonction')?.value != typeFonction.Etudiant ">
+                        <div class="mb-3"
+                             [ngClass]="{'has-error': formulaire.get('dedesi')?.invalid && (formulaire.get('dedesi')?.dirty || formulaire.get('dedesi')?.touched)}">
+                          <label for="registerDedesi" class="form-label">Designation</label>
+                          <input type="text" class="form-control" id="registerDedesi" placeholder="Entrez votre designation"
+                                 formControlName="dedesi">
+                          <div
+                            *ngIf="formulaire.get('dedesi')?.invalid && (formulaire.get('dedesi')?.dirty || formulaire.get('dedesi')?.touched)"
+                            class="text-danger">
+                            <div *ngIf="formulaire.get('dedesi')?.errors?.['required']">
+                              La designation est requise.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-lg-6" *ngIf="formulaire.get('fonction')?.value === typeFonction.Etudiant">
+                        <div class="mb-3"
+                             [ngClass]="{'has-error': formulaire.get('civilite')?.invalid && (formulaire.get('civilite')?.dirty || formulaire.get('civilite')?.touched)}">
+                          <label for="registerCivilite" class="form-label">Civilité</label>
+                          <select class="form-select" id="registerCivilite" formControlName="civilite">
+                            <option value="" disabled selected>Choisissez votre civilité</option>
+                            <option value="MADAME">Madame</option>
+                            <option value="MONSIEUR">Monsieur</option>
+                            <option value="MADEMOISELLE">Mademoiselle</option>
+                          </select>
+                          <div
+                            *ngIf="formulaire.get('civilite')?.invalid && (formulaire.get('civilite')?.dirty || formulaire.get('civilite')?.touched)"
+                            class="text-danger">
+                            <div *ngIf="formulaire.get('civilite')?.errors?.['required']">
+                              La civilité est requise.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+
+                      <div class="col-lg-6">
+                        <div class="mb-3"
+                             [ngClass]="{'has-error': formulaire.get('prenom')?.invalid && (formulaire.get('prenom')?.dirty || formulaire.get('prenom')?.touched)}">
+                          <label for="registerFirstName" class="form-label">Prénom</label>
+                          <input type="text" class="form-control" id="registerFirstName"
+                                 placeholder="Entrez votre prénom"
+                                 formControlName="prenom">
+                          <div
+                            *ngIf="formulaire.get('prenom')?.invalid && (formulaire.get('prenom')?.dirty || formulaire.get('prenom')?.touched)"
+                            class="text-danger">
+                            <div *ngIf="formulaire.get('prenom')?.errors?.['required']">
+                              Le prénom est requis.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-lg-6">
+                        <div class="mb-3"
+                             [ngClass]="{'has-error': formulaire.get('nom')?.invalid && (formulaire.get('nom')?.dirty || formulaire.get('nom')?.touched)}">
+                          <label for="registerLastName" class="form-label">Nom</label>
+                          <input type="text" class="form-control" id="registerLastName" placeholder="Entrez votre nom"
+                                 formControlName="nom">
+                          <div
+                            *ngIf="formulaire.get('nom')?.invalid && (formulaire.get('nom')?.dirty || formulaire.get('nom')?.touched)"
+                            class="text-danger">
+                            <div *ngIf="formulaire.get('nom')?.errors?.['required']">
+                              Le nom est requis.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-lg-6">
+                        <div class="mb-3"
+                             [ngClass]="{'has-error': formulaire.get('email')?.invalid && (formulaire.get('email')?.dirty || formulaire.get('email')?.touched)}">
+                          <label for="registerEmail" class="form-label">Adresse email</label>
+                          <input type="email" class="form-control" id="registerEmail" placeholder="Entrez votre email"
+                                 formControlName="email">
+                          <div
+                            *ngIf="formulaire.get('email')?.invalid && (formulaire.get('email')?.dirty || formulaire.get('email')?.touched)"
+                            class="text-danger">
+                            <div *ngIf="formulaire.get('email')?.errors?.['required']">
+                              L'email est requis.
+                            </div>
+                            <div *ngIf="formulaire.get('email')?.errors?.['required']">
+                              L'email doit être au format valide.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-lg-6" >
+                        <div class="mb-3"
+                             [ngClass]="{'has-error': formulaire.get('telephone')?.invalid && (formulaire.get('telephone')?.dirty || formulaire.get('telephone')?.touched)}">
+                          <label for="registerTelephone" class="form-label">Telephone</label>
+                          <input type="telephone" class="form-control" id="registerTelephone" placeholder="Ex:00123456789"
+                                 formControlName="telephone">
+                          <div
+                            *ngIf="formulaire.get('telephone')?.invalid && (formulaire.get('telephone')?.dirty || formulaire.get('telephone')?.touched)"
+                            class="text-danger">
+                            <!-- connexion-pedago.component.html -->
+                            <div *ngIf="formulaire.get('telephone')?.errors?.['required']">
+                              Le numéro de téléphone est requis.
+                            </div>
+
+                            <div *ngIf="formulaire.get('telephone')?.errors">
+                              Le numéro doit être au format valide.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-lg-6">
+                        <div class="mb-3"
+                             [ngClass]="{'has-error': formulaire.get('poste')?.invalid && (formulaire.get('poste')?.dirty || formulaire.get('poste')?.touched)}">
+                          <label for="poste" class="form-label">Poste</label>
+                          <input type="text" class="form-control" id="poste" placeholder="Entrez votre poste"
+                                 formControlName="poste">
+                          <div
+                            *ngIf="formulaire.get('poste')?.invalid && (formulaire.get('poste')?.dirty || formulaire.get('poste')?.touched)"
+                            class="text-danger">
+                            <div *ngIf="formulaire.get('poste')?.errors?.['required']">
+                              Le poste est requis.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-lg-6">
+                        <div class="mb-3"
+                             [ngClass]="{'has-error': formulaire.get('pays')?.invalid && (formulaire.get('pays')?.dirty || formulaire.get('pays')?.touched)}">
+                          <label for="registerCountry" class="form-label">Pays</label>
+                          <select class="form-select" id="registerCountry" formControlName="pays">
+                            <option value="" disabled selected>Choisissez votre pays</option>
+                            <option value="Sénégal">Sénégal</option>
+                            <option value="Bénin">Bénin</option>
+                            <option value="Burkina Faso">Burkina Faso</option>
+                            <option value="Burundi">Burundi</option>
+                            <option value="Cameroun">Cameroun</option>
+                            <option value="Côte d'Ivoire">Côte d'Ivoire</option>
+                            <option value="République du Congo">République du Congo</option>
+                            <option value="Gabon">Gabon</option>
+                            <option value="Mauritanie">Mauritanie</option>
+                            <option value="Niger">Niger</option>
+                            <option value="République centrafricaine">République centrafricaine</option>
+                            <option value="Tchad">Tchad</option>
+                            <option value="Togo">Togo</option>
+                            <option value="Mali">Mali</option>
+                          </select>
+                          <div
+                            *ngIf="formulaire.get('pays')?.invalid && (formulaire.get('pays')?.dirty || formulaire.get('pays')?.touched)"
+                            class="text-danger">
+                            <div *ngIf="formulaire.get('pays')?.errors?.['required']">
+                              Le pays est requis.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-lg-6" *ngIf="formulaire.get('fonction')?.value === typeFonction.Etudiant">
+                        <div class="mb-3"
+                             [ngClass]="{'has-error': formulaire.get('lieuNaissance')?.invalid && (formulaire.get('lieuNaissance')?.dirty || formulaire.get('lieuNaissance')?.touched)}">
+                          <label for="lieuNaissance" class="form-label">Lieu de naissance</label>
+                          <input type="text" class="form-control" id="lieuNaissance"
+                                 placeholder="Entrez votre lieu de naissance" formControlName="lieuNaissance">
+                          <div
+                            *ngIf="formulaire.get('lieuNaissance')?.invalid && (formulaire.get('lieuNaissance')?.dirty || formulaire.get('lieuNaissance')?.touched)"
+                            class="text-danger">
+                            <div *ngIf="formulaire.get('lieuNaissance')?.errors?.['required']">
+                              Le lieu de naissance est requis.
+                            </div>
+                            <!-- Autres validations personnalisées si nécessaire -->
+                          </div>
+                        </div>
+                      </div>
+
+                      <div class="col-lg-12" *ngIf="formulaire.get('fonction')?.value === typeFonction.Etudiant">
+                        <div class="mb-3"
+                             [ngClass]="{'has-error': formulaire.get('dateNaissance')?.invalid && (formulaire.get('dateNaissance')?.dirty || formulaire.get('dateNaissance')?.touched)}">
+                          <label for="dateNaissance" class="form-label">Date de naissance</label>
+                          <input type="date" class="form-control" id="dateNaissance" formControlName="dateNaissance">
+                          <div
+                            *ngIf="formulaire.get('dateNaissance')?.invalid && (formulaire.get('dateNaissance')?.dirty || formulaire.get('dateNaissance')?.touched)"
+                            class="text-danger">
+                            <div *ngIf="formulaire.get('dateNaissance')?.errors?.['required']">
+                              La date de naissance est requise.
+                            </div>
+                            <!-- Autres validations personnalisées si nécessaire -->
+                          </div>
+                        </div>
+                      </div>
+
+
+                      <div class="col-lg-12" *ngIf="formulaire.get('fonction')?.value !== typeFonction.Etudiant">
+                        <div class="mb-3"
+                             [ngClass]="{'has-error': formulaire.get('files')?.invalid && (formulaire.get('files')?.dirty || formulaire.get('files')?.touched)}">
+                          <label for="files" class="form-label">Fichiers</label>
+                          <input type="file" class="form-control" id="files" name="files"
+                                 (change)="onFileChange($event)"
+                                 multiple
+                                 accept="application/pdf"
+                          >
+                          <div
+                            *ngIf="formulaire.get('files')?.invalid && (formulaire.get('files')?.dirty || formulaire.get('files')?.touched)"
+                            class="text-danger">
+                            <div *ngIf="formulaire.get('files')?.errors?.['required']">
+                              Les fichiers sont requis.
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+
+                    <button type="submit" [disabled]="!formulaire.valid" class="btn btn-primary w-100">S'inscrire
+                    </button>
+                    <p class="text-center mt-3">Vous avez déjà un compte ?
+                      <button class="btn btn-link" (click)="toggleLoginForm()">Connectez-vous ici</button>
+                    </p>
+                  </form>
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end col -->
+
+    <div class="col-xl-8 order-xl-2">
+      <div class="img auth-full-page-content p-md-5 p-4"
+           style="background-image: url('assets/eismvpedagogie.png'); background-size: cover; background-position: center; height: 100vh;"></div>
+    </div>
+    <!-- end col -->
+
+  </div>
+  <!-- end row -->
+</div>
+
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <button type="button" class="btn-close" aria-label="Close"
+            (click)="modal.dismiss('Cliquer pour fermer')">
+    </button>
+  </div>
+
+  <div id="outerContainer">
+    <div class="pdf-container">
+<!--      <pdf-viewer-->
+<!--        [autoresize]="true"-->
+<!--        [external-link-target]="'blank'"-->
+<!--        [fit-to-page]="false"-->
+<!--        [original-size]="false"-->
+<!--        [render-text]="true"-->
+<!--        [rotation]="0"-->
+<!--        [show-all]="true"-->
+<!--        [show-borders]="false"-->
+<!--        [src]="'../assets/guide preInscription.pdf'"-->
+<!--        [zoom-scale]="'page-width'"-->
+<!--        [zoom]="1"-->
+<!--        style="width: 100%; height: 800px;">-->
+<!--      </pdf-viewer>-->
+    </div>
+    <!-- Bouton de téléchargement -->
+
+  </div>
+
+
+</ng-template>
+
+
+
+<ng-template #contents let-modal>
+  <div class="modal-header">
+    <button type="button" class="btn-close" aria-label="Close"
+            (click)="modal.dismiss('Cliquer pour fermer')">
+    </button>
+  </div>
+  <div id="outerContainer">
+    <div class="pdf-container">
+<!--      <pdf-viewer-->
+<!--        [autoresize]="true"-->
+<!--        [external-link-target]="'blank'"-->
+<!--        [fit-to-page]="false"-->
+<!--        [original-size]="false"-->
+<!--        [render-text]="true"-->
+<!--        [rotation]="0"-->
+<!--        [show-all]="true"-->
+<!--        [show-borders]="false"-->
+<!--        [src]="'../assets/conditions Admission.pdf'"-->
+<!--        [stick-to-page]="false"-->
+<!--        [zoom-scale]="'page-width'"-->
+<!--        [zoom]="1"-->
+<!--        style="width: 100%; height: 800px;">-->
+<!--      </pdf-viewer>-->
+    </div>
+    <!-- Bouton de téléchargement -->
+  </div>
+
+</ng-template>
+
+
+<div class="contact-buttons">
+  <div class="call-button">
+    <a href="tel:+221338585584">
+      <div class="label">Assistance</div>
+      <div class="phone-info">
+        <i class="mdi mdi-phone"></i><br>
+        +221 33 858 55 84
+      </div>
+    </a>
+  </div>
+
+
+  <div class="whatsapp-button">
+    <a href="https://wa.me/+221781430694" target="_blank">
+      <i class="mdi mdi-whatsapp"></i>
+    </a>
+  </div>
+</div>

@@ -1,0 +1,15 @@
+<!-- SHELL : sidebar (gauche) + header (haut) + footer (bas) -->
+<div class="shell">
+  <app-sidebar></app-sidebar>
+
+  <div class="main">
+    <app-header></app-header>
+
+    <!-- Ici on rend TOUT le contenu /espacedetravail/** -->
+    <div class="page container-fluid py-3">
+      <router-outlet></router-outlet>
+    </div>
+
+    <app-footer></app-footer>
+  </div>
+</div>

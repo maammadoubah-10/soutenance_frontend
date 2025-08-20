@@ -1,0 +1,49 @@
+:host { display:block; }
+
+/* Panneau = toujours visible, jamais recouvert */
+.app-sidebar-panel{
+  position: sticky;
+  top: 0;
+  z-index: 1001;
+  width: 260px;
+  min-height: 100vh;
+  background: #fff;
+  border-right: 1px solid #e6eaf0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Barre du haut avec logo seulement */
+.topbar{
+  height: 60px;
+  display: flex; align-items: center;
+  padding: 0 12px;
+}
+.logo{ height: 28px; display:block; }
+.logo-fallback{
+  width: 28px; height: 28px; border-radius: 8px;
+  background: #dbe7ff; color:#23406e; font-weight: 700;
+  display:flex; align-items:center; justify-content:center;
+}
+
+.sep{ height:1px; background:#1f6fff; opacity:.2; }
+
+/* Liens */
+.nav{ display:flex; flex-direction:column; padding: 8px 6px; }
+.nav-link{
+  display:flex; align-items:center; gap:10px;
+  padding:10px 12px; margin:3px 4px; border-radius:10px;
+  color:#0b1f44 !important; text-decoration:none;
+}
+.nav-link:hover{ background:#eef3ff; }
+.nav-link.active{
+  background: rgba(31,111,255,.12);
+  color:#1f6fff !important; font-weight:600;
+}
+.icon{ font-size:18px; line-height:1; }
+
+/* Pied */
+.sidebar-footer{
+  margin-top:auto; padding:10px 12px; color:#6b7280; font-size:12px;
+  border-top:1px dashed #e6eaf0;
+}

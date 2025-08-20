@@ -1,0 +1,31 @@
+<aside class="app-sidebar-panel">
+  <!-- BARRE DU HAUT : Logo uniquement -->
+  <div class="topbar">
+    <ng-container *ngIf="!logoError; else fallback">
+      <img class="logo" [src]="logoUrl" alt="logo" (error)="logoError = true" />
+    </ng-container>
+    <ng-template #fallback>
+      <div class="logo-fallback">{{ initials }}</div>
+    </ng-template>
+  </div>
+
+  <!-- Ligne bleue de séparation -->
+  <div class="sep"></div>
+
+  <!-- Liens -->
+  <nav class="nav">
+    <a class="nav-link"
+       *ngFor="let it of visibleItems"
+       [routerLink]="it.route"
+       routerLinkActive="active"
+       [routerLinkActiveOptions]="{ exact: it.exact === true }">
+      <i class="{{ it.icon }} icon"></i>
+      <span class="label">{{ it.label }}</span>
+    </a>
+  </nav>
+
+  <!-- Pied -->
+  <div class="sidebar-footer">
+    <div class="hint">© {{ currentYear }}</div>
+  </div>
+</aside>

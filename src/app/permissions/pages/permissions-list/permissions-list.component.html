@@ -1,0 +1,77 @@
+<div class="sj-card p-3 p-md-4">
+  <!-- Header -->
+  <div class="d-flex align-items-center justify-content-between mb-3">
+    <div>
+      <h4 class="m-0" style="color:var(--sj-text)">Permissions</h4>
+      <div class="text-muted small">Gérez les codes d’accès de l’application</div>
+    </div>
+    <button *ngIf="canCreate" class="sj-btn-primary" (click)="goNew()">
+      + Nouvelle permission
+    </button>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="sj-toolbar mb-3">
+    <div class="sj-search">
+      <i class="bx bx-search"></i>
+      <input class="sj-input" [(ngModel)]="searchCode" placeholder="Rechercher par code…" />
+    </div>
+    <button class="sj-btn-primary" (click)="onSearch()">Rechercher</button>
+    <span class="spacer"></span>
+    <span class="sj-badge">Total : {{ total }}</span>
+  </div>
+
+  <!-- Messages -->
+  <div *ngIf="errorMsg" class="alert alert-danger py-2">{{ errorMsg }}</div>
+
+  <!-- Table -->
+  <div class="table-responsive" *ngIf="!loading; else skeleton">
+    <table class="sj-table">
+      <thead>
+        <tr>
+          <th style="width:90px">ID</th>
+          <th>Code</th>
+          <th>Description</th>
+          <th style="width:120px"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let p of items">
+          <td class="text-muted">#{{ p.id }}</td>
+          <td><strong>{{ p.code }}</strong></td>
+          <td class="text-muted">{{ p.description }}</td>
+          <td class="text-end">
+            <a [routerLink]="['/espacedetravail/permissions', p.id]" class="btn btn-sm btn-outline-primary">
+              Modifier
+            </a>
+          </td>
+        </tr>
+        <tr *ngIf="items.length === 0">
+          <td colspan="4" class="text-center text-muted py-4">Aucune permission trouvée.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Pagination -->
+  <div class="d-flex align-items-center justify-content-between mt-3">
+    <div class="text-muted small">
+      Page {{ pageIndex + 1 }} — {{ items.length }} élément(s) affiché(s)
+    </div>
+    <div class="d-flex gap-2">
+      <button class="btn btn-outline-secondary btn-sm"
+              [disabled]="pageIndex===0"
+              (click)="load(pageIndex-1)">Précédent</button>
+      <button class="btn btn-outline-secondary btn-sm"
+              [disabled]="(pageIndex + 1) * pageSize >= total"
+              (click)="load(pageIndex+1)">Suivant</button>
+    </div>
+  </div>
+</div>
+
+<ng-template #skeleton>
+  <div class="sj-card p-4 text-center">
+    <div class="spinner-border text-primary" role="status"></div>
+    <div class="mt-2 text-muted">Chargement…</div>
+  </div>
+</ng-template>

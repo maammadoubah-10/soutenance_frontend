@@ -1,0 +1,32 @@
+<div class="card" *ngIf="!loading && u">
+  <div class="card-header">
+    <h3>Utilisateur #{{ u.id }} — {{ u.email }}</h3>
+  </div>
+  <div class="card-body">
+    <p><b>Actif:</b>
+      <input type="checkbox" [checked]="u.estActif" (change)="toggleActif()" />
+      {{ u.estActif ? 'Oui' : 'Non' }}
+    </p>
+    <p><b>Admin:</b>
+      <input type="checkbox" [checked]="u.estAdmin" (change)="toggleAdmin()" />
+      {{ u.estAdmin ? 'Oui' : 'Non' }}
+    </p>
+
+    <h4>Rôles</h4>
+    <p>
+      <select #sel (change)="addRole(+sel.value)">
+        <option [value]="0">+ Ajouter un rôle…</option>
+        <option *ngFor="let rr of rolesRef" [value]="rr.id">{{ rr.nom }}</option>
+      </select>
+    </p>
+    <ul>
+      <li *ngFor="let rr of u.roles">
+        {{ rr.nom }}
+        <button (click)="removeRole(rr.id)">Retirer</button>
+      </li>
+    </ul>
+
+    <p><a routerLink="../">← Retour</a></p>
+  </div>
+</div>
+<div *ngIf="loading">Chargement…</div>

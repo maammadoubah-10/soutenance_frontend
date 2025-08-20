@@ -1,0 +1,58 @@
+<div class="card">
+  <div class="card-header">
+    <h3>Utilisateurs</h3>
+   <a [routerLink]="['/espacedetravail/utilisateur','nouveau']">+ Nouveau</a>  </div>
+
+  <div class="card-body">
+    <input [(ngModel)]="search" placeholder="Rechercher par email…" />
+    <button (click)="load()">Rechercher</button>
+
+    <div *ngIf="loading">Chargement…</div>
+
+    <table class="table" *ngIf="!loading">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Email</th>
+          <th>Rôles</th>
+          <th>Actif</th>
+          <th>Admin</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let u of items">
+          <td>{{ u.id }}</td>
+          <td><a (click)="goEdit(u)">{{ u.email }}</a></td>
+          <td>
+            <span>{{ rolesText(u) }}</span>
+            <div style="margin-top:.25rem;">
+              <select #r (change)="addRole(u, +r.value)">
+                <option [value]="0">+ Ajouter un rôle…</option>
+                <option *ngFor="let rr of rolesRef" [value]="rr.id">{{ rr.nom }}</option>
+              </select>
+              <ng-container *ngFor="let rr of u.roles">
+                <button (click)="removeRole(u, rr.id)" title="Retirer">× {{ rr.nom }}</button>
+              </ng-container>
+            </div>
+          </td>
+          <td>
+            <label>
+              <input type="checkbox" [checked]="u.estActif" (change)="toggleActif(u)" />
+              {{ u.estActif ? 'Oui' : 'Non' }}
+            </label>
+          </td>
+          <td>
+            <label>
+              <input type="checkbox" [checked]="u.estAdmin" (change)="toggleAdmin(u)" />
+              {{ u.estAdmin ? 'Oui' : 'Non' }}
+            </label>
+          </td>
+          <td>
+            <button (click)="remove(u)">Supprimer</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
