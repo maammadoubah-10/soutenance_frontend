@@ -1,4 +1,4 @@
-<!-- src/app/utilisateur/pages/utilisateur-form/utilisateur-form.component.html -->
+src/app/utilisateur/pages/utilisateur-form/utilisateur-form.component.html
 <div class="card shadow-sm">
   <div class="card-header d-flex align-items-center justify-content-between">
     <h5 class="m-0">Nouvel utilisateur</h5>
@@ -7,7 +7,6 @@
 
   <div class="card-body">
     <div class="row g-4">
-      <!-- Colonne GAUCHE : recherche + liste personnels -->
       <div class="col-12 col-lg-6">
         <label class="form-label">Personnel (recherche RH)</label>
         <div class="row g-2 mb-2">
@@ -48,7 +47,6 @@
         </div>
       </div>
 
-      <!-- Colonne DROITE : création d'utilisateur -->
       <div class="col-12 col-lg-6">
         <div class="alert alert-info" *ngIf="selected">
           <strong>Sélection :</strong>
@@ -85,8 +83,6 @@
     </div>
   </div>
 </div>
-
-<!-- Modale “Ajouter un personnel” -->
 <div class="modal-backdrop" *ngIf="showAdd"></div>
 <div class="modal" *ngIf="showAdd" role="dialog" aria-modal="true">
   <div class="modal-card">

@@ -1,15 +1,320 @@
-<!-- SHELL : sidebar (gauche) + header (haut) + footer (bas) -->
-<div class="shell">
-  <app-sidebar></app-sidebar>
+<div id="layout-wrapper">
+  <app-entetedepage (settingsButtonClicked)="onSettingsButtonClicked()"
+    (mobileMenuButtonClicked)="onToggleMobileMenu()">
+  </app-entetedepage>
 
   <div class="main">
-    <app-header></app-header>
+    <div class="page-content">
+      <!-- content -->
+      <div class="container-fluid">
 
-    <!-- Ici on rend TOUT le contenu /espacedetravail/** -->
-    <div class="page container-fluid py-3">
-      <router-outlet></router-outlet>
+        <div class="background-image">
+          <p style="font-family: 'Times New Roman'; font-size: 50px">Espace de travail</p>
+        </div>
+
+        <div class="img">
+        <div class="card" style="margin-top: 10px" >
+          <div class="card-body" style="background-color: #0535A0">
+            <div class="row">
+              <div class="col-lg-4">
+                <div class="media">
+                  <div class="me-3">
+                    <img *ngIf="profilSrc"  [src]="profilSrc" alt="" class="avatar-md rounded-circle img-thumbnail">
+
+                    <span *ngIf="!profilSrc"  class="avatar-user-profil-title rounded-circle bg-danger text-white font-size-24 avatar-user-profil avatar-md">
+                      {{utilisateurAuthentifie?.personnel?.prenom[0] + utilisateurAuthentifie?.personnel?.prenom[1]}}
+                     </span>
+
+                  </div>
+                  <div  class="media-body align-self-center">
+                    <div class="text-muted">
+                      <p class="mb-2 text-white">Bienvenu sur votre espace de travail!</p>
+                      <h5 class="mb-1 text-white">{{utilisateurAuthentifie?.personnel?.prenom }} {{utilisateurAuthentifie?.personnel?.nom }} </h5>
+                      <div *ngIf="utilisateurAuthentifie">
+                        <p *ngFor="let role of utilisateurAuthentifie.role" class="mb-0 text-white">{{role.nom}}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div  class="line"></div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 align-self-center">
+                <div class="text-lg-center mt-4 mt-lg-0">
+                  <div class="row">
+                    <div class="col-6">
+                      <div *ngIf="utilisateurAuthentifie?.personnel?.poste!=null">
+                        <p class="text-white mb-2 "><img style="height: 20px" class="mx-2" src="../../assets/Icon metro-profile.png">Poste occupé</p>
+                        <h5 class="mb-0 text-white">{{utilisateurAuthentifie?.personnel?.poste.designation}}</h5>
+                      </div>
+                    </div>
+                    <div class="col-6" >
+                      <div >
+                        <p class="text-white mb-2">Dernière connexion</p>
+                        <h5 class="mb-0 text-white">{{utilisateurAuthentifie?.dernierConnexion| date:'dd MMMM yyyy à HH:mm:ss' :'':'fr-FR'}}</h5>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-lg-4 parame d-none d-lg-block">
+                <div class="clearfix  mt-4 mt-lg-0">
+                  <div class="dropdownr float-end" ngbDropdown>
+                    <button class="btn text-black btn-light dropdown-toggle" type="button" data-toggle="dropdown"
+                      aria-haspopup="true" aria-expanded="false" ngbDropdownToggle>
+                      <i class="bx bxs-cog align-middle mr-1"></i>
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+                      <a class="dropdown-item" routerLink="/moncompte/profil"><i
+                        class="bx bx-user font-size-16 align-middle me-1"></i>
+                        Profil </a>
+                      <a class="dropdown-item" ><i
+                        class="bx bx-key font-size-16 align-middle me-1"></i>
+                        Changer le Mot de Passe </a>
+                      <a class="dropdown-item d-block" routerLink="/moncompte/parametre">
+                        <i
+                        class="bx bx-wrench font-size-16 align-middle me-1"></i>
+                        Paramètres </a>
+                      <a class="dropdown-item" routerLink="/moncompte/historique"><i
+                        class="bx bx-lock-open font-size-16 align-middle me-1"></i>
+                        Historique </a>
+                      <div class="dropdown-divider"></div>
+                      <a class="dropdown-item text-danger" (click)="deconnexion()"><i
+                        class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i>
+                        Déconnexion</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+
+          <div class="card" style="margin-top: 30px;">
+            <div class="card-body" style="background-color: #FFF; height: 50px; border-radius: 10px;">
+              <div class="row" *ngIf="isHolidayToday">
+                <marquee behavior="scroll" direction="left">
+                <p class="justify-content-center">🎉 Aujourd'hui est un jour férié ! 🎉 ... Bonne fête ! 🎈</p>
+                </marquee>
+              </div>
+              <div class="row" *ngIf="isHolidayTomorrow">
+                <marquee behavior="scroll" direction="left">
+                <p class="justify-content-center">Demain est un jour férié ! ... Bonne fête anticipée ! 🎉 ... {{ holidayNameTomorrow }}</p>
+                </marquee>
+              </div>
+              <div class="row" *ngIf="isNextDayHoliday">
+                <marquee behavior="scroll" direction="left">
+                <p class="justify-content-center">Le jour suivant est un jour férié ! ... Profitez de votre journée de repos ! 🎉 ... {{ holidayNameNextDay }}</p>
+                </marquee>
+              </div>
+              <div class="row" *ngIf="isRegularDay">
+                <marquee behavior="scroll" direction="left">
+                <p class="justify-content-center">Il n'y a pas de jour férié prévu. ... {{ motivationMessage }}</p>
+                </marquee>
+              </div>
+            </div>
+          </div>
+
+
+
+
+
+
+          <div class="row">
+            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
+                <div class="card text-center">
+                  <div class="ombre card-body">
+                    <a routerLink="/utilisateur"> <img  src="assets/images/logiciels/1.png"
+                                                        class="rounded-circle img-thumbnail avatar-md" alt="Gestion des utilisateurs" title="Gestion des utilisateurs">
+                    </a>
+                    <p class=" mt-3"><span class="noir" >Gestion  des  utilisateurs</span></p>
+                  </div>
+                </div>
+              </div>
+            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
+                <div class="card text-center">
+                  <div class="ombre card-body">
+                    <!-- target="_blank" http://192.168.1.188/dist/index.html#/login?user={{utilisateurAuthentifie?.email}} -->
+                    <a href="/courrier"> <img src="assets/images/logiciels/2.png"
+                                                    class="rounded-circle img-thumbnail avatar-md" alt="Gestion des courriers" title="Gestion des courriers">
+                    </a>
+                    <p class=" mt-3"><span class="noir" >Gestion des courriers</span></p>
+                  </div>
+                </div>
+              </div>
+            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
+                <div class="card text-center">
+                  <div class="ombre card-body">
+                    <a routerLink="/marchepublic"> <img src="assets/images/logiciels/3.png"
+                                                        class="rounded-circle img-thumbnail avatar-md" alt="Gestion des marchés publics" title="Gestion des marchés publics">
+                    </a>
+                    <p class=" mt-3"><span class="noir">Passation des marchés</span></p>
+                  </div>
+                </div>
+              </div>
+            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
+                <div class="card text-center">
+                  <div class="ombre card-body">
+                    <a routerLink="/rh"> <img src="assets/images/logiciels/4.png"
+                                                     class="rounded-circle img-thumbnail avatar-md" alt="Ressources Humaines" title="Ressources Humaines">
+                    </a>
+                    <p class=" mt-3"><span class="noir">Ressources Humaines</span></p>
+                  </div>
+                </div>
+              </div>
+
+
+            <!--<div class="  col-xl-2 col-lg-3 col-sm-3 " >
+                <div class="card text-center">
+                  <div class="ombre card-body">
+                    <a routerLink="/personnel"> <img src="assets/images/logiciels/4.png"
+                                                     class="rounded-circle img-thumbnail avatar-md" alt="Gestion du personnel" title="Gestion du personnel">
+                    </a>
+                    <p class=" mt-3"><span class="noir">Gestion du personnel</span></p>
+                  </div>
+                </div>
+              </div>-->
+
+            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
+                <div class="card text-center">
+                  <div class="ombre card-body">
+                    <a routerLink="/budgetaire"> <img src="assets/images/logiciels/5.png"
+                                                      class="rounded-circle img-thumbnail avatar-md" alt="Gestion budgétaire et contrôle interne " title="Gestion budgétaire et contrôle interne">
+                    </a>
+                    <p class=" mt-3"><span class="noir">Budger et contrôle int</span></p>
+                  </div>
+                </div>
+              </div>
+            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
+                <div class="card text-center">
+                  <div class="ombre card-body">
+                    <a routerLink="/commercial"> <img src="assets/images/logiciels/6.1.png"
+                                                      class="rounded-circle img-thumbnail avatar-md" alt="Gestion commerciale " title="Gestion commerciale">
+                    </a>
+                    <p class=" mt-3"><span class="noir">Gestion commerciale</span></p>
+                  </div>
+                </div>
+              </div>
+            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
+              <div class="card text-center">
+                <div class="ombre card-body">
+                  <a routerLink="/comptabilite-matiere"> <img src="assets/images/logiciels/7.png"
+                                                              class="rounded-circle img-thumbnail avatar-md" alt="Gestion de la comptabilité matière" title="Gestion de la comptabilité matière">
+                  </a>
+                  <p class=" mt-3"><span class="noir">Comptabilité matière</span></p>
+                </div>
+              </div>
+            </div>
+            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
+              <div class="card text-center">
+                <div class="ombre card-body">
+                  <a routerLink="/comptabilitefinanciere"> <img src="assets/images/logiciels/8.png"
+                                                                class="rounded-circle img-thumbnail avatar-md" alt="Gestion financière et comptable" title="Gestion financière et comptable">
+                  </a>
+                  <p class=" mt-3"><span class="noir">Finance et comptable</span></p>
+                </div>
+              </div>
+            </div>
+            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
+              <div class="card text-center">
+                <div class="ombre card-body">
+                  <a routerLink="/immobilisation"> <img src="assets/images/logiciels/9.1.png"
+                                                                       class="rounded-circle img-thumbnail avatar-md" alt="Gestion des immobilisations" title="Gestion des immobilisations">
+                  </a>
+                  <p class=" mt-3"><span class="noir">Immobilisations</span></p>
+                </div>
+              </div>
+            </div>
+            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
+              <div class="card text-center">
+                <div class="ombre card-body">
+                  <a routerLink="/publication"> <img src="assets/images/logiciels/10.png"
+                                                     class="rounded-circle img-thumbnail avatar-md" alt="Gestion de la publication " title="Gestion de la publication ">
+                  </a>
+                  <p class=" mt-3"><span class="noir">Publication</span></p>
+                </div>
+              </div>
+            </div>
+            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
+              <div class="card text-center">
+                <div class="ombre card-body">
+                  <a routerLink="/production-publication"> <img src="assets/images/logiciels/11.png"
+                                                                class="rounded-circle img-thumbnail avatar-md"
+                                                                alt="Gestion de la production "
+                                                                title="Gestion de la production">
+                  </a>
+                  <p class=" mt-3"><span class="noir">Gestion de la production</span></p>
+                </div>
+              </div>
+            </div>
+            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
+              <div class="card text-center">
+                <div class="ombre card-body">
+                  <a routerLink="/tache"> <img src="assets/images/logiciels/12.png"
+                                               class="rounded-circle img-thumbnail avatar-md" alt="Gestion de tâche" title="Gestion de tâche">
+                  </a>
+                  <p class=" mt-3"><span class="noir">Gestion de tâche</span></p>
+                </div>
+              </div>
+            </div>
+           <!-- <div class="  col-xl-2 col-lg-3 col-sm-3 " >
+              <div class="card text-center">
+                <div class="ombre card-body">
+                  <a routerLink="/paie"> <img src="assets/images/logiciels/13.png" class="rounded-circle img-thumbnail avatar-md" alt="Gestion de la paie"
+                                              title="Gestion de la paie">
+
+                  </a>
+                  <p class=" mt-3"><span class="noir">Gestion de la paie</span></p>
+                </div>
+              </div>
+            </div> -->
+          </div>
+
+        </div>
+      </div>
     </div>
+    <!-- footer -->
 
-    <app-footer></app-footer>
+    <footer class="footer-dashboard" style="background-color: #210b63; color: white;">
+      <div class="container-fluid ">
+          <div class="row">
+              <div class="col-sm-6">
+                  {{year}} © ISI
+              </div>
+              <div class="col-sm-6">
+                  <div class="text-sm-end d-none d-sm-block">
+                      Design & Develop by ISI Dev Teams
+                  </div>
+              </div>
+          </div>
+      </div>
+  </footer>
+
   </div>
+
+  <ng-container *ngIf="utilisateurAuthentifieState$|async as reponse" [ngSwitch]="reponse.dataState">
+
+    <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+        <div class="alert alert-info" role="alert">
+            {{dataStateEnum.CHARGEMENT}}
+        </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+        <div class="alert alert-danger" role="alert">
+            Code d'erreur :  {{reponse.errorMessage}}
+        </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+    </ng-container>
+
+  </ng-container>
 </div>
+
+
+
+<!--app-rightsidebar></app-rightsidebar-->

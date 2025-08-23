@@ -1,0 +1,271 @@
+<div class="container-fluid px-3 main">
+  <app-titredepage title="Permissions" [items]?="items"></app-titredepage>
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-header bg-success"></div>
+        <div class="card-body">
+          <h4 class="card-title">Liste des Permissions</h4>
+          <p class="card-title-desc">
+            Le tableau suivant présente la liste des Permissions
+          </p>
+          <div class="row " style="display: flex">
+            <div class="col-sm-4">
+              <button
+                class="btn btn-success btn-label"
+                (click)="openModal(content)"
+              >
+                <i class="mdi mdi-plus label-icon"></i>
+                Ajouter une permission
+              </button>
+            </div>
+
+            <div class="col-sm-2" >
+              <select name="perPage" id="" class="form-control">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+
+            <div class="col-sm-4">
+              <div class="search-box me-2 mb-2 d-inline-block">
+                <input type="text" class="form-control" placeholder="Rechercher une permission ..."
+                       [(ngModel)]="code"
+                       (keyup)="onPageChange(currentPage)"
+                       name="searchValue">
+                <i class="bx bx-search-alt search-icon"></i>
+              </div>
+            </div>
+
+          </div>
+          <hr />
+          <ng-container
+            [ngSwitch]="response.dataState"
+            *ngIf="permissionsStates$ | async as response"
+          >
+            <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+              <div class="alert alert-info" role="alert">
+                {{ dataStateEnum.CHARGEMENT }}
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+              <div class="alert alert-info" role="alert">
+                {{ response.dataState }}
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+              <div class="table-responsive mt-2">
+                <table class="table table-bordered no-wrap align-middle">
+                  <thead>
+                  <tr class="text-center justify-content-center">
+                    <th>#</th>
+                    <th>Désignation</th>
+                    <th>Description</th>
+                    <th>Action</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr class="text-center justify-content-center"
+                      *ngFor="let permission of permissions | filter:term ;let i = index;">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{permission.code}}</td>
+                    <td style="text-align: justify">{{permission.description}}</td>
+                    <td>
+                      <button
+                        placement="top"
+                        ngbTooltip="Modifier"
+                        class="btn btn-info mx-1 mt-1 btn-sm"
+                        (click)="openModal(content,permission)"
+                      >
+                        <i class="mdi mdi-pencil"></i>
+                      </button>
+                      <button
+                        placement="top"
+                        ngbToolTip="Supprimer"
+                        class="btn btn-danger mx-1 mt-1 btn-sm"
+                        (click)="supprimerFormat(permission.id)">
+                        <i class="bx bx-trash-alt"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="response.data?.length == 0">
+                    <td colspan="2" class="text-center"><i style="color: #d9534f;font-size: xxx-large" class='bx bxs-data btn btn-lg'></i><br>Aucune Permissions</td>
+                  </tr>
+                  </tbody>
+                </table>
+                <div class="row justify-content-between align-items-center mb-3"
+                     *ngIf="totalPermissions > 10"
+                >
+
+                  <div class="col-auto me-auto"></div>
+                  <div class="col-auto">
+                    <div class="d-flex align-items-center">
+                      <button
+                        class="btn btn-primary mr-2 mx-3 btn-sm"
+                        (click)="currentPage = currentPage - 1; handleClick()"
+                        [disabled]="currentPage === 0"
+                      >
+                        Précédent
+                      </button>
+                      <ng-container *ngIf="pages.length > 1">
+                        <ng-container *ngIf="pages.length <= 11">
+                          <ng-container *ngFor="let page of pages">
+                            <button
+                              class="btn btn-primary btn-sm mx-1"
+                              (click)="currentPage = page; handleClick()"
+                              [disabled]="currentPage === page"
+                            >
+                              {{ page +1}}
+                            </button>
+                          </ng-container>
+                        </ng-container>
+                        <ng-container *ngIf="pages.length > 11">
+                          <ng-container *ngIf="currentPage <= 6">
+                            <ng-container *ngFor="let page of pages.slice(0, 5)">
+                              <button
+                                class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page"
+                              >
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                            <button class="btn btn-primary btn-sm mx-1" disabled>
+                              ...
+                            </button>
+                            <ng-container *ngFor="let page of pages.slice(-5)">
+                              <button
+                                class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page"
+                              >
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                          </ng-container>
+                          <ng-container
+                            *ngIf="currentPage > 6 && currentPage < pages.length - 5"
+                          >
+                            <ng-container
+                              *ngFor="
+                      let page of pages.slice(currentPage - 4, currentPage)
+                    "
+                            >
+                              <button
+                                class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page"
+                              >
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                            <button class="btn btn-primary btn-sm mx-1" disabled>
+                              ...
+                            </button>
+                            <ng-container
+                              *ngFor="
+                      let page of pages.slice(currentPage, currentPage + 4)
+                    "
+                            >
+                              <button
+                                class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page"
+                              >
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                          </ng-container>
+
+
+                          <ng-container *ngIf="currentPage >= pages.length - 5">
+                            <ng-container *ngFor="let page of pages.slice(0, 5)">
+                              <button
+                                class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page"
+                              >
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                            <button class="btn btn-primary btn-sm mx-1" disabled>
+                              ...
+                            </button>
+                            <ng-container *ngFor="let page of pages.slice(-5)">
+                              <button
+                                class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page"
+                              >
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                          </ng-container>
+                        </ng-container>
+                      </ng-container>
+                      <button
+                        class="btn btn-primary btn-sm mx-3"
+                        (click)="currentPage = currentPage + 1; handleClick()"
+                        [disabled]="currentPage+1 === totalPages"
+                      >
+                        Suivant
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Forms Modal -->
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4>{{formulairePermission.get('id')?.value ? 'Modifier': 'Créer'}}</h4>
+    <button type="button" class="btn-close" aria-label="Close"
+            (click)="modal.dismiss('Cliquer pour fermer')">
+    </button>
+  </div>
+  <div class="modal-body">
+    <form  [formGroup]="formulairePermission"
+           (ngSubmit)="creerModifierPermission()" >
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="mb-3">
+            <label for="code">Code</label>
+            <input type="text" class="form-control" placeholder="Veillez svp entrer la code de la catégorie comptable"  formControlName="code" id="code"
+                   [ngClass]="{'is-invalid': formulairePermission.get('code')?.invalid && formulairePermission.get('code')?.dirty, 'is-valid': formulairePermission.get('code')?.valid}"
+            >
+            <div *ngIf="formulairePermission.get('code')?.invalid && formulairePermission.get('code')?.dirty" class="text-danger">
+              <div *ngIf="formulairePermission.get('code')?.errors?.['required']">Le code est obligatoire</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="mb-3">
+            <label for="description">Description</label>
+            <textarea rows="5" type="text" class="form-control" placeholder="Veillez svp entrer la description"  formControlName="description" id="description"
+                   [ngClass]="{'is-invalid': formulairePermission.get('description')?.invalid && formulairePermission.get('description')?.dirty, 'is-valid': formulairePermission.get('description')?.valid}"
+            ></textarea>
+            <div *ngIf="formulairePermission.get('description')?.invalid && formulairePermission.get('description')?.dirty" class="text-danger">
+              <div *ngIf="formulairePermission.get('description')?.errors?.['required']">La description est obligatoire</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" [disabled]="formulairePermission.invalid" type="submit">{{formulairePermission.get('id')?.value ? 'Modifier': 'Créer'}}</button>
+      </div>
+    </form>
+  </div>
+</ng-template>

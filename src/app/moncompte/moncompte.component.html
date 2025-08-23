@@ -1,0 +1,21 @@
+<div id="layout-wrapper" >
+
+    <app-entetedepage (settingsButtonClicked)="onSettingsButtonClicked()" (mobileMenuButtonClicked)="onToggleMobileMenu()">
+    </app-entetedepage>
+  
+    <app-menu-compte [isCondensed]="isCondensed" ></app-menu-compte>
+  
+    <div class="main-content" >
+      <div class="page-content">
+        <!-- content -->
+        <router-outlet></router-outlet>
+      </div>
+  
+
+      <!-- footer -->
+      <app-pieddepage></app-pieddepage>
+    </div>
+  </div>
+  
+  <!--app-rightsidebar></app-rightsidebar-->
+  

@@ -1,0 +1,275 @@
+<div class="container-fluid">
+  <app-titredepage title="Utilisateurs" [items]?="items"></app-titredepage><div class="card mb-5 mb-xl-10">
+  <div class="card-body pt-9 pb-0">
+    <!--begin::Details-->
+    <div class="d-flex flex-wrap flex-sm-nowrap">
+      <!--begin: Pic-->
+      <div class="me-7 mb-4">
+          <img *ngIf="profilSrc"  [src]="profilSrc" alt="" class="rounded avatar-lg">
+          <span *ngIf="!profilSrc"  class="avatar-user-profil-title rounded avatar-lg bg-danger text-white font-size-24 avatar-user-profil avatar-md">
+                      {{utilisateurAuthentifie?.personnel?.prenom[0] +
+                        utilisateurAuthentifie?.personnel?.prenom[1] +
+                        utilisateurAuthentifie?.personnel?.prenom[2] +
+                        utilisateurAuthentifie?.personnel?.prenom[3] +
+                          utilisateurAuthentifie?.personnel?.prenom[4] +
+                        utilisateurAuthentifie?.personnel?.prenom[5]}}
+         </span>
+      </div>
+      <span class="connexion-point-blanc"></span>
+      <span class="connexion-point"></span>
+      <!--end::Pic-->
+
+      <!--begin::Info-->
+      <div class="flex-grow-1">
+        <!--begin::Title-->
+        <div class="d-flex justify-content-between align-items-start flex-wrap mb-2">
+          <!--begin::User-->
+          <div class="d-flex flex-column">
+            <!--begin::Name-->
+            <div class="d-flex align-items-center mb-2" style="margin-left: 5px">
+              <a href="#" class="text-gray-900 text-hover-primary fs-2 fw-bold me-1">
+                {{utilisateurAuthentifie?.personnel?.prenom + " " + utilisateurAuthentifie?.personnel?.nom}}</a>
+              <a href="#"><i class="mdi mdi-check-decagram fs-1 text-success opacity-50"></i></a>
+            </div>
+            <!--end::Name-->
+
+            <!--begin::Info-->
+            <div class="d-flex flex-wrap fw-semibold fs-6 mb-4 pe-2" >
+              <a style="margin-left: 5px" class="d-flex align-items-center text-gray-400 text-hover-primary me-5 mb-2">
+                <i class="bx bx-user-circle fs-4 me-1"></i>
+                {{utilisateurAuthentifie?.personnel?.poste?.designation}}
+              </a>
+              <a href="#" class="d-flex align-items-center text-gray-400 text-hover-primary me-5 mb-2">
+                <i class="mdi mdi-bag-personal fs-4 me-1"><span class="path1"></span><span class="path2"></span></i>
+                {{utilisateurAuthentifie?.personnel?.poste?.service?.designation}}
+              </a>
+              <a href="#" class="d-flex align-items-center text-gray-400 text-hover-primary mb-2">
+                <i class="mdi mdi-email fs-4"></i>
+                {{utilisateurAuthentifie?.email}}
+              </a>
+            </div>
+            <!--end::Info-->
+          </div>
+          <!--end::User-->
+
+        </div>
+        <!--end::Title-->
+
+      </div>
+      <!--end::Info-->
+    </div>
+    <!--end::Details-->
+  </div>
+  <ng-container *ngIf="utilisateurAuthentifieState$|async as reponse"
+                [ngSwitch]="reponse.dataState">
+
+    <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+      <div class="alert alert-info" role="alert">
+        {{dataStateEnum.CHARGEMENT}}
+      </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+      <div class="alert alert-danger" role="alert">
+        Code d'erreur :  {{reponse.errorMessage}}
+      </div>
+    </ng-container>
+
+    <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+    </ng-container>
+
+  </ng-container>
+</div>
+<!-- </div> -->
+
+<div class="row flex-grow-1">
+  <div class="col-md-6 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-3 align-items-baseline">
+          <h6 class="card-title mb-0">Total Utilisateurs Actif</h6>
+        </div>
+        <div class="row">
+          <div class="col-6 col-md-12 col-xl-5">
+            <h3 class="mb-2">{{statistiqueTb?.nombreTotalUtilisateurActif}}</h3>
+            <div class="d-flex align-items-baseline">
+              <p class="text-success">
+                <span>+3.3%</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                     viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round"
+                     class="feather feather-arrow-up icon-sm mb-1"
+                     appfeathericon=""><line x1="12" y1="19" x2="12" y2="5">
+                </line><polyline points="5 12 12 5 19 12"></polyline></svg>
+              </p>
+            </div>
+          </div>
+          <div class="col-6 col-md-12 col-xl-7">
+            <div class="mt-md-3 mt-xl-0">
+              <div class="avatar-sm ms-auto">
+                <div class="avatar-title bg-light rounded-circle text-success font-size-24">
+                  <i class="mdi mdi-lock-open"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-6 grid-margin stretch-card">
+    <div class="card">
+      <div class="card-body">
+        <div class="d-flex justify-content-between mb-3 align-items-baseline">
+          <h6 class="card-title mb-0">Total Utilisateurs Désactiver</h6>
+        </div>
+        <div class="row">
+          <div class="col-6 col-md-12 col-xl-5">
+            <h3 class="mb-2">{{statistiqueTb?.nombreTotalUtilisateurNonActif}}</h3>
+            <div class="d-flex align-items-baseline">
+              <p class="text-danger">
+                <span>+3.3%</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                     viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor"
+                     stroke-width="2"
+                     stroke-linecap="round"
+                     stroke-linejoin="round"
+                     class="feather feather-arrow-up icon-sm mb-1"
+                     appfeathericon=""><line x1="12" y1="19" x2="12" y2="5">
+                </line><polyline points="5 12 12 5 19 12"></polyline></svg>
+              </p>
+            </div>
+          </div>
+          <div class="col-6 col-md-12 col-xl-7">
+            <div class="mt-md-3 mt-xl-0">
+              <div class="avatar-sm ms-auto">
+                <div class="avatar-title bg-light rounded-circle text-danger font-size-24">
+                  <i class="mdi mdi-lock-remove"></i>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="row flex-grow-1">
+<div class="col-md-4 grid-margin stretch-card">
+  <div class="card">
+    <div class="card-body">
+      <div class="d-flex justify-content-between mb-3 align-items-baseline">
+        <h6 class="card-title mb-0">Total Utilisateurs</h6>
+      </div>
+      <div class="row">
+        <div class="col-6 col-md-12 col-xl-5">
+          <h3 class="mb-2">{{statistiqueTb?.nombreTotalUtilisateur}}</h3>
+          <div class="d-flex align-items-baseline">
+            <p class="text-primary">
+              <span>+3.3%</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                   viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor"
+                   stroke-width="2"
+                   stroke-linecap="round"
+                   stroke-linejoin="round"
+                   class="feather feather-arrow-up icon-sm mb-1"
+                   appfeathericon=""><line x1="12" y1="19" x2="12" y2="5">
+              </line><polyline points="5 12 12 5 19 12"></polyline></svg>
+            </p>
+          </div>
+        </div>
+        <div class="col-6 col-md-12 col-xl-7">
+          <div class="mt-md-3 mt-xl-0">
+            <div class="avatar-sm ms-auto">
+              <div class="avatar-title bg-light rounded-circle text-primary font-size-24">
+                <i class="bx bxs-user"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="col-md-4 grid-margin stretch-card">
+  <div class="card">
+    <div class="card-body">
+      <div class="d-flex justify-content-between mb-3 align-items-baseline">
+        <h6 class="card-title mb-0">Total Rôle</h6>
+      </div>
+      <div class="row">
+        <div class="col-6 col-md-12 col-xl-5">
+          <h3 class="mb-2">{{statistiqueTb?.nombreTotalRole}}</h3>
+          <div class="d-flex align-items-baseline">
+            <p class="text-warning">
+              <span>+3.3%</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                   viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor"
+                   stroke-width="2"
+                   stroke-linecap="round"
+                   stroke-linejoin="round"
+                   class="feather feather-arrow-up icon-sm mb-1"
+                   appfeathericon=""><line x1="12" y1="19" x2="12" y2="5">
+              </line><polyline points="5 12 12 5 19 12"></polyline></svg>
+            </p>
+          </div>
+        </div>
+        <div class="col-6 col-md-12 col-xl-7">
+          <div class="mt-md-3 mt-xl-0">
+            <div class="avatar-sm ms-auto">
+              <div class="avatar-title bg-light rounded-circle text-warning font-size-24">
+                <i class="bx bxs-group"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="col-md-4 grid-margin stretch-card">
+  <div class="card">
+    <div class="card-body">
+      <div class="d-flex justify-content-between mb-3 align-items-baseline">
+        <h6 class="card-title mb-0">Total Permission</h6>
+      </div>
+      <div class="row">
+        <div class="col-6 col-md-12 col-xl-5">
+          <h3 class="mb-2">{{statistiqueTb?.nombreTotalPermission}}</h3>
+          <div class="d-flex align-items-baseline">
+            <p class="text-info">
+              <span>+3.3%</span>
+              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+                   viewBox="0 0 24 24" fill="none"
+                   stroke="currentColor"
+                   stroke-width="2"
+                   stroke-linecap="round"
+                   stroke-linejoin="round"
+                   class="feather feather-arrow-up icon-sm mb-1"
+                   appfeathericon=""><line x1="12" y1="19" x2="12" y2="5">
+              </line><polyline points="5 12 12 5 19 12"></polyline></svg>
+            </p>
+          </div>
+        </div>
+        <div class="col-6 col-md-12 col-xl-7">
+          <div class="mt-md-3 mt-xl-0">
+            <div class="avatar-sm ms-auto">
+              <div class="avatar-title bg-light rounded-circle text-info font-size-24">
+                <i class="bx bxs-user-voice"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>

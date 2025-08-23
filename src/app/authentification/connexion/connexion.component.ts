@@ -1,15 +1,17 @@
+// src/app/authentification/connexion/connexion.component.ts
 import { Component, OnInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { DataStateEnum } from '../../state/state';
 import { map, catchError, startWith } from 'rxjs/operators';
 
 import { AuthentificationService } from '../services/authentication.service';
-import {ActivatedRoute, Router, RouterLink, RouterOutlet} from '@angular/router';
+import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import Swal from "sweetalert2";
-import {GLOBAL_CONFIG} from "../../commun/models/global";
-import {AsyncPipe, NgIf, NgSwitch, NgSwitchCase} from "@angular/common";
-import {FormsModule} from "@angular/forms";
+import { GLOBAL_CONFIG } from "../../commun/models/global";
+import { AsyncPipe, CommonModule, NgIf, NgSwitch, NgSwitchCase } from "@angular/common";
+import { FormsModule, ReactiveFormsModule } from "@angular/forms";
+import { NgbDropdownModule, NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
 
 @Component({
   selector: 'app-connexion',
@@ -19,11 +21,13 @@ import {FormsModule} from "@angular/forms";
     AsyncPipe,
     NgSwitch,
     FormsModule,
+    ReactiveFormsModule,
     NgSwitchCase,
     NgIf,
     RouterLink,
+    NgbDropdownModule
   ],
-  styleUrls: ['./connexion.component.scss']
+    styleUrls: ['./connexion.component.scss']
 })
 export class ConnexionComponent implements OnInit {
 
@@ -77,6 +81,7 @@ onSubmit(): void {
         }
         // Le service a déjà posé token, permissions, isAdmin
         this.successmsg('Connexion réussie', 'Vous êtes maintenant connecté.');
+        console.log('on est la  nest ce pas')
         this.router.navigate(['/espacedetravail']); // OK
       },
       error: () => {

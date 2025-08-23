@@ -1,50 +1,50 @@
-// src/app/espacedetravail/espacedetravail.module.ts
 import { NgModule } from '@angular/core';
-import { CommonModule, NgOptimizedImage } from '@angular/common';
+import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
+
+
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { HttpClientModule } from '@angular/common/http';
+
+import { NgbNavModule, NgbDropdownModule, NgbModalModule, NgbTooltipModule , NgbCollapseModule} from '@ng-bootstrap/ng-bootstrap';
+import { NgApexchartsModule } from 'ng-apexcharts';
+import { SimplebarAngularModule } from 'simplebar-angular';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+
+import { ClickOutsideModule } from 'ng-click-outside';
 
 import { EspacedetravailRoutingModule } from './espacedetravail-routing.module';
 import { EspacedetravailComponent } from './espacedetravail.component';
-
-// Commun / RH / i18n / ng-bootstrap
 import { CommunModule } from '../commun/commun.module';
-import { RhModule } from '../rh/rh.module';
-import { TranslateModule } from '@ngx-translate/core';
-import {
-  NgbCollapseModule,
-  NgbDropdownModule,
-  NgbModalModule,
-  NgbNavModule,
-  NgbTooltipModule
-} from '@ng-bootstrap/ng-bootstrap';
-import { SharedLayoutModule } from '../layout/shared-layout.module';
+import { MenuComponent } from './menu/menu.component';
+import { EntetedepageComponent } from '../commun/entetedepage/entetedepage.component';
+
+
 
 @NgModule({
   declarations: [
-    EspacedetravailComponent, // ⬅️ garde seulement le shell
-    // ❌ NE PAS déclarer AdminDashboardComponent (il est standalone)
+    EspacedetravailComponent,
+    MenuComponent,
   ],
   imports: [
     CommonModule,
+    EspacedetravailRoutingModule,
+    CommunModule,
+    TranslateModule,
+    NgbDropdownModule,
+    ClickOutsideModule,
+    SimplebarAngularModule,
+
     FormsModule,
+    NgbModalModule,
+    
+    NgApexchartsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    SharedLayoutModule,
-
-    EspacedetravailRoutingModule,
-
-    NgbDropdownModule,
-    NgbTooltipModule,
-    NgbModalModule,
     NgbNavModule,
+    NgbTooltipModule,
     NgbCollapseModule,
+    SimplebarAngularModule,
 
-    NgOptimizedImage,
-    TranslateModule,
-
-    CommunModule,
-    RhModule,
   ]
 })
-export class EspacedetravailModule {}
+export class EspacedetravailModule { }

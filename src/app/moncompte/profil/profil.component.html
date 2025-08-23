@@ -1,0 +1,110 @@
+<div class="container-fluid">
+<!-- <app-titredepage title="Mon compte" [items]="items || []"></app-titredepage> -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-4">
+                            <div class="media">
+                                <div class="me-3">
+                                    <img *ngIf="profilSrc" [src]="profilSrc" alt=""
+                                        class="avatar-md rounded-circle img-thumbnail">
+
+                                    <span *ngIf="!profilSrc"
+                                        class="avatar-user-profil-title rounded-circle bg-danger text-white font-size-24 avatar-user-profil avatar-md">
+                                        {{utilisateurAuthentifie?.personnel?.prenom[0] + utilisateurAuthentifie?.personnel?.prenom[1] }}
+                                    </span>
+
+                                </div>
+                                <div class="media-body align-self-center">
+                                    <div class="text-muted">
+                                        <p class="mb-2">Votre compte.</p>
+                                        <h5 class="mb-1">{{utilisateurAuthentifie?.personnel?.prenom }}
+                                            {{utilisateurAuthentifie?.personnel?.nom }} </h5>
+                                        <p class="mb-0">{{utilisateurAuthentifie?.role[0].nom}}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 align-self-center">
+                            <div class="text-lg-center mt-4 mt-lg-0">
+                                <div class="row">
+                                    <div class="col-5">
+                                        <div>
+                                            <p class="text-muted text-truncate mb-2">Dernière connexion</p>
+                                            <h5 class="mb-0">{{utilisateurAuthentifie?.dernierConnexion| date:'dd MMMM yyyy à HH:mm:ss' :'':'fr-FR'}}</h5>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div>
+                                            <p class="text-muted text-truncate mb-2">Poste occupé</p>
+                                            <h5 class="mb-0">{{utilisateurAuthentifie?.personnel?.poste.designation}}
+                                            </h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 d-none d-lg-block">
+                            <div class="clearfix  mt-4 mt-lg-0">
+                                <div class="dropdown float-end" ngbDropdown>
+                                <div class="upload-btn-wrapper">
+                                    <button  class="btn btn-primary dropdown-toggle" title="Changer l'image du profile" (click)="fileUpload.click()" ><i class="bx bx-image-add align-middle mr-1"></i></button>
+                                <input
+                                #fileUpload
+                                type="file"
+                                (click)="fileUpload.value = ''"
+                                (change)="importFile($event)"
+                                style="display:none"
+                                />
+                                    accept="image/*"  />
+                                  <button  class="btn btn-warning dropdown-toggle mx-3"  title="Modifier le Mot de Passe" ><i class="bx bx-key align-middle mr-1"></i></button>
+                                </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!--div class="col-lg-4 d-none d-lg-block">
+                            <div class="clearfix  mt-4 mt-lg-0">
+                                <div class="dropdown float-end" ngbDropdown>
+                                    <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"
+                                        aria-haspopup="true" aria-expanded="false" ngbDropdownToggle>
+                                        <i class="bx bxs-cog align-middle mr-1"></i>
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
+                                        <a class="dropdown-item" href="javascript: void(0);">Action</a>
+                                        <a class="dropdown-item" href="javascript: void(0);">Another action</a>
+                                        <a class="dropdown-item" href="javascript: void(0);">Something else</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div-->
+                    </div>
+
+                    <!-- end row -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <ng-container *ngIf="utilisateurAuthentifieState$|async as reponse" [ngSwitch]="reponse.dataState">
+
+
+
+        <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+            <div class="alert alert-danger" role="alert">
+                Code d'erreur : {{reponse.errorMessage}} {{reponse.errorMessage}}
+            </div>
+        </ng-container>
+
+        <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+        </ng-container>
+
+    </ng-container>
+
+
+</div>

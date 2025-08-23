@@ -1,38 +1,25 @@
-import {Component, EventEmitter, Inject, OnInit, Output} from '@angular/core';
-import {DataStateEnum, ModelDataState} from "../../state/state";
-import {WebSocketSubject} from "rxjs/internal/observable/dom/WebSocketSubject";
-import {TranslateService} from "@ngx-translate/core";
-import {DomSanitizer, SafeUrl, Title} from "@angular/platform-browser";
-import {UtilisateurAuthentifie} from "../../authentification/models/utilisateur-authentifie";
-import {AuthentificationService} from "../../authentification/services/authentication.service";
-import {Router} from "@angular/router";
-import {interval, Observable, Subject, takeUntil} from "rxjs";
-import {ToastrService} from "ngx-toastr";
-import {HttpClient, HttpErrorResponse} from "@angular/common/http";
-import {catchError, map, startWith} from "rxjs/operators";
-import {environment} from "../../../environments/environment";
-import {PedagogieService} from "../../pedagogie/services/pedagogie.service";
-import {NotificationService} from "../../pedagogie/services/notification.service";
-import {WebsocketService} from "../services/websocket.service";
-import {NgbDropdownMenu} from "@ng-bootstrap/ng-bootstrap";
-import {AsyncPipe, DatePipe, DOCUMENT, NgForOf, NgIf, NgSwitch, NgSwitchCase} from "@angular/common";
-import {NgxSimplebarModule} from "ngx-simplebar";
-
+import { Component, OnInit, Inject, Output, EventEmitter } from '@angular/core';
+//import { LanguageService } from '../../core/services/language.service';
+import { Router } from '@angular/router';
+import { TranslateService } from '@ngx-translate/core';
+import { DOCUMENT } from '@angular/common';
+import { map, catchError, startWith, tap, takeUntil } from 'rxjs/operators';
+import { interval, Observable, of, Subject } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { DomSanitizer, SafeUrl, Title } from '@angular/platform-browser';
+import { WebSocketSubject } from 'rxjs/webSocket';
+import { ToastrService } from 'ngx-toastr';
+import { WebsocketService } from '../services/websocket.service';
+import { NotificationService } from '../services/notification.service';
+import { PedagogieService } from '../../pedagogie/services/pedagogie.service';
+import { DataStateEnum, ModelDataState } from '../../state/state';
+import { UtilisateurAuthentifie } from '../../authentification/models/utilisateur-authentifie';
+import { AuthentificationService } from '../../authentification/services/authentication.service';
+import { environment } from '../../../environments/environment';
 @Component({
   selector: 'app-entetedepage',
-  imports: [
-    NgSwitch,
-    NgIf,
-    NgSwitchCase,
-    DatePipe,
-    AsyncPipe,
-    NgForOf,
-    NgbDropdownMenu,
-    NgxSimplebarModule
-  ],
   templateUrl: './entetedepage.component.html',
-  standalone: true,
-  styleUrl: './entetedepage.component.scss'
+  styleUrls: ['./entetedepage.component.scss']
 })
 export class EntetedepageComponent implements OnInit{
   dataStateEnum = DataStateEnum;

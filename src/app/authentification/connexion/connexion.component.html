@@ -9,26 +9,12 @@
     <p class="subtitle">Connectez-vous pour accéder à {{ entreprise || 'ISI' }}</p>
 
     <form class="stack" name="form" #f="ngForm" (ngSubmit)="f.form.valid && onSubmit()" novalidate>
-      <input
-        class="input"
-        type="email"
-        placeholder="Adresse e-mail*"
-        [(ngModel)]="form.email"
-        name="email"
-        required
-        #email="ngModel"
-        pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}$"
-      />
+      <input class="input" type="email" placeholder="Adresse e-mail*" [(ngModel)]="form.email" name="email" required
+        #email="ngModel" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}" />
 
-      <input
-        class="input"
-        [type]="'password'"
-        placeholder="Mot de passe*"
-        [(ngModel)]="form.motdepasse"
-        name="motdepasse"
-        required
-        #motdepasse="ngModel"
-      />
+
+      <input class="input" [type]="'password'" placeholder="Mot de passe*" [(ngModel)]="form.motdepasse"
+        name="motdepasse" required #motdepasse="ngModel" />
 
       <div class="text-end">
         <a [routerLink]="'/motdepasseoublie'" class="help-link">Mot de passe oublié ?</a>

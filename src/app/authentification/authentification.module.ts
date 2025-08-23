@@ -3,10 +3,11 @@ import { CommonModule } from '@angular/common';
 import { AuthentificationRoutingModule } from './authentification-routing.module';
 import { AuthentificationComponent } from './authentification.component';
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {NgbAlertModule} from "@ng-bootstrap/ng-bootstrap";
+import {NgbAlertModule, NgbCarouselModule} from "@ng-bootstrap/ng-bootstrap";
 import {CommunModule} from "../commun/commun.module";
 import {HttpClientModule} from "@angular/common/http";
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
+import { NgxSimplebarModule } from 'ngx-simplebar';
 @NgModule({
   declarations: [
     AuthentificationComponent,
@@ -20,8 +21,8 @@ import { ResetPasswordComponent } from './pages/reset-password/reset-password.co
     HttpClientModule,
     CommunModule,
     NgbAlertModule,
-    //NgxSimplebarModule
-  // CarouselModule,
+    NgxSimplebarModule,
+    NgbCarouselModule,
   //  PdfViewerModule,
   //  PdfViewerModule
   ]

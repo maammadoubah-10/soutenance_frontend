@@ -8,22 +8,22 @@ const routes: Routes = [
   {
     path: '',
     component: EspacedetravailComponent,
-    children: [
-      // d'abord les features
-      { path: 'utilisateur', loadChildren: () => import('../utilisateur/utilisateur.module').then(m => m.UtilisateurModule) },
-      { path: 'roles',       loadChildren: () => import('../roles/roles.module').then(m => m.RolesModule) },
-      { path: 'permissions', loadChildren: () => import('../permissions/permissions.module').then(m => m.PermissionsModule) },
+    // children: [
+    //   // d'abord les features
+    //   { path: 'utilisateur', loadChildren: () => import('../utilisateur/utilisateur.module').then(m => m.UtilisateurModule) },
+    //   { path: 'roles',       loadChildren: () => import('../roles/roles.module').then(m => m.RolesModule) },
+    //   { path: 'permissions', loadChildren: () => import('../permissions/permissions.module').then(m => m.PermissionsModule) },
 
       // puis le dashboard
-      {
-        path: 'dashboard',
-        loadComponent: () =>
-          import('./pages/admin-dashboard/admin-dashboard.component')
-            .then(m => m.AdminDashboardComponent),
-      },
-      // enfin le redirect vide
-      { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
-    ]
+      // {
+      //   path: 'dashboard',
+      //   loadComponent: () =>
+      //     import('./pages/admin-dashboard/admin-dashboard.component')
+      //       .then(m => m.AdminDashboardComponent),
+      // },
+      // // enfin le redirect vide
+      // { path: '', pathMatch: 'full', redirectTo: 'dashboard' },
+    //]
   }
 ];
 

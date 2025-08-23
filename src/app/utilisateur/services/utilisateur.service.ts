@@ -1,16 +1,26 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
+import HttpResponse from "../../utilisateur/models/HttpResponse";
+
 import { environment } from '../../../environments/environment';
 import { Role } from '../../roles/models/role.model';
 import { Utilisateur, UtilisateurDto } from '../models/utilisateur';
 import { Statistique } from '../models/statistique';
-
+import { Permission } from '../models/permission';
+const host = environment.hostmicroserviceutilisateur;
 const ROOT = environment.hostmicroserviceutilisateur.replace(/\/+$/, ''); // ex: http://localhost:9001/utilisateur
 const join = (base: string, path: string) => `${base}/${path.replace(/^\/+/, '')}`;
 
+  const httpOptions = {
+  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
+};
+
 @Injectable({ providedIn: 'root' })
 export class UtilisateurService {
+
+
+
   private http = inject(HttpClient);
 
   // Base unique pour toutes les routes "utilisateurs"
@@ -24,6 +34,8 @@ export class UtilisateurService {
       roles: u.roles ?? [],
     } as Utilisateur;
   }
+
+
 
   // -------- Lecture
   afficherLesUtilisateurs(): Observable<Utilisateur[]> {
@@ -131,4 +143,109 @@ export class UtilisateurService {
     const params = new HttpParams().set('token', token);
     return this.http.patch(join(this.base, 'reinitialisation'), body, { params });
   }
+
+    /*
+  Permissions début
+  */
+  afficherLesPermissions(): Observable<Permission[]> {
+    return this.http.get<Permission[]>(host + 'permissions/', httpOptions);
+  }
+
+  public creerPermission(data: any): Observable<any> {
+    return this.http.post<any>(
+      host + 'permissions/',
+      data
+    );
+  }
+
+  public modifierPermission(data:any):Observable<any>{
+    return this.http.patch<any>(
+      host+ 'permissions/'+data.id,
+      data)
+  }
+  
+  public supprimerPermission(id: number) {
+    return this.http.delete<any>(host + 'permissions/' + id);
+  }
+
+  afficherLesPermissionsPageRecherches(page: number = 0, size: number = 10, code: string = ''): Observable<any> {
+    const url = `${host+ 'permissions/page'}?page=${page}&size=${size}&code=${code}`;
+    // @ts-ignore
+    return this.http.get<Permission[]>(url, { observe: 'response' });
+  }
+
+  public recherchePermission(search : string) {
+    let params = new HttpParams()
+      .set('code',search.toString());
+    return this.http.get<any>(
+      host+ 'permissions/recherche',{params}
+    )
+  }
+
+  /*
+  Permissions fin
+  */
+
+ /*
+    Role / role début
+  */
+
+  afficherLesRoles(): Observable<Role[]> {
+    return this.http.get<Role[]>(host + 'roles/', httpOptions);
+  }
+
+  public creerRole(data: any): Observable<any> {
+    return this.http.post<any>(
+      host + 'roles/',
+      data
+    );
+  }
+
+  public modifierRole(data:any):Observable<any>{
+    return this.http.patch<any>(
+      host+ 'roles/'+data.id,
+      data)
+  }
+
+
+  public supprimerRole(id: number) {
+    return this.http.delete<any>(host + 'roles/' + id);
+  }
+
+  afficherLesRolePageRecherches(page: number = 0, size: number = 10, nom: string = ''): Observable<any> {
+    const url = `${host+ 'roles/page'}?page=${page}&size=${size}&nom=${nom}`;
+    // @ts-ignore
+    return this.http.get<Role[]>(url, { observe: 'response' });
+  }
+
+  public retirerUnePermission(id:number,data:any):Observable<any>{
+    return this.http.patch<any>(
+      host+ 'roles/'+id+'/retirer-permissions',
+      data)
+  }
+
+  public ajouterUnePermission(id:number,data:any):Observable<any>{
+    return this.http.patch<any>(
+      host+ 'roles/'+id+'/ajouter-permissions',
+      data)
+  }
+
+  public rechercheRole(search : string) {
+    let params = new HttpParams()
+      .set('nom',search.toString());
+    return this.http.get<any>(
+      host+ 'roles/recherche',{params}
+    )
+  }
+
+  afficherLesPermissionsDuRole(id: number): Observable<Permission[]>  {
+    return this.http.get<Permission[]>(host + `roles/${id}/permissions`);
+  }
+
+  /*
+  Role / role  Fin
+  */
 }
+
+
+ 

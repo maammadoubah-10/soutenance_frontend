@@ -1,0 +1,354 @@
+<div class="container-fluid px-3 main">
+  <app-titredepage title="Rôles" [items]?="items"></app-titredepage>
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-header bg-success"></div>
+        <div class="card-body">
+          <h4 class="card-title">Liste des rôles</h4>
+          <p class="card-title-desc">
+            Le tableau suivant présente la liste des rôles
+          </p>
+          <div class="row " style="display: flex">
+            <div class="col-sm-4">
+              <button class="btn btn-success btn-label" (click)="openModal(content)">
+                <i class="mdi mdi-plus label-icon"></i>
+                Ajouter un rôle
+              </button>
+            </div>
+
+            <div class="col-sm-2">
+              <select name="perPage" id="" class="form-control">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+
+            <div class="col-sm-4">
+              <div class="search-box me-2 mb-2 d-inline-block">
+                <input type="text" class="form-control" placeholder="Rechercher un rôle ..." [(ngModel)]?="nom"
+                  (keyup)="onPageChange(currentPage)" name="searchValue">
+                <i class="bx bx-search-alt search-icon"></i>
+              </div>
+            </div>
+
+          </div>
+          <hr />
+          <ng-container [ngSwitch]="response.dataState" *ngIf="rolesStates$ | async as response">
+            <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+              <div class="alert alert-info" role="alert">
+                {{ dataStateEnum.CHARGEMENT }}
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+              <div class="alert alert-info" role="alert">
+                {{ response.dataState }}
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+              <div class="table-responsive mt-2">
+                <table class="table table-bordered no-wrap align-middle">
+                  <thead>
+                    <tr class="text-center justify-content-center">
+                      <th>#</th>
+                      <th>Désignation</th>
+                      <th>Permission(s)</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr class="text-center justify-content-center"
+                      *ngFor="let role of roles | filter:term ;let i = index;">
+                      <td>{{ i + 1 }}</td>
+                      <td class="justify-content-center">{{role?.nom}}</td>
+                      <td>
+                        <button
+                          style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;"
+                          type="button" class="btn btn-info"
+                          (click)="openModalListePermissionRole(role,details)">Aperçu</button>
+                      </td>
+                      <td>
+                        <button placement="top" ngbTooltip="Ajouter la/les permission(s)"
+                          class="btn btn-outline-success mx-1 mt-1 btn-sm"
+                          (click)="openModalAjouterPermissionsRole(role, contentAjouter)">
+                          <i class="mdi mdi-plus"></i>
+                        </button>
+                        <button placement="top" ngbTooltip="Retirer la/les permission(s)"
+                          class="btn btn-outline-danger mx-1 mt-1 btn-sm"
+                          (click)="openModalRetirerPermissionsRole(role, contentRetirer)">
+                          <i class="bx bx-x"></i>
+                        </button>
+                        <!--<button
+                        placement="top"
+                        ngbTooltip="Modifier"
+                        class="btn btn-info mx-1 mt-1 btn-sm"
+                        (click)="openModal(content,role)"
+                      >
+                        <i class="mdi mdi-pencil"></i>
+                      </button>-->
+                        <button placement="top" ngbToolTip="Supprimer" class="btn btn-danger mx-1 mt-1 btn-sm"
+                          (click)="supprimerFormat(role.id)">
+                          <i class="bx bx-trash-alt"></i>
+                        </button>
+                      </td>
+                    </tr>
+                    <tr *ngIf="response.data?.length == 0">
+                      <td colspan="2" class="text-center"><i style="color: #d9534f;font-size: xxx-large"
+                          class='bx bxs-data btn btn-lg'></i><br>Aucun Rôles</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="row justify-content-between align-items-center mb-3" *ngIf="totalRoles > 10">
+
+                  <div class="col-auto me-auto"></div>
+                  <div class="col-auto">
+                    <div class="d-flex align-items-center">
+                      <button class="btn btn-primary mr-2 mx-3 btn-sm"
+                        (click)="currentPage = currentPage - 1; handleClick()" [disabled]="currentPage === 0">
+                        Précédent
+                      </button>
+                      <ng-container *ngIf="pages.length > 1">
+                        <ng-container *ngIf="pages.length <= 11">
+                          <ng-container *ngFor="let page of pages">
+                            <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                              [disabled]="currentPage === page">
+                              {{ page +1}}
+                            </button>
+                          </ng-container>
+                        </ng-container>
+                        <ng-container *ngIf="pages.length > 11">
+                          <ng-container *ngIf="currentPage <= 6">
+                            <ng-container *ngFor="let page of pages.slice(0, 5)">
+                              <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page">
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                            <button class="btn btn-primary btn-sm mx-1" disabled>
+                              ...
+                            </button>
+                            <ng-container *ngFor="let page of pages.slice(-5)">
+                              <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page">
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                          </ng-container>
+                          <ng-container *ngIf="currentPage > 6 && currentPage < pages.length - 5">
+                            <ng-container *ngFor="
+                      let page of pages.slice(currentPage - 4, currentPage)
+                    ">
+                              <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page">
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                            <button class="btn btn-primary btn-sm mx-1" disabled>
+                              ...
+                            </button>
+                            <ng-container *ngFor="
+                      let page of pages.slice(currentPage, currentPage + 4)
+                    ">
+                              <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page">
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                          </ng-container>
+
+
+                          <ng-container *ngIf="currentPage >= pages.length - 5">
+                            <ng-container *ngFor="let page of pages.slice(0, 5)">
+                              <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page">
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                            <button class="btn btn-primary btn-sm mx-1" disabled>
+                              ...
+                            </button>
+                            <ng-container *ngFor="let page of pages.slice(-5)">
+                              <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page">
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                          </ng-container>
+                        </ng-container>
+                      </ng-container>
+                      <button class="btn btn-primary btn-sm mx-3" (click)="currentPage = currentPage + 1; handleClick()"
+                        [disabled]="currentPage+1 === totalPages">
+                        Suivant
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Forms Modal -->
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4>{{formulaireRole.get('id')?.value ? 'Modifier': 'Créer'}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cliquer pour fermer')">
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="formulaireRole" (ngSubmit)="creerModifierRole()">
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="mb-3">
+            <label for="nom">Nom</label>
+            <input type="text" class="form-control" placeholder="Veillez svp entrer la nom de la catégorie comptable"
+              formControlName="nom" id="nom"
+              [ngClass]="{'is-invalid': formulaireRole.get('nom')?.invalid && formulaireRole.get('nom')?.dirty, 'is-valid': formulaireRole.get('nom')?.valid}">
+            <div *ngIf="formulaireRole.get('nom')?.invalid && formulaireRole.get('nom')?.dirty" class="text-danger">
+              <div *ngIf="formulaireRole.get('nom')?.errors?.['required']">Le nom est obligatoire</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-12" *ngIf="formulaireRole.get('id')?.value == null">
+          <label for="permissions">La/Les Permission(s)</label>
+         <ng-select
+          [items]?="permissions"
+          [searchable]?="true"
+          [multiple]?="true"
+          [typeahead]?="searchItemPermission"
+          (search)?="onSearchPermission($event)"
+          [loading]?="loading"
+          formControlName="permissions"
+          id="permissions"
+          [ngClass]="{
+            'is-invalid': formulaireRole.get('permissions')?.invalid && formulaireRole.get('permissions')?.dirty,
+            'is-valid': formulaireRole.get('permissions')?.valid
+          }"
+          placeholder="Tapez les trois premières lettres">
+
+        </ng-select>
+
+        <!-- Message d'erreur -->
+        <div *ngIf="formulaireRole.get('permissions')?.invalid && formulaireRole.get('permissions')?.dirty"
+            class="text-danger">
+          <div *ngIf="formulaireRole.get('permissions')?.errors?.['required']">
+            La/Les Permission(s) est/sont obligatoire
+          </div>
+        </div>
+
+                </div>
+
+
+              </div>
+
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" [disabled]="formulaireRole.invalid"
+          type="submit">{{formulaireRole.get('id')?.value ? 'Modifier': 'Créer'}}</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #details role="document" let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title" id="exampleModalLabel"> Le(s) Permission(s)</h5>
+    <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+  </div>
+  <div class="modal-body">
+    <div class="button-items">
+      <button *ngFor="let permission of permissionsDuRoles" type="button" class="btn btn-light">
+        {{permission.code}}
+      </button>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <div class="mt-3 hstack">
+      <span class="btn btn-secondary me-2 border" (click)="modal.dismiss('Cross click')">Fermer</span>
+      <!-- <button [disabled]="!impactSalarialForm.valid" class="btn btn-primary">{{ impactSalarialForm.get('id').value == null ? 'Ajouter' : 'Modifier' }}</button> -->
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #contentRetirer let-modal>
+  <div class="modal-header">
+    <h4>Retirer La/Les Permission(s)</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cliquer pour fermer')"></button>
+  </div>
+  <div class="modal-body">
+    <form (ngSubmit)="retirerUnePermission()">
+      <div class="row">
+        <div class="col-md-12">
+          <label for="permissionIds">La/Les Permission(s)</label>
+            <ng-select
+              [items]?="permissionsDuRoles"
+              [multiple]?="true"
+              [closeOnSelect]?="false"
+              [clearable]?="true"
+              bindLabel="code"
+              bindValue="id"
+              [(ngModel)]="permissionIds"
+              name="permissionIds"
+              required
+              [searchable]?="true"
+              [typeahead]?="searchItemPermission"
+              (search)?="onSearchPermission($event.term)"
+              [loading]?="loading"
+              id="permissionIds">
+            </ng-select>
+
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" [disabled]="!permissionIds || permissionIds.length === 0"
+          type="submit">Retirer</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #contentAjouter let-modal>
+  <div class="modal-header">
+    <h4>Ajouter La/Les Permission(s)</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cliquer pour fermer')"></button>
+  </div>
+  <div class="modal-body">
+    <form (ngSubmit)="ajouterUnePermission()">
+      <div class="row">
+        <div class="col-md-12">
+          <label for="permissionIds">La/Les Permission(s)</label>
+          <ng-select
+              [items]?="permissionsDuRoles"
+              [multiple]?="true"
+              [closeOnSelect]?="false"
+              [clearable]?="true"
+              bindLabel="code"
+              bindValue="id"
+              [(ngModel)]="permissionIds"
+              name="permissionIds"
+              required
+              [searchable]?="true"
+              [typeahead]?="searchItemPermission"
+              (search)?="onSearchPermission($event.term)"
+              [loading]?="loading"
+              id="permissionIds">
+            </ng-select>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" [disabled]="!permissionIds || permissionIds.length === 0"
+          type="submit">Ajouter</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
