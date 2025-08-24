@@ -1,5 +1,5 @@
 <div class="container-fluid px-3 main">
-  <app-titredepage title="Rôles" [items]?="items"></app-titredepage>
+  <app-titredepage title="Rôles"[items]="items"></app-titredepage>
   <div class="row">
     <div class="col">
       <div class="card">
@@ -28,7 +28,7 @@
 
             <div class="col-sm-4">
               <div class="search-box me-2 mb-2 d-inline-block">
-                <input type="text" class="form-control" placeholder="Rechercher un rôle ..." [(ngModel)]?="nom"
+                <input type="text" class="form-control" placeholder="Rechercher un rôle ..." [(ngModel)]="nom"
                   (keyup)="onPageChange(currentPage)" name="searchValue">
                 <i class="bx bx-search-alt search-icon"></i>
               </div>

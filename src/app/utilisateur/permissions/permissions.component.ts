@@ -20,7 +20,7 @@ import { AuthentificationService } from '../../authentification/services/authent
 
 export class PermissionsComponent implements OnInit {
   //
-items ?: Array<{}>;
+ items: any[] = [];
 
   term: any;
   //

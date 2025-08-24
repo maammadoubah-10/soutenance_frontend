@@ -28,6 +28,7 @@ import { FilterPipe } from './filter.pipe';
     TranslateModule.forRoot(),
     ToastrModule.forRoot(),
     NgPipesModule,
+
     // StoreDevtoolsModule.instrument({
     //   maxAge: 25,
     //   logOnly: environment.production,

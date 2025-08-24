@@ -15,7 +15,8 @@ import { AuthentificationService } from '../../authentification/services/authent
   styleUrls: ['./tableaudebord.component.scss']
 })
 export class TableaudebordComponent implements OnInit {
-  items?: Array<{}>;
+  items: any[] = [];
+
   dataStateEnum = DataStateEnum;
   profilSrc :any;
   utilisateurAuthentifie: any;
@@ -26,8 +27,10 @@ export class TableaudebordComponent implements OnInit {
                private authenficationSerice: AuthentificationService,) {}
 
   ngOnInit(): void {
-    this.items = [{ label: 'Utilisateurs' }, { label: 'Tableau de bord', active: true }];
-    this.obtenirUnUtilisateurParEmail();
+  this.items = [
+      { label: 'Utilisateurs' },
+      { label: 'Tableau de bord', active: true }
+    ];    this.obtenirUnUtilisateurParEmail();
     this.obtenunirStatistique()
   }
 

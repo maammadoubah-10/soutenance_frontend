@@ -17,7 +17,7 @@ import { AuthentificationService } from '../../authentification/services/authent
   styleUrls: ['./roles.component.scss']
 })
 export class RolesComponent implements OnInit {
-  items ?: Array<{}>;
+  items: any[] = [];
   term: any;
 
   roles$: any;
@@ -41,7 +41,7 @@ export class RolesComponent implements OnInit {
   id?: number;
   index?: number;
   selected?: number;
-  nom: string = "";
+  nom?: string ;
   totalRoles: number = 0;
   currentPage: number = 0;
   rolesPerPage: number = 10;

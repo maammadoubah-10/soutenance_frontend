@@ -58,7 +58,7 @@
 </div> -->
 
 
-<!-- <div id="layout-wrapper" >
+<div id="layout-wrapper">
 
     <app-entetedepage (settingsButtonClicked)="onSettingsButtonClicked()" (mobileMenuButtonClicked)="onToggleMobileMenu()">
     </app-entetedepage>
@@ -66,24 +66,13 @@
     <app-menu [isCondensed]="isCondensed" ></app-menu>
   
     <div class="main-content" >
-      <div class="page-content"> -->
+      <div class="page-content">
         <!-- content -->
-        <!-- <router-outlet></router-outlet>
-      </div> -->
+        <router-outlet></router-outlet>
+      </div>
 
       <!-- footer -->
-      <!-- <app-pieddepage></app-pieddepage>
+      <app-pieddepage></app-pieddepage>
     </div>
-  </div> -->
-  
-
-  <div id="layout-wrapper">
-  <app-entetedepage></app-entetedepage>
-  <app-menu-utilisateur></app-menu-utilisateur>
-  <div class="main-content">
-    <div class="page-content">
-      <router-outlet></router-outlet>   <!-- ici -->
-    </div>
-    <app-pieddepage></app-pieddepage>
   </div>
-</div>
+  

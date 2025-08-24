@@ -17,7 +17,7 @@ import { MenuItem } from './menu.model';
 import MetisMenu from 'metismenujs';
 
 @Component({
-  selector: 'app-menu-utilisateur',
+  selector: 'app-menu',
   templateUrl: './menu.component.html',
   styleUrls: ['./menu.component.scss']
 })
