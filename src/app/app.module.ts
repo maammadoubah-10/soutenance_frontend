@@ -15,6 +15,7 @@ import { TokenInterceptor } from './core/interceptors/token.interceptor';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import localeFr from '@angular/common/locales/fr';
 import { FilterPipe } from './filter.pipe';
+import { SimplebarAngularModule } from 'simplebar-angular';
 // export function createTranslateLoader(http: HttpClient) { ... }
 
 @NgModule({
@@ -28,7 +29,7 @@ import { FilterPipe } from './filter.pipe';
     TranslateModule.forRoot(),
     ToastrModule.forRoot(),
     NgPipesModule,
-
+   SimplebarAngularModule,
     // StoreDevtoolsModule.instrument({
     //   maxAge: 25,
     //   logOnly: environment.production,

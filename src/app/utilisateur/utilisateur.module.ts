@@ -40,6 +40,7 @@ import { NgxSimplebarModule } from 'ngx-simplebar';
 import { CommunModule } from '../commun/commun.module';
 import { RolesComponent } from './roles/roles.component';
 import { FilterPipe } from "../filter.pipe";
+import { SimplebarAngularModule } from 'simplebar-angular';
 
 
 @NgModule({
@@ -57,7 +58,7 @@ import { FilterPipe } from "../filter.pipe";
     UtilisateurRoutingModule,
     FormsModule,
     NgbModalModule,
-    NgxSimplebarModule,
+    SimplebarAngularModule,
     HttpClientModule,
     NgbNavModule,
     NgbTooltipModule,

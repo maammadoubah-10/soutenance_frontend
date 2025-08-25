@@ -16,7 +16,7 @@ import { AuthentificationService } from '../../authentification/services/authent
   styleUrls: ['./profil.component.scss']
 })
 export class ProfilComponent implements OnInit {
-  items: Array<{ label: string; active?: boolean }> = [];
+  items: any[] = [];
 
   term: any;
 

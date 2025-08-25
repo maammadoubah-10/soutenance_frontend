@@ -38,7 +38,6 @@
               "ng-wizard/themes/ng_wizard_theme_arrows.min.css",
                "node_modules/boxicons/css/boxicons.min.css",
               "@angular/material/prebuilt-themes/indigo-pink.css",
-              "src/styles.scss",
               "node_modules/bootstrap/dist/css/bootstrap.min.css"
               ],
             "scripts": []

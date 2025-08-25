@@ -9,7 +9,7 @@
         <!-- {{menuItems}} -->
         <ng-container *ngFor="let item of menuItems">
           <li class="menu-title" *ngIf="item.isTitle">{{ item.label  }}</li>
-          <li *ngIf="!item.isTitle && !item.isLayout">
+          <li *ngIf=  "!item.isTitle && !item.isLayout">
             <a *ngIf="hasItems(item)" href="javascript:void(0);" class="is-parent"
               [ngClass]="{'has-arrow': !item.badge, 'has-dropdown': item.badge}">
               <i class="bx {{item.icon}}" *ngIf="item.icon"></i>
@@ -52,7 +52,7 @@
   </ng-template>
   <!-- Sidebar -->
   
-  <div class="vertical-menu">
+  <!-- <div class="vertical-menu">
     <ngx-simplebar class="h-100" #componentRef>
       <div *ngIf="!isCondensed">
         <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
@@ -60,7 +60,24 @@
       <div *ngIf="isCondensed">
         <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
       </div>
+    </ngx-simplebar> -->
+
+    <div class="layout-wrapper">
+  <!-- Sidebar -->
+  <div class="vertical-menu">
+    <ngx-simplebar class="h-100" #componentRef>
+      <div *ngIf="!isCondensed">
+        <ng-container *ngTemplateOutlet="contentTemplate"></ng-container>
+      </div>
     </ngx-simplebar>
+  </div>
+
+  <!-- Contenu -->
+  <div class="container-fluid px-3 main">
+    <router-outlet></router-outlet>
+  </div>
+</div>
+
 
 <!-- <div class="vertical-menu">
   <div class="h-100 overflow-auto">
@@ -69,5 +86,5 @@
 </div> -->
 
 
-  </div>
+  <!-- </div> -->
   <!-- Left Sidebar End -->

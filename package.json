@@ -39,7 +39,7 @@
     "ngx-simplebar": "^0.0.1",
     "ngx-toastr": "^19.0.0",
     "rxjs": "~7.8.0",
-    "simplebar": "^6.2.6",
+    "simplebar": "^6.3.2",
     "simplebar-angular": "^3.2.5",
     "sweetalert2": "^11.11.0",
     "tslib": "^2.3.0",
