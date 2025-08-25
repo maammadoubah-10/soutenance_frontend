@@ -1,22 +1,21 @@
 import { Role } from '../../roles/models/role.model';
+import { Personnel } from './personnel';
 
 export interface Utilisateur {
   id: number;
   email: string;
-
-  // le backend renvoie Set<Role> => JSON "roles"
-  roles: Role[];
-
-  // le backend sérialise ce champ avec la clé JSON "est_actif"
-  // on normalise côté service vers estActif (camelCase)
-  estActif: boolean;
-
-  estAdmin: boolean;
+    role : Role[];
+    personnel : Personnel;
+    est_actif: boolean
+     estActif: boolean;
+    estAdmin: boolean
 
   // champs potentiellement présents côté backend
   personnelId?: number;
+
   codeImageDeProfil?: string;
   tailleImageDeProfil?: number;
+
 }
 
 /**

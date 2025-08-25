@@ -74,12 +74,17 @@ export class UtilisateurService {
   }
 
   // (2) garder aussi l’ancienne signature si tu l’utilises ailleurs
-  creerUtilisateur(dto: UtilisateurDto): Observable<Utilisateur> {
-    return this.http.post<Utilisateur>(this.base, dto).pipe(map(u => this.normalize(u)));
+  public creerUtilisateur(data: any): Observable<any> {
+    return this.http.post<any>(
+      host + 'utilisateurs',
+      data
+    );
   }
 
-  modifierUtilisateur(id: number, dto: Partial<UtilisateurDto>): Observable<Utilisateur> {
-    return this.http.patch<Utilisateur>(join(this.base, String(id)), dto).pipe(map(u => this.normalize(u)));
+   public modifierUtilisateur(data:any):Observable<any>{
+    return this.http.patch<any>(
+      host+ 'utilisateurs/'+data.id,
+      data)
   }
 
   supprimerUtilisateur(id: number): Observable<void> {
@@ -245,6 +250,45 @@ export class UtilisateurService {
   /*
   Role / role  Fin
   */
+
+
+  
+  /*
+  Utilisateur début
+  */
+
+  afficherLesUtilisateursPageRecherches(): Observable<any> {
+    const url = `${host+ 'utilisateurs'}`;
+    // @ts-ignore
+    return this.http.get<Utilisateur[]>(url, { observe: 'response' });
+  }
+
+  
+
+  /*
+  Utilisateur début
+  */
+
+
+    /*
+  Personne début
+  */
+  personnelNonUtilisateur(): Observable<any[]> {
+    return this.http.get<any[]>(host + 'personnels/nonutilisateur/', httpOptions);
+  }
+
+  public recherchePersonnel(search : string) {
+    let params = new HttpParams()
+      .set('designation',search.toString());
+    return this.http.get<any>(
+      host+ 'personnels/recherche',{params}
+    )
+  }
+
+  /*
+  Personne début
+  */
+
 }
 
 

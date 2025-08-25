@@ -4,6 +4,7 @@ import { UtilisateurComponent } from './utilisateur.component';
 import { PermissionsComponent } from './permissions/permissions.component';
 import { TableaudebordComponent } from './tableaudebord/tableaudebord.component';
 import { RolesComponent } from './roles/roles.component';
+import { UtilisateursComponent } from './utilisateurs/utilisateurs.component';
 
 const routes: Routes = [
   // { path: '', component: UtilisateurComponent },          // liste
@@ -29,6 +30,7 @@ const routes: Routes = [
       { path: 'tableaudebord', component: TableaudebordComponent },
       { path: 'permissions', component: PermissionsComponent },
       { path: 'roles', component: RolesComponent },
+      { path: 'utilisateurs', component: UtilisateursComponent },
     ],
   }
   

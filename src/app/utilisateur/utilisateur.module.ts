@@ -41,6 +41,7 @@ import { CommunModule } from '../commun/commun.module';
 import { RolesComponent } from './roles/roles.component';
 import { FilterPipe } from "../filter.pipe";
 import { SimplebarAngularModule } from 'simplebar-angular';
+import { UtilisateursComponent } from './utilisateurs/utilisateurs.component';
 
 
 @NgModule({
@@ -52,6 +53,7 @@ import { SimplebarAngularModule } from 'simplebar-angular';
     TableaudebordComponent,
     MenuComponent,
     RolesComponent,
+    UtilisateursComponent,
   ],
   imports: [
     CommonModule,
