@@ -124,7 +124,7 @@ export class UtilisateursComponent implements OnInit {
           this.pages = this.getPages();
           return { dataState: this.dataStateEnum.CHARGE, data: this.utilisateurs };
         }),
-        startWith({ dataState: this.dataStateEnum.CHARGEMENT })
+        startWith({ dataState: this.dataStateEnum.CHARGEMENT, data: [] })
       ).pipe(
         catchError(err => {
           return of({ dataState: this.dataStateEnum.ERREUR, data: [] });
@@ -133,27 +133,21 @@ export class UtilisateursComponent implements OnInit {
   }
 
   onAfficherLesUtilisateurs(): void {
-    this.utilisateursStates$ = this.utilisateurService
-      .afficherLesUtilisateursPageRecherches()
-      .pipe(
-        map((data: any) => {
-          this.utilisateurs = data.body.content;
-          this.totalUtilisateurs = data.body.totalElements;
-          this.totalPages = data.body.totalPages
-          this.pages = this.getPages();
-          return {
-            dataState: this.dataStateEnum.CHARGE,
-            data: this.utilisateurs,
-          };
-        }),
-        startWith({ dataState: this.dataStateEnum.CHARGEMENT })
-      )
-      .pipe(
-        catchError((err) => {
-          return of({ dataState: this.dataStateEnum.ERREUR, data: [] });
-        })
-      );
-  }
+  this.utilisateursStates$ = this.utilisateurService
+    .afficherLesUtilisateursPageRecherches()
+    .pipe(
+      map((res: any) => {
+        const body = res?.body ?? res;
+        const content = body?.content ?? body;
+        this.totalUtilisateurs = body?.totalElements ?? (Array.isArray(content) ? content.length : 0);
+        this.totalPages = body?.totalPages ?? 1;
+        this.pages = this.getPages();
+        return { dataState: this.dataStateEnum.CHARGE, data: Array.isArray(content) ? content : [] };
+      }),
+      startWith({ dataState: this.dataStateEnum.CHARGEMENT, data: [] }),
+      catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] }))
+    );
+}
 
   onPageChange(event: any): void {
     this.currentPage = 0;

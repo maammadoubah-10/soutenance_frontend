@@ -2,9 +2,9 @@ import { Role } from '../../roles/models/role.model';
 import { Personnel } from './personnel';
 
 export interface Utilisateur {
-  id: number;
-  email: string;
-    role : Role[];
+    id: number;
+    email: string;
+    role? : Role[];
     personnel : Personnel;
     est_actif: boolean
      estActif: boolean;

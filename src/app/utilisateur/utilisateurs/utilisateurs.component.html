@@ -11,13 +11,13 @@
           </p>
           <div class="row " style="display: flex">
             <div class="col-sm-4">
-              <!-- <button
+              <button
                 class="btn btn-success btn-label"
                 (click)="openModal(content)"
               >
                 <i class="mdi mdi-plus label-icon"></i>
                 Ajouter un utilisateur
-              </button> -->
+              </button>
             </div>
 
             <div class="col-sm-2" >
@@ -42,137 +42,160 @@
           </div>
           <hr />
           <ng-container
-            [ngSwitch]?="response.dataState"
-            *ngIf="utilisateursStates$ | async as response"
-          >
-            <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
-              <div class="alert alert-info" role="alert">
-                {{ dataStateEnum.CHARGEMENT }}
-              </div>
-            </ng-container>
-            <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
-              <div class="alert alert-info" role="alert">
-                {{ response.dataState }}
-              </div>
-            </ng-container>
-            <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
-              <div class="table-responsive mt-2">
-                <table class="table table-bordered no-wrap align-middle">
-                  <thead>
-                  <tr class="text-center justify-content-center">
-                    <th>#</th>
-                    <th>Nom</th>
-                    <th>Prénoms</th>
-                    <th>Email</th>
-                    <th>Rôle(s)</th>
-                    <th>Statut</th>
-                    <th>Admin</th>
-                    <th>Action</th>
-                  </tr>
-                  </thead>
-                  <tbody>
-                  <tr class="text-center justify-content-center"
-                      *ngFor="let utilisateur of utilisateurs | filter:term ;let i = index;">
-                    <td>{{ i + 1 }}</td>
-                    <td>{{utilisateur?.personnel?.nom}}</td>
-                    <td>{{utilisateur?.personnel?.prenom}}</td>
-                    <td>{{utilisateur?.email}}</td>
-                    <td>
-                      <button style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .5rem; --bs-btn-font-size: .75rem;"
-                              *ngIf="utilisateur?.role != 0"
-                              type="button" class="btn btn-info"
-                              (click)="openModalDetails(details,utilisateur?.role)">Aperçu</button>
-                    </td>
-                    <td>
-                      <i *ngIf="utilisateur?.est_actif" class="mdi mdi-lock-open font-size-18 text-success"> Actif</i>
-                      <i *ngIf="!utilisateur?.est_actif" class="mdi mdi-lock-remove font-size-18 text-danger"> Inactif</i>
-                    </td>
-                    <td>
-                      <i *ngIf="utilisateur?.estAdmin" class="mdi mdi-lock-open font-size-18 text-success"> Admin</i>
-                      <i *ngIf="!utilisateur?.estAdmin" class="mdi mdi-lock-remove font-size-18 text-danger"> InAdmin</i>
-                    </td>
-                    <td>
+  *ngIf="utilisateursStates$ | async as response"
+  [ngSwitch]="response.dataState"
+>
+  <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+    <div class="alert alert-info" role="alert">
+      {{ dataStateEnum.CHARGEMENT }}
+    </div>
+  </ng-container>
 
-                      <!-- <button
-                        placement="top"
-                        ngbTooltip="Ajouter le/les rôle(s)"
-                        class="btn btn-outline-success mx-1 mt-1 btn-sm"
-                        (click)="openModalAjouterRolesUtilisateur(utilisateur, contentAjouter)"
-                      >
-                        <i class="mdi mdi-plus"></i>
-                      </button> -->
-                      <!-- <button
-                        placement="top"
-                        ngbTooltip="Retirer le/les rôle(s)"
-                        class="btn btn-outline-danger mx-1 mt-1 btn-sm"
-                        (click)="openModalRetirerRolesUtilisateur(utilisateur, contentRetirer)"
-                      >
-                        <i class="bx bx-x"></i>
-                      </button> -->
+  <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+    <div class="alert alert-danger" role="alert">
+      Erreur de chargement.
+    </div>
+  </ng-container>
 
-                      <button
-                        *ngIf="!utilisateur?.est_actif"
-                        placement="top"
-                        ngbToolTip="Activer"
-                        title="Activer l'utilisateur"
-                        class="btn btn-success mx-1 mt-1 btn-sm"
-                        (click)="inverserEstActif(utilisateur)"
-                        >
-                        <i class="mdi mdi-lock-open"></i>
-                      </button>
-                      <button
-                        *ngIf="utilisateur?.est_actif"
-                        placement="top"
-                        ngbToolTip="Désactiver"
-                        title="Désactiver l'utilisateur"
-                        class="btn btn-danger mx-1 mt-1 btn-sm"
-                        (click)="inverserEstActif(utilisateur)"
-                      >
-                        <i class="mdi mdi-lock-remove"></i>
-                      </button>
+  <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+    <div class="table-responsive mt-2">
+      <table class="table table-bordered no-wrap align-middle">
+        <thead>
+          <tr class="text-center justify-content-center">
+            <th>#</th>
+            <th>Nom</th>
+            <th>Prénoms</th>
+            <th>Email</th>
+            <th>Rôle(s)</th>
+            <th>Statut</th>
+            <th>Admin</th>
+            <th>Action</th>
+          </tr>
+        </thead>
 
-                      <button
-                        *ngIf="!utilisateur?.estAdmin"
-                        placement="top"
-                        ngbToolTip="Nommer Administrateur"
-                        title="Nommer Administrateur"
-                        class="btn btn-outline-success mx-1 mt-1 btn-sm"
-                        (click)="inverserEstAdmin(utilisateur)"
-                      >
-                        <i class="bx bx-user-plus"></i>
-                      </button>
-                      <button
-                        *ngIf="utilisateur?.estAdmin"
-                        placement="top"
-                        ngbToolTip="Révoquer Administrateur"
-                        title="Révoquer Administrateur"
-                        class="btn btn-outline-danger mx-1 mt-1 btn-sm"
-                        (click)="inverserEstAdmin(utilisateur)"
-                      >
-                        <i class="bx bx-user-x"></i>
-                      </button>
+        <tbody>
+          <tr
+            class="text-center justify-content-center"
+            *ngFor="let utilisateur of (response?.data ?? []); let i = index"          >
+            <td>{{ i + 1 }}</td>
+            <td>{{ utilisateur?.personnel?.nom }}</td>
+            <td>{{ utilisateur?.personnel?.prenom }}</td>
+            <td>{{ utilisateur?.email }}</td>
 
-                     <!-- <button
-                        placement="top"
-                        ngbTooltip="Modifier"
-                        class="btn btn-info mx-1 mt-1 btn-sm"
-                        (click)="openModal(content,utilisateur)">
-                        <i class="mdi mdi-pencil"></i>
-                      </button>-->
-                      <button
-                        placement="top"
-                        ngbToolTip="Supprimer"
-                        class="btn btn-danger mx-1 mt-1 btn-sm"
-                        (click)="supprimerFormat(utilisateur.id)">
-                        <i class="bx bx-trash-alt"></i>
-                      </button>
-                    </td>
-                  </tr>
-                  <tr *ngIf="response.data?.length == 0">
-                    <td colspan="8" class="text-center"><i style="color: #d9534f;font-size: xxx-large" class='bx bxs-data btn btn-lg'></i><br>Aucun Utilisateurs</td>
-                  </tr>
-                  </tbody>
-                </table>
+            <td>
+              <button
+                style="--bs-btn-padding-y:.25rem; --bs-btn-padding-x:.5rem; --bs-btn-font-size:.75rem;"
+                *ngIf="(utilisateur?.role?.length ?? 0) > 0"
+                type="button"
+                class="btn btn-info"
+                (click)="openModalDetails(details, utilisateur?.role)"
+              >
+                Aperçu
+              </button>
+            </td>
+
+            <td>
+              <i *ngIf="utilisateur?.est_actif" class="mdi mdi-lock-open font-size-18 text-success"> Actif</i>
+              <i *ngIf="!utilisateur?.est_actif" class="mdi mdi-lock-remove font-size-18 text-danger"> Inactif</i>
+            </td>
+
+            <td>
+              <i *ngIf="utilisateur?.estAdmin" class="mdi mdi-lock-open font-size-18 text-success"> Admin</i>
+              <i *ngIf="!utilisateur?.estAdmin" class="mdi mdi-lock-remove font-size-18 text-danger"> InAdmin</i>
+            </td>
+
+            <td>
+              <button
+                placement="top"
+                ngbTooltip="Ajouter le/les rôle(s)"
+                class="btn btn-outline-success mx-1 mt-1 btn-sm"
+                (click)="openModalAjouterRolesUtilisateur(utilisateur, contentAjouter)"
+              >
+                <i class="mdi mdi-plus"></i>
+              </button>
+
+              <button
+                placement="top"
+                ngbTooltip="Retirer le/les rôle(s)"
+                class="btn btn-outline-danger mx-1 mt-1 btn-sm"
+                (click)="openModalRetirerRolesUtilisateur(utilisateur, contentRetirer)"
+              >
+                <i class="bx bx-x"></i>
+              </button>
+
+              <button
+                *ngIf="!utilisateur?.est_actif"
+                placement="top"
+                ngbTooltip="Activer"
+                title="Activer l'utilisateur"
+                class="btn btn-success mx-1 mt-1 btn-sm"
+                (click)="inverserEstActif(utilisateur)"
+              >
+                <i class="mdi mdi-lock-open"></i>
+              </button>
+
+              <button
+                *ngIf="utilisateur?.est_actif"
+                placement="top"
+                ngbTooltip="Désactiver"
+                title="Désactiver l'utilisateur"
+                class="btn btn-danger mx-1 mt-1 btn-sm"
+                (click)="inverserEstActif(utilisateur)"
+              >
+                <i class="mdi mdi-lock-remove"></i>
+              </button>
+
+              <button
+                *ngIf="!utilisateur?.estAdmin"
+                placement="top"
+                ngbTooltip="Nommer Administrateur"
+                title="Nommer Administrateur"
+                class="btn btn-outline-success mx-1 mt-1 btn-sm"
+                (click)="inverserEstAdmin(utilisateur)"
+              >
+                <i class="bx bx-user-plus"></i>
+              </button>
+
+              <button
+                *ngIf="utilisateur?.estAdmin"
+                placement="top"
+                ngbTooltip="Révoquer Administrateur"
+                title="Révoquer Administrateur"
+                class="btn btn-outline-danger mx-1 mt-1 btn-sm"
+                (click)="inverserEstAdmin(utilisateur)"
+              >
+                <i class="bx bx-user-x"></i>
+              </button>
+
+              <button
+                placement="top"
+                ngbTooltip="Modifier"
+                class="btn btn-info mx-1 mt-1 btn-sm"
+                (click)="openModal(content, utilisateur)"
+              >
+                <i class="mdi mdi-pencil"></i>
+              </button>
+
+              <button
+                placement="top"
+                ngbTooltip="Supprimer"
+                class="btn btn-danger mx-1 mt-1 btn-sm"
+                (click)="supprimerFormat(utilisateur.id)"
+              >
+                <i class="bx bx-trash-alt"></i>
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="(response.data?.length || 0) === 0">
+            <td colspan="8" class="text-center">
+              <i style="color:#d9534f;font-size:xxx-large" class="bx bxs-data btn btn-lg"></i><br>
+              Aucun Utilisateurs
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    
                 <div class="row justify-content-between align-items-center mb-3"
                      *ngIf="totalUtilisateurs > 10"
                 >
@@ -304,7 +327,7 @@
 
 
 <!-- Forms Modal -->
-<!-- <ng-template #content let-modal>
+<ng-template #content let-modal>
   <div class="modal-header">
     <h4>{{formulaireUtilisateur.get('id')?.value ? 'Modifier': 'Créer'}}</h4>
     <button type="button" class="btn-close" aria-label="Close"
@@ -312,7 +335,7 @@
     </button>
   </div>
   <div class="modal-body">
-    <form  [formGroup]?="formulaireUtilisateur"
+    <form  [formGroup]="formulaireUtilisateur"
            (ngSubmit)="creerModifierUtilisateur()" >
 
       <div class="row">
@@ -320,10 +343,10 @@
           <div class="mb-3">
             <label for="email">Adresse Email</label>
             <input type="email" class="form-control" placeholder="Veillez svp entrer l'email de l'utilisateur"  formControlName="email" id="email"
-                   [ngClass]="{'is-invalid': formulaireUtilisateur.get('email').invalid && formulaireUtilisateur.get('email').dirty, 'is-valid': formulaireUtilisateur.get('email').valid}"
+                   [ngClass]="{'is-invalid': formulaireUtilisateur.get('email')?.invalid && formulaireUtilisateur.get('email'), 'is-valid': formulaireUtilisateur.get('email')?.valid}"
             >
-            <div *ngIf="formulaireUtilisateur.get('email').invalid && formulaireUtilisateur.get('email').dirty" class="text-danger">
-              <div *ngIf="formulaireUtilisateur.get('email').errors.required">L'email est obligatoire</div>
+            <div *ngIf="formulaireUtilisateur.get('email')?.invalid && formulaireUtilisateur.get('email')?.dirty" class="text-danger">
+              <div *ngIf="formulaireUtilisateur.get('email')?.errors?.['required']">L'email est obligatoire</div>
             </div>
           </div>
         </div>
@@ -334,20 +357,19 @@
             <ng-select
               [searchable] = true
               autofocus="true"
-              [typeahead]="searchItemPersonnel"
               (search) = "onSearchPersonnel($event.term)"
               [loading]="loading"
               formControlName="personnel"
               id="personnel"
-              [ngClass]="{'is-invalid': formulaireUtilisateur.get('personnel').invalid && formulaireUtilisateur.get('personnel').dirty,
-      'is-valid': formulaireUtilisateur.get('personnel').valid}"
+              [ngClass]="{'is-invalid': formulaireUtilisateur.get('personnel')?.invalid && formulaireUtilisateur.get('personnel')?.dirty,
+      'is-valid': formulaireUtilisateur.get('personnel')?.valid}"
               placeholder="Tapez les trois premières lettres"
             >
               <ng-option *ngFor="let personnel of personnels" [value]="personnel.id">
                 {{ personnel?.prenom + ' ' + personnel?.nom}}
               </ng-option>
-              <div *ngIf="formulaireUtilisateur.get('personnel').invalid && formulaireUtilisateur.get('personnel').dirty" class="text-danger">
-                <div *ngIf="formulaireUtilisateur.get('personnel').errors.required">Le Personnel est obligatoire</div>
+              <div *ngIf="formulaireUtilisateur.get('personnel')?.invalid && formulaireUtilisateur.get('personnel')?.dirty" class="text-danger">
+                <div *ngIf="formulaireUtilisateur.get('personnel')?.errors?.['required']">Le Personnel est obligatoire</div>
               </div>
             </ng-select>
           </div>
@@ -358,32 +380,31 @@
           <ng-select
             [searchable] = true
             autofocus="true"
-            multiple="true"
-            [typeahead]="searchItemRole"
+            [multiple]="true"
             (search) = "onSearchRole($event.term)"
             [loading]="loading"
             formControlName="role"
             id="role"
-            [ngClass]="{'is-invalid': formulaireUtilisateur.get('role').invalid && formulaireUtilisateur.get('role').dirty,
-      'is-valid': formulaireUtilisateur.get('role').valid}"
+            [ngClass]="{'is-invalid': formulaireUtilisateur.get('role')?.invalid && formulaireUtilisateur.get('role')?.dirty,
+      'is-valid': formulaireUtilisateur.get('role')?.valid}"
             placeholder="Tapez les trois premières lettres"
           >
             <ng-option *ngFor="let role of roles" [value]="role.id">
               {{ role.nom}}
             </ng-option>
-            <div *ngIf="formulaireUtilisateur.get('role').invalid && formulaireUtilisateur.get('role').dirty" class="text-danger">
-              <div *ngIf="formulaireUtilisateur.get('role').errors.required">Le/Les Rôle(s) est/sont obligatoire</div>
+            <div *ngIf="formulaireUtilisateur.get('role')?.invalid && formulaireUtilisateur.get('role')?.dirty" class="text-danger">
+              <div *ngIf="formulaireUtilisateur.get('role')?.errors?.['required']">Le/Les Rôle(s) est/sont obligatoire</div>
             </div>
           </ng-select>
         </div>
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-primary" [disabled]="formulaireUtilisateur.invalid" type="submit">{{formulaireUtilisateur.get('id').value ? 'Modifier': 'Créer'}}</button>
+        <button class="btn btn-primary" [disabled]="formulaireUtilisateur.invalid" type="submit">{{formulaireUtilisateur.get('id')?.value ? 'Modifier': 'Créer'}}</button>
       </div>
     </form>
   </div>
-</ng-template> -->
+</ng-template>
 
 <ng-template #details role="document" let-modal>
   <div class="modal-header">
@@ -406,7 +427,7 @@
   </div>
 </ng-template>
 
-<!-- <ng-template #contentRetirer let-modal>
+<ng-template #contentRetirer let-modal>
   <div class="modal-header">
     <h4>Retirer Le/Les Rôle(s)</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cliquer pour fermer')"></button>
@@ -426,7 +447,6 @@
             name="roleIds"
             required
             [searchable]="true"
-            [typeahead]="searchItemRole"
             (search)="onSearchRole($event.term)"
             [loading]="loading"
             id="roleIds"
@@ -443,9 +463,9 @@
       </div>
     </form>
   </div>
-</ng-template> -->
+</ng-template>
 
-<!-- <ng-template #contentAjouter let-modal>
+<ng-template #contentAjouter let-modal>
   <div class="modal-header">
     <h4>Ajouter Le/Les Rôle(s)</h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cliquer pour fermer')"></button>
@@ -465,7 +485,6 @@
             name="roleIds"
             required
             [searchable]="true"
-            [typeahead]="searchItemRole"
             (search)="onSearchRole($event.term)"
             [loading]="loading"
             id="roleIds"
@@ -482,4 +501,4 @@
       </div>
     </form>
   </div>
-</ng-template> -->
+</ng-template>
