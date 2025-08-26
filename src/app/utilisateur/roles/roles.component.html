@@ -1,5 +1,5 @@
 <div class="container-fluid px-3 main">
-  <app-titredepage title="Rôles"[items]="items"></app-titredepage>
+  <app-titredepage title="Rôles" [items]="items"></app-titredepage>
   <div class="row">
     <div class="col">
       <div class="card">
@@ -219,42 +219,36 @@
 
         <div class="col-md-12" *ngIf="formulaireRole.get('id')?.value == null">
           <label for="permissions">La/Les Permission(s)</label>
-         <ng-select
-          [items]?="permissions"
-          [searchable]?="true"
-          [multiple]?="true"
-          [typeahead]?="searchItemPermission"
-          (search)?="onSearchPermission($event)"
-          [loading]?="loading"
-          formControlName="permissions"
-          id="permissions"
-          [ngClass]="{
-            'is-invalid': formulaireRole.get('permissions')?.invalid && formulaireRole.get('permissions')?.dirty,
-            'is-valid': formulaireRole.get('permissions')?.valid
-          }"
-          placeholder="Tapez les trois premières lettres">
 
-        </ng-select>
+          <select formControlName="permissions" id="permissions" multiple class="form-control" [ngClass]="{
+      'is-invalid': formulaireRole.get('permissions')?.invalid && formulaireRole.get('permissions')?.dirty,
+      'is-valid': formulaireRole.get('permissions')?.valid
+    }" size="5">
+            <option value="">Sélectionnez les permissions</option>
+            <option *ngFor="let permission of permissions" [value]="permission.id">
+              {{ permission.code }}
+            </option>
+          </select>
 
-        <!-- Message d'erreur -->
-        <div *ngIf="formulaireRole.get('permissions')?.invalid && formulaireRole.get('permissions')?.dirty"
+          <!-- Message d'erreur -->
+          <div *ngIf="formulaireRole.get('permissions')?.invalid && formulaireRole.get('permissions')?.dirty"
             class="text-danger">
-          <div *ngIf="formulaireRole.get('permissions')?.errors?.['required']">
-            La/Les Permission(s) est/sont obligatoire
+            <div *ngIf="formulaireRole.get('permissions')?.errors?.['required']">
+              La/Les Permission(s) est/sont obligatoire(s)
+            </div>
           </div>
         </div>
 
-                </div>
-
-
-              </div>
-
-
-      <div class="modal-footer">
-        <button class="btn btn-primary" [disabled]="formulaireRole.invalid"
-          type="submit">{{formulaireRole.get('id')?.value ? 'Modifier': 'Créer'}}</button>
       </div>
-    </form>
+
+
+
+
+  <div class="modal-footer">
+    <button class="btn btn-primary" [disabled]="formulaireRole.invalid" type="submit">{{formulaireRole.get('id')?.value
+      ? 'Modifier': 'Créer'}}</button>
+  </div>
+  </form>
   </div>
 </ng-template>
 
@@ -288,22 +282,21 @@
       <div class="row">
         <div class="col-md-12">
           <label for="permissionIds">La/Les Permission(s)</label>
-            <ng-select
-              [items]?="permissionsDuRoles"
-              [multiple]?="true"
-              [closeOnSelect]?="false"
-              [clearable]?="true"
-              bindLabel="code"
-              bindValue="id"
-              [(ngModel)]="permissionIds"
-              name="permissionIds"
-              required
-              [searchable]?="true"
-              [typeahead]?="searchItemPermission"
-              (search)?="onSearchPermission($event.term)"
-              [loading]?="loading"
-              id="permissionIds">
-            </ng-select>
+         <ng-select 
+  [items]="permissionsDuRoles" 
+  [multiple]="true" 
+  [closeOnSelect]="false" 
+  [clearable]="true"
+  bindLabel="code" 
+  bindValue="id" 
+  [(ngModel)]="permissionIds" 
+  name="permissionIds" 
+  required
+  [searchable]="true"
+  (search)="onSearchPermission($event.term)"
+  [loading]="loading" 
+  id="permissionIds">
+</ng-select>
 
         </div>
       </div>
@@ -324,26 +317,27 @@
   <div class="modal-body">
     <form (ngSubmit)="ajouterUnePermission()">
       <div class="row">
-        <div class="col-md-12">
-          <label for="permissionIds">La/Les Permission(s)</label>
-          <ng-select
-              [items]?="permissionsDuRoles"
-              [multiple]?="true"
-              [closeOnSelect]?="false"
-              [clearable]?="true"
-              bindLabel="code"
-              bindValue="id"
-              [(ngModel)]="permissionIds"
-              name="permissionIds"
-              required
-              [searchable]?="true"
-              [typeahead]?="searchItemPermission"
-              (search)?="onSearchPermission($event.term)"
-              [loading]?="loading"
-              id="permissionIds">
-            </ng-select>
+      <div class="col-md-12">
+  <label for="permissionIds">La/Les Permission(s)</label>
+  
+ <ng-select 
+  [items]="permissionsDuRoles" 
+  [multiple]="true" 
+  [closeOnSelect]="false" 
+  [clearable]="true"
+  bindLabel="code" 
+  bindValue="id" 
+  [(ngModel)]="permissionIds" 
+  name="permissionIds" 
+  required
+  [searchable]="true" 
+  (search)="onSearchPermission($event.term)"
+  [loading]="loading" 
+  id="permissionIds">
+</ng-select>
+</div>
         </div>
-      </div>
+    
 
       <div class="modal-footer">
         <button class="btn btn-primary" [disabled]="!permissionIds || permissionIds.length === 0"

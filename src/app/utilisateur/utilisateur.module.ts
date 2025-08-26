@@ -42,6 +42,7 @@ import { RolesComponent } from './roles/roles.component';
 import { FilterPipe } from "../filter.pipe";
 import { SimplebarAngularModule } from 'simplebar-angular';
 import { UtilisateursComponent } from './utilisateurs/utilisateurs.component';
+import { NgSelectModule } from '@ng-select/ng-select'; // Vérifiez cet import
 
 
 @NgModule({
@@ -76,7 +77,8 @@ import { UtilisateursComponent } from './utilisateurs/utilisateurs.component';
     ReactiveFormsModule,
     UtilisateurRoutingModule,
     CommunModule,
-    FilterPipe
+    FilterPipe,
+    NgSelectModule,
 ]
 })
 export class UtilisateurModule { }
