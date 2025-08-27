@@ -143,7 +143,9 @@ export class EspacedetravailComponent implements OnInit , AfterViewInit{
 
 
   obtenirUnUtilisateurParEmail() {
+
     const email = sessionStorage.getItem("email") ?? ""; 
+    console.log("utilisateur connecter ",email);
   this.utilisateurAuthentifieState$ = this.authenficationSerice
   .obtenirUnUtilisateurParEmail(email)
   .pipe(

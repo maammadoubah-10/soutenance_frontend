@@ -9,6 +9,7 @@ import { Utilisateur, UtilisateurDto } from '../models/utilisateur';
 import { Statistique } from '../models/statistique';
 import { Permission } from '../models/permission';
 const host = environment.hostmicroserviceutilisateur;
+const hostpersonnel = environment.hostmicroservicepersonnel;
 const ROOT = environment.hostmicroserviceutilisateur.replace(/\/+$/, ''); // ex: http://localhost:9001/utilisateur
 const join = (base: string, path: string) => `${base}/${path.replace(/^\/+/, '')}`;
 
@@ -274,7 +275,7 @@ export class UtilisateurService {
   Personne début
   */
   personnelNonUtilisateur(): Observable<any[]> {
-    return this.http.get<any[]>(host + 'personnels/nonutilisateur/', httpOptions);
+    return this.http.get<any[]>(hostpersonnel + 'personnels/listes/', httpOptions);
   }
 
   public recherchePersonnel(search : string) {

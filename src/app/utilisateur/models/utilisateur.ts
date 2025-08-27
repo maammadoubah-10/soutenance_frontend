@@ -1,4 +1,5 @@
 import { Role } from '../../roles/models/role.model';
+import { EtatCivil } from './etat-civil';
 import { Personnel } from './personnel';
 
 export interface Utilisateur {
@@ -7,8 +8,9 @@ export interface Utilisateur {
     role? : Role[];
     personnel : Personnel;
     est_actif: boolean
-     estActif: boolean;
+    estActif: boolean;
     estAdmin: boolean
+    
 
   // champs potentiellement présents côté backend
   personnelId?: number;
