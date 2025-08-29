@@ -110,6 +110,7 @@ export class EspacedetravailComponent implements OnInit , AfterViewInit{
     //this.changeSidebar(this.sidebartype);
 
     document.body.setAttribute('data-layout', 'vertical');
+    console.log("utilisateur connecter ici ",this.utilisateurAuthentifie.personnel?.etatCivil?.prenom)
 
   }
 

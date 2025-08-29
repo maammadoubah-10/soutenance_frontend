@@ -7,6 +7,7 @@ export interface Utilisateur {
     email: string;
     role? : Role[];
     personnel : Personnel;
+    personnelid : number;
     est_actif: boolean
     estActif: boolean;
     estAdmin: boolean

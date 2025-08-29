@@ -1,7 +1,7 @@
-<div class="login-wrap">
-  <div class="login-card stack">
+<!-- <div class="login-wrap">
+  <div class="login-card stack"> -->
     <!-- Logo ISI -->
-    <div class="logo-circle">
+    <!-- <div class="logo-circle">
       <img src="assets/groupe_isi.png" alt="ISI" />
     </div>
 
@@ -25,9 +25,85 @@
       </button>
     </form>
   </div>
-</div>
+</div> -->
 
 <!-- Bloc d’état : inchangé (ton chargement SweetAlert est gardé côté TS) -->
+<!-- <ng-container *ngIf="response | async as reponse" [ngSwitch]="reponse.dataState">
+  <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+    <div class="alert alert-info" role="alert">Chargement en cours...</div>
+  </ng-container>
+  <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+    <div class="alert alert-danger" role="alert">
+      Code d'erreur : {{ reponse.errorStatus }} {{ reponse.errorMessage }}
+    </div>
+  </ng-container>
+  <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+    <div class="alert alert-success" role="alert">{{ reponse.data }}</div>
+  </ng-container>
+</ng-container> -->
+
+
+<div class="login-wrap">
+  <div class="login-card stack">
+    <!-- Logo ISI -->
+    <div class="logo-circle">
+      <img src="assets/groupe_isi.png" alt="ISI" />
+    </div>
+
+    <h1 class="title">Bienvenue</h1>
+    <p class="subtitle">Connectez-vous pour accéder à {{ entreprise || 'ISI' }}</p>
+
+    <!-- Formulaire de connexion initial -->
+    <form *ngIf="!showDoubleFactorForm" class="stack" name="form" #f="ngForm" 
+          (ngSubmit)="f.form.valid && onSubmit()" novalidate>
+      <input class="input" type="email" placeholder="Adresse e-mail*" 
+             [(ngModel)]="form.email" name="email" required
+             #email="ngModel" pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}" />
+
+      <input class="input" [type]="'password'" placeholder="Mot de passe*" 
+             [(ngModel)]="form.motdepasse" name="motdepasse" required 
+             #motdepasse="ngModel" />
+
+      <div class="text-end">
+        <a [routerLink]="'/motdepasseoublie'" class="help-link">Mot de passe oublié ?</a>
+      </div>
+
+      <button class="primary-btn" type="submit" 
+              [disabled]="email.invalid || motdepasse.invalid || loading">
+        <span *ngIf="!loading">Continuer</span>
+        <span *ngIf="loading">Connexion en cours...</span>
+      </button>
+    </form>
+
+    <!-- Formulaire de double facteur -->
+    <form *ngIf="showDoubleFactorForm" class="stack" name="doubleFactorForm" #df="ngForm"
+          (ngSubmit)="df.form.valid && onSubmitDoubleFactor()" novalidate>
+      <div class="alert alert-info">
+        <i class="fas fa-info-circle"></i>
+        Un code de vérification a été envoyé à votre email.
+      </div>
+
+      <input class="input" type="email" placeholder="Adresse e-mail*" 
+             [(ngModel)]="doubleFactorForm.email" name="email" required readonly />
+
+      <input class="input" type="text" placeholder="Code de vérification*" 
+             [(ngModel)]="doubleFactorForm.motdepasse" name="motdepasse" required
+             #code="ngModel" maxlength="6" />
+
+      <button class="primary-btn" type="submit" 
+              [disabled]="code.invalid || loading">
+        <span *ngIf="!loading">Vérifier le code</span>
+        <span *ngIf="loading">Vérification en cours...</span>
+      </button>
+
+      <button type="button" class="secondary-btn" (click)="resetForm()">
+        Retour à la connexion
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Messages d'état -->
 <ng-container *ngIf="response | async as reponse" [ngSwitch]="reponse.dataState">
   <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
     <div class="alert alert-info" role="alert">Chargement en cours...</div>

@@ -14,7 +14,7 @@
 
         <div class="img">
         <div class="card" style="margin-top: 10px" >
-          <div class="card-body" style="background-color: #0535A0">
+          <div class="card-body" style="background-color: #04163d">
             <div class="row">
               <div class="col-lg-4">
                 <div class="media">
@@ -22,7 +22,7 @@
                     <img *ngIf="profilSrc"  [src]="profilSrc" alt="" class="avatar-md rounded-circle img-thumbnail">
 
                     <span *ngIf="!profilSrc"  class="avatar-user-profil-title rounded-circle bg-danger text-white font-size-24 avatar-user-profil avatar-md">
-                      {{utilisateurAuthentifie?.personnel?.prenom[0] + utilisateurAuthentifie?.personnel?.prenom[1]}}
+                      {{utilisateurAuthentifie?.personnel?.etatCivil?.prenom[0] + utilisateurAuthentifie?.personnel?.etatCivil?.prenom[1]}}
                      </span>
 
                   </div>
@@ -51,7 +51,7 @@
                     <div class="col-6" >
                       <div >
                         <p class="text-white mb-2">Dernière connexion</p>
-                        <h5 class="mb-0 text-white">{{utilisateurAuthentifie?.dernierConnexion| date:'dd MMMM yyyy à HH:mm:ss' :'':'fr-FR'}}</h5>
+                        <h5 class="mb-0 text-white">{{utilisateurAuthentifie?.dernierConnexion | date:'dd MMMM yyyy à HH:mm:ss' :'':'fr-FR'}}</h5>
                       </div>
                     </div>
                   </div>

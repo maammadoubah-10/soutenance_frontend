@@ -150,6 +150,8 @@ export class UtilisateurService {
     return this.http.patch(join(this.base, 'reinitialisation'), body, { params });
   }
 
+  
+
     /*
   Permissions début
   */

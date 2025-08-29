@@ -197,4 +197,12 @@ export class AuthentificationService {
     }
     return undefined;
   }
+
+  setToken(token: string): void {
+  localStorage.setItem('token', token);
+}
+
+setUser(user: any): void {
+  localStorage.setItem('user', JSON.stringify(user));
+}
 }

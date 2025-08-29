@@ -353,21 +353,21 @@
 
        <div class="col-md-6">
   <div class="mb-3">
-    <label for="personnel">Personnel</label>
+    <label for="personnelid">Personnel</label>
     <select
-      formControlName="personnel"
-      id="personnel"
+      formControlName="personnelid"
+      id="personnelid"
       class="form-control"
-      [ngClass]="{'is-invalid': formulaireUtilisateur.get('personnel')?.invalid && formulaireUtilisateur.get('personnel')?.dirty,
-                   'is-valid': formulaireUtilisateur.get('personnel')?.valid}"
+      [ngClass]="{'is-invalid': formulaireUtilisateur.get('personnelid')?.invalid && formulaireUtilisateur.get('personnelid')?.dirty,
+                   'is-valid': formulaireUtilisateur.get('personnelid')?.valid}"
     >
       <option value="">Sélectionnez un personnel</option>
       <option *ngFor="let personnel of personnels" [value]="personnel.id">
         {{ personnel?.etatCivil?.prenom + ' ' + personnel?.etatCivil?.nom }}
       </option>
     </select>
-    <div *ngIf="formulaireUtilisateur.get('personnel')?.invalid && formulaireUtilisateur.get('personnel')?.dirty" class="text-danger">
-      <div *ngIf="formulaireUtilisateur.get('personnel')?.errors?.['required']">Le Personnel est obligatoire</div>
+    <div *ngIf="formulaireUtilisateur.get('personnelid')?.invalid && formulaireUtilisateur.get('personnelid')?.dirty" class="text-danger">
+      <div *ngIf="formulaireUtilisateur.get('personnelid')?.errors?.['required']">Le Personnel est obligatoire</div>
     </div>
   </div>
 </div>

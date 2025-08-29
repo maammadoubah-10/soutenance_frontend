@@ -65,7 +65,7 @@ export class UtilisateursComponent implements OnInit {
     id: new  FormControl(),
     email: new FormControl('', [Validators.required,Validators.email]),
     role: new FormControl('', [Validators.required]),
-    personnel: new FormControl('', [Validators.required]),
+    personnelid: new FormControl('', [Validators.required]),
 
   })
 
@@ -87,7 +87,7 @@ export class UtilisateursComponent implements OnInit {
     this.formData = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       role: ['', [Validators.required]],
-      personnel: ['', [Validators.required]],
+      personnelid: ['', [Validators.required]],
     });
 
     this.onAfficherLesUtilisateurs();
@@ -124,7 +124,7 @@ export class UtilisateursComponent implements OnInit {
           this.pages = this.getPages();
           return { dataState: this.dataStateEnum.CHARGE, data: this.utilisateurs };
         }),
-        startWith({ dataState: this.dataStateEnum.CHARGEMENT, data: [] })
+        startWith({ dataState: this.dataStateEnum.CHARGEMENT })
       ).pipe(
         catchError(err => {
           return of({ dataState: this.dataStateEnum.ERREUR, data: [] });
@@ -214,7 +214,7 @@ export class UtilisateursComponent implements OnInit {
                 if (e.id == response.body.id){
                   e.email = response.body.email
                   e.role = response.body.role
-                  e.personnel = response.body.personnel
+                  e.personnelid = response.body.personnelid
                 }
                 return e;
               })

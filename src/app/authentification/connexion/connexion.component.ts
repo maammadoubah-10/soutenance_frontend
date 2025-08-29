@@ -2,7 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { DataStateEnum } from '../../state/state';
-import { map, catchError, startWith } from 'rxjs/operators';
+import { map, catchError, startWith, tap } from 'rxjs/operators';
 
 import { AuthentificationService } from '../services/authentication.service';
 import { ActivatedRoute, Router, RouterLink, RouterOutlet } from '@angular/router';
@@ -12,6 +12,7 @@ import { GLOBAL_CONFIG } from "../../commun/models/global";
 import { AsyncPipe, CommonModule, NgIf, NgSwitch, NgSwitchCase } from "@angular/common";
 import { FormsModule, ReactiveFormsModule } from "@angular/forms";
 import { NgbDropdownModule, NgbDropdown } from '@ng-bootstrap/ng-bootstrap';
+import { UtilisateurService } from '../../utilisateur/services/utilisateur.service';
 
 @Component({
   selector: 'app-connexion',
@@ -41,6 +42,10 @@ export class ConnexionComponent implements OnInit {
     motdepasse: null
   };
 
+  showDoubleFactorForm = false;
+  doubleFactorForm = { email: '', motdepasse: '' };
+  loading = false;
+
   response !: Observable<any>;
 
   // set the currenr year
@@ -48,7 +53,9 @@ export class ConnexionComponent implements OnInit {
 
   // tslint:disable-next-line: max-line-length
   constructor(private authenfication: AuthentificationService,
-              private router: Router) { }
+              private router: Router,
+              private activatedRoute : ActivatedRoute,
+            private utilisateurService:UtilisateurService) { }
 
   ngOnInit() {
 
@@ -67,30 +74,69 @@ export class ConnexionComponent implements OnInit {
   //   }
   // }// src/app/authentification/connexion/connexion.component.ts
 onSubmit(): void {
-  const { email, motdepasse } = this.form;
+     const { email, motdepasse } = this.form;
+    this.loading = true;
 
-  this.showLoadingModal();
+    this.authenfication.connexion(email, motdepasse)
+      .pipe(catchError((error: HttpErrorResponse) => this.authenfication.gestionnaireDerreur(error)))
+      .subscribe({
+        next: (data) => {
+          this.loading = false;
+          
+          if (data.doubleFacteur) {
+            // Utilisateur avec double facteur activé
+            this.showDoubleFactorForm = true;
+            this.doubleFactorForm.email = email;
+            this.successmsg('Code envoyé', 'Un code de vérification a été envoyé à votre email.');
+          } else {
+            // Connexion directe réussie
+            this.successmsg('Connexion réussie', 'Vous êtes maintenant connecté.');
+            this.router.navigate(['/espacedetravail']);
+          }
+        },
+        error: () => {
+          this.loading = false;
+          this.errormsg('Connexion échouée', 'Une erreur s\'est produite lors de l\'authentification.');
+        }
+      });
+}
 
-  this.authenfication.connexion(email, motdepasse)
+// connexion.component.ts
+onSubmitDoubleFactor(): void {
+  const { email, motdepasse } = this.doubleFactorForm; // Seulement email et code
+  this.loading = true;
+
+  // Envoyez seulement email et code (le code remplace le mot de passe)
+  this.utilisateurService.connexionDoubleFacteur({ email, motdepasse })
     .pipe(catchError((error: HttpErrorResponse) => this.authenfication.gestionnaireDerreur(error)))
     .subscribe({
-      next: (data) => {
-        if (data.dataState === this.dataStateEnum.ERREUR) {
-          Swal.fire('Connexion échouée', data.errorMessage, 'error');
+      next: async (data) => {
+        this.loading = false;
+        if (!data?.token) {
+          this.errormsg('Erreur', 'Token de connexion manquant');
           return;
         }
-        // Le service a déjà posé token, permissions, isAdmin
+        
+        // Stockez le token
+        const token: string = data?.token ?? data?.accessToken ?? '';
+        const perms: string[] = Array.isArray(data?.permissions) ? data.permissions : [];
+        this.authenfication.sauvegarderDansLaSession(token, email, perms, !!data?.isAdmin || perms.includes('admin'));
+        
         this.successmsg('Connexion réussie', 'Vous êtes maintenant connecté.');
-        console.log('on est la  nest ce pas')
-        this.router.navigate(['/espacedetravail']); // OK
+        this.router.navigate(['/espacedetravail']);
       },
       error: () => {
-        this.errormsg('Connexion échouée', 'Une erreur s’est produite lors de l’authentification.');
+        this.loading = false;
+        this.errormsg('Code incorrect', 'Le code de vérification est incorrect.');
       }
     });
 }
 
-
+  resetForm(): void {
+    this.showDoubleFactorForm = false;
+    this.doubleFactorForm = { email: '', motdepasse: '' };
+    this.form = { email: '', motdepasse: '' };
+  }
 
   showLoadingModal(): void {
     Swal.fire({
