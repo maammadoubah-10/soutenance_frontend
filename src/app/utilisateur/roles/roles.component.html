@@ -11,7 +11,7 @@
           </p>
           <div class="row " style="display: flex">
             <div class="col-sm-4">
-              <button class="btn btn-success btn-label" (click)="openModal(content)">
+              <button class="btn btn-darkblue btn-label" (click)="openModal(content)">
                 <i class="mdi mdi-plus label-icon"></i>
                 Ajouter un rôle
               </button>
@@ -80,14 +80,14 @@
                           (click)="openModalRetirerPermissionsRole(role, contentRetirer)">
                           <i class="bx bx-x"></i>
                         </button>
-                        <!--<button
+                        <button
                         placement="top"
                         ngbTooltip="Modifier"
-                        class="btn btn-info mx-1 mt-1 btn-sm"
+                        class="btn btn-darkblue mx-1 mt-1 btn-sm"
                         (click)="openModal(content,role)"
                       >
                         <i class="mdi mdi-pencil"></i>
-                      </button>-->
+                      </button>
                         <button placement="top" ngbToolTip="Supprimer" class="btn btn-danger mx-1 mt-1 btn-sm"
                           (click)="supprimerFormat(role.id)">
                           <i class="bx bx-trash-alt"></i>
@@ -319,7 +319,7 @@
 
 
       <div class="modal-footer">
-        <button class="btn btn-primary" [disabled]="!permissionIds || permissionIds.length === 0"
+        <button class="btn btn-darkblue" [disabled]="!permissionIds || permissionIds.length === 0"
           type="submit">Ajouter</button>
       </div>
     </form>

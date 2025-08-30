@@ -213,7 +213,7 @@ export class UtilisateursComponent implements OnInit {
               this.utilisateurs?.map(e =>{
                 if (e.id == response.body.id){
                   e.email = response.body.email
-                  e.role = response.body.role
+                  e.roles = response.body.role
                   e.personnelid = response.body.personnelid
                 }
                 return e;
@@ -302,7 +302,7 @@ export class UtilisateursComponent implements OnInit {
   openModalRetirerRolesUtilisateur(utilisateur: Utilisateur, content:any) {
     this.openModal(content);
     this.idUtilisateur = utilisateur.id;
-    this.rolesDuPersonnel = utilisateur.role
+    this.rolesDuPersonnel = utilisateur.roles
   }
 
   retirerUnRole() {

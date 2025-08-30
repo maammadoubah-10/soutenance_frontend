@@ -5,7 +5,7 @@ import { Personnel } from './personnel';
 export interface Utilisateur {
     id: number;
     email: string;
-    role? : Role[];
+    roles? : Role[];
     personnel : Personnel;
     personnelid : number;
     est_actif: boolean

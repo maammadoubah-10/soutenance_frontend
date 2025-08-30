@@ -11,7 +11,7 @@
           </p>
           <div class="row " style="display: flex">
             <div class="col-sm-4">
-              <button class="btn btn-success btn-label" (click)="openModal(content)">
+              <button class="btn btn-darkblue btn-label" (click)="openModal(content)">
                 <i class="mdi mdi-plus label-icon"></i>
                 Ajouter une permission
               </button>
@@ -65,7 +65,7 @@
                       <td>{{permission.code}}</td>
                       <td style="text-align: justify">{{permission.description}}</td>
                       <td>
-                        <button placement="top" ngbTooltip="Modifier" class="btn btn-info mx-1 mt-1 btn-sm"
+                        <button placement="top" ngbTooltip="Modifier" class="btn btn-darkblue mx-1 mt-1 btn-sm"
                           (click)="openModal(content,permission)">
                           <i class="mdi mdi-pencil"></i>
                         </button>

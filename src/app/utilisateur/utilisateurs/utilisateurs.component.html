@@ -12,7 +12,7 @@
           <div class="row " style="display: flex">
             <div class="col-sm-4">
               <button
-                class="btn btn-success btn-label"
+                class="btn btn-darkblue btn-label"
                 (click)="openModal(content)"
               >
                 <i class="mdi mdi-plus label-icon"></i>
@@ -85,10 +85,10 @@
             <td>
               <button
                 style="--bs-btn-padding-y:.25rem; --bs-btn-padding-x:.5rem; --bs-btn-font-size:.75rem;"
-                *ngIf="(utilisateur?.role?.length ?? 0) > 0"
+                *ngIf="(utilisateur?.roles?.length ?? 0) > 0"
                 type="button"
-                class="btn btn-info"
-                (click)="openModalDetails(details, utilisateur?.role)"
+                class="btn btn-darkblue"
+                (click)="openModalDetails(details, utilisateur?.roles)"
               >
                 Aperçu
               </button>
@@ -170,7 +170,7 @@
               <button
                 placement="top"
                 ngbTooltip="Modifier"
-                class="btn btn-info mx-1 mt-1 btn-sm"
+                class="btn btn-darkblue mx-1 mt-1 btn-sm"
                 (click)="openModal(content, utilisateur)"
               >
                 <i class="mdi mdi-pencil"></i>

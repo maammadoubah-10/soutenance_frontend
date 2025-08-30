@@ -18,7 +18,7 @@
                                 </div>
                                 <div class="media-body align-self-center">
                                     <div class="text-muted">
-                                        <p class="mb-2">Votre compte.</p>
+                                        <p class="mb-2">Mon Compte.</p>
                                         <h5 class="mb-1">{{utilisateurAuthentifie?.personnel?.prenom }}
                                             {{utilisateurAuthentifie?.personnel?.nom }} </h5>
                                         <p class="mb-0">{{utilisateurAuthentifie?.role[0].nom}}</p>
@@ -47,7 +47,7 @@
                             </div>
                         </div>
 
-                        <div class="col-lg-4 d-none d-lg-block">
+                        <!-- <div class="col-lg-4 d-none d-lg-block">
                             <div class="clearfix  mt-4 mt-lg-0">
                                 <div class="dropdown float-end" ngbDropdown>
                                 <div class="upload-btn-wrapper">
@@ -64,7 +64,23 @@
                                 </div>
                                 </div>
                             </div>
+                        </div> -->
+
+
+    <div class="col-lg-4 d-none d-lg-block">
+                            <div class="clearfix  mt-4 mt-lg-0">
+                                <div class="dropdown float-end" ngbDropdown>
+                                <div class="upload-btn-wrapper">
+                                    <button  class="btn btn-primary dropdown-toggle" title="Changer l'image du profile" (click)="fileUpload.click()" ><i class="bx bx-image-add align-middle mr-1"></i></button>
+                                    <input #fileUpload type="file" (click)="fileUpload.value = ''"(change)="importFile($event)" style="display:none"
+                                    accept="image/*"  />
+                                  <button  class="btn btn-darkblue dropdown-toggle mx-3"  title="Modifier le Mot de Passe" ><i class="bx bx-key align-middle mr-1"></i></button>
+                                </div>
+                                </div>
+                            </div>
                         </div>
+
+
 
                         <!--div class="col-lg-4 d-none d-lg-block">
                             <div class="clearfix  mt-4 mt-lg-0">
