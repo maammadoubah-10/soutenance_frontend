@@ -7,20 +7,6 @@ import { RolesComponent } from './roles/roles.component';
 import { UtilisateursComponent } from './utilisateurs/utilisateurs.component';
 
 const routes: Routes = [
-  // { path: '', component: UtilisateurComponent },          // liste
-  // { path: 'nouveau', component: UtilisateurFormComponent },
-  // { path: ':id', component: UtilisateurEditComponent },
-
-  //   { path: '', redirectTo: 'tableaudebord', pathMatch: 'full' },
-  // {
-  //   path: '', component: UtilisateurComponent,
-  //   children : [
-  //     { path: 'tableaudebord', component: TableaudebordComponent },
-  //     { path: 'permissions', component: PermissionsComponent},
-  //     //{ path: 'roles', component: RolesComponent },
-  //    // { path: 'utilisateurs', component: UtilisateursComponent },
-  //   ],
-  // }
 
   { 
      path: '',

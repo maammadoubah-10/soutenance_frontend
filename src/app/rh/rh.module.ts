@@ -16,12 +16,16 @@ import { ToastrModule } from 'ngx-toastr';
 import { PosteComponent } from './poste/poste.component';
 
 import { UiSwitchModule } from 'ngx-ui-switch';
+import { ServiceComponent } from './service/service.component';
+import { DetailComponent } from './service/detail/detail.component';
 
 @NgModule({
   declarations: [
     RhComponent,
     MenuComponent,
-    PosteComponent
+    PosteComponent,
+    ServiceComponent,
+    DetailComponent,
   ],
   imports: [
     CommonModule,
@@ -29,7 +33,6 @@ import { UiSwitchModule } from 'ngx-ui-switch';
     SimplebarAngularModule,
     CommunModule,
     TranslateModule,
-    CommonModule,
     RhRoutingModule,
     LayoutModule,
     NgApexchartsModule,
