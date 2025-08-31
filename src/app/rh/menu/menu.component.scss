@@ -1,0 +1,139 @@
+:host {
+  display: block;
+}
+
+// .vertical-menu {
+//   width: 250px;
+//   z-index: 1001;
+//   background: #fff;
+//   bottom: 0;
+//   margin-top: 0;
+//   position: fixed;
+//   top: 70px;
+//   box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+// }
+
+#sidebar-menu {
+  padding: 10px 0;
+  height: calc(100% - 70px);
+}
+
+.menu-title {
+  padding: 12px 20px;
+  letter-spacing: .05em;
+  pointer-events: none;
+  cursor: default;
+  font-size: 11px;
+  text-transform: uppercase;
+  color: #6c757d;
+  font-weight: 600;
+}
+
+.metismenu {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.metismenu li {
+  display: block;
+  width: 100%;
+}
+
+.metismenu li a {
+  display: flex;
+  align-items: center;
+  padding: 12px 20px;
+  color: #6c757d;
+  text-decoration: none;
+  transition: all 0.3s;
+  position: relative;
+  
+  &:hover {
+    color: #7266ee;
+    background-color: rgba(114, 102, 238, 0.1);
+  }
+  
+  &.active {
+    color: #7266ee;
+    background-color: rgba(114, 102, 238, 0.1);
+    border-left: 3px solid #7266ee;
+  }
+}
+
+.metismenu li a i {
+  margin-right: 10px;
+  font-size: 18px;
+}
+
+.metismenu li a .badge {
+  margin-left: auto;
+}
+
+.sub-menu {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+  
+  li a {
+    padding: 10px 20px 10px 55px;
+    font-size: 13.5px;
+  }
+}
+
+.has-arrow:after {
+  content: "\F142";
+  font-family: "Material Design Icons";
+  display: block;
+  float: right;
+  transition: transform .2s;
+  font-size: 16px;
+}
+
+.mm-active > a.has-arrow:after {
+  transform: rotate(90deg);
+}
+
+.mm-collapse:not(.mm-show) {
+  display: none;
+}
+
+.mm-collapse.mm-show {
+  display: block;
+}
+
+.side-nav-link-ref {
+  cursor: pointer;
+}
+
+.h-100 {
+  height: 100%;
+}
+
+// Responsive
+@media (max-width: 992px) {
+  .vertical-menu {
+    position: fixed;
+    top: 70px;
+    left: -250px;
+    transition: all 0.3s ease;
+    
+    &.menu-open {
+      left: 0;
+    }
+  }
+}
+
+
+.vertical-menu {
+  width: 250px;
+  z-index: 1001;
+  background: #fff;
+  bottom: 0;
+  margin-top: 0;
+  /* ❌ Supprimer : position: fixed; */
+  /* ❌ Supprimer : top: 70px; */
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
+  height: 100vh; /* occuper toute la hauteur */
+}
+

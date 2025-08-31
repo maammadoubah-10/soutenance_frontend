@@ -32,7 +32,7 @@ export class PosteService {
     return this.httpClient.get<Poste>(url, { observe: 'response' });
   }
 
-  public voirPoste(id){
+  public voirPoste(id:number){
     return this.httpClient.get<any>(
       this.contextPath+ '/'+id
     )}

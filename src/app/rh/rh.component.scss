@@ -1,0 +1,22 @@
+.main-container {
+  min-height: calc(100vh - 70px);
+  margin-top: 70px;
+}
+
+.sidebar-fixed {
+  flex: 0 0 250px;
+  width: 250px;
+  position: sticky;
+  top: 70px;
+  height: calc(100vh - 70px);
+  overflow-y: auto;
+}
+
+.content-scrollable {
+  flex: 1;
+  min-width: 0;
+  padding: 20px;
+  background: #f6f9ff;
+  overflow-y: auto;
+  height: calc(100vh - 70px);
+}
