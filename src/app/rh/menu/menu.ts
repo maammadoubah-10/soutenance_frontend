@@ -9,7 +9,7 @@ export const MENU: MenuItem[] = [
   },
   {
     id: 2,
-    label: 'Espace de travail',
+    label: 'Portail',
     icon: 'bx-home-circle',
     link: '/espacedetravail',
   },
@@ -47,12 +47,12 @@ export const MENU: MenuItem[] = [
         icon: 'bx bx-bookmark',
         link: 'services',
       },
-      {
-        id: 4,
-        label: 'Organigramme',
-        icon: 'bx bx-line-chart',
-        link: 'organigrammes',
-      },
+    //   {
+    //     id: 4,
+    //     label: 'Organigramme',
+    //     icon: 'bx bx-line-chart',
+    //     link: 'organigrammes',
+    //   },
       {
         id: 4,
         label: 'Mission',

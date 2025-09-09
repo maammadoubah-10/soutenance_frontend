@@ -171,7 +171,11 @@ export class DetailComponent implements OnInit {
       this.formulaireDossier.reset()
       this.formulaireDossier.get('service')?.setValue(null)
     }
-    this.modalService.open(content)
+     this.modalService.open(content, {
+    size: 'lg',        // ← Taille large
+    backdrop: 'static', // ← Empêche la fermeture en cliquant à l'extérieur
+    keyboard: false     // ← Empêche la fermeture avec la touche Échap
+  });
 
   }
 

@@ -3,12 +3,12 @@ import { MenuItem } from "./menu.model";
 export const MENU: MenuItem[] = [
     {
         id: 1,
-        label: 'LES LOGICIELS',
+        label: 'LES FONCTIONALITES',
         isTitle: true
     },
     {
         id: 2,
-        label: 'Espace de travail',
+        label: 'Portail',
         icon: 'bx-home-circle',
         link: '/espacedetravail',
     },

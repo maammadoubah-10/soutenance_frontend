@@ -34,12 +34,12 @@ export class ContratService {
   //   );
   // }
 
-  public creerContrat(id: string, onlyOfficeModel: any): Observable<Contrat> {
+  public creerContrat(id: number, piece: any): Observable<Contrat> {
     const url = `${this.contextPath}/create/${id}`;
 
     return this.httpClient.post<Contrat>(
       url,
-      onlyOfficeModel
+      piece
     );
   }
 

@@ -102,7 +102,11 @@ export class ServiceComponent implements OnInit {
       this.formulaireDossier.reset()
       this.formulaireDossier['controls'].service.setValue(null);
     }
-    this.modalService.open(content)
+     this.modalService.open(content, {
+    size: 'lg',      
+    backdrop: 'static', 
+    keyboard: false 
+  });
 
   }
 

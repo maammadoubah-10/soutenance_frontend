@@ -7,5 +7,10 @@ export interface Conge {
   dateFin: Date,
   commentaire: string,
   valide: boolean
-  personnel: Personnel
+  personnel?: Personnel
+  personnelId: number
+  pieces:string
+  typeConge:string
+  motif:string
+  nbreJour:number
 }

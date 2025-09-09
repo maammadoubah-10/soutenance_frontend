@@ -1,0 +1,675 @@
+<div class="container-fluid">
+  <app-titredepage title="Personnel" [items]="items"></app-titredepage>
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card job-filter">
+        <div class="card-body p-3">
+          <div class="row g-3">
+            <div class="col-xxl-4 col-lg-6">
+              <div class="position-relative"><input type="search" id="searchInput"
+                  placeholder="Taper les trois première lettre du nom ..." [(ngModel)]="nom"
+                  (keyup)="onPageChangenom(currentPage)" class="form-control ng-untouched ng-pristine ng-valid">
+              </div>
+            </div>
+            <div class="col-xxl-4 col-lg-6">
+              <div class="position-relative"><input type="search" id="searchInputP"
+                  placeholder="Taper les trois première lettre du prenom ..." [(ngModel)]="prenom"
+                  (keyup)="onPageChangePrenom(currentPage)" class="form-control ng-untouched ng-pristine ng-valid">
+              </div>
+            </div>
+            <div class="col-xxl-4 col-lg-6">
+              <div class="position-relative"><input type="search" id="searchInputM"
+                  placeholder="Taper les trois première chiffre du matricule ..." [(ngModel)]="matricule"
+                  (keyup)="onPageChangeMatricule(currentPage)" class="form-control ng-untouched ng-pristine ng-valid">
+              </div>
+            </div>
+            <div class="col-xxl-2 col-lg-6">
+              <div class="position-relative h-100 hstack gap-3">
+                <button (click)="openModal(content)" type="submit" class="btn btn-primary h-100 w-100"><i
+                    class="mdi mdi-plus align-middle"></i> Ajouter Un nouveau personnel
+                </button>
+                <button (click)="retraitePersonnelGroupe()" type="submit" class="btn btn-danger h-100 w-100"><i
+                    class="mdi mdi-alert-remove align-middle"></i> Mise en retraites
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <ng-container [ngSwitch]="response?.dataState" *ngIf="dossiers | async as response">
+    <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+      <div class="alert alert-info" role="alert">
+        {{ dataStateEnum.CHARGEMENT }}
+      </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+      <div class="alert alert-danger" role="alert">Erreur:</div>
+    </ng-container>
+    <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+      <div class="row" id="candidate-list">
+        <div class="col-xl-3 col-md-6" *ngFor="let dossier of listeDossierPage ?? []">
+          <div class="card">
+            <div class="card-body">
+              <div class="d-flex align-start mb-3">
+                <div *ngIf="dossier?.dateEmbauchage && !dossier?.debaucher && !dossier?.retraiter" class="flex-grow-1">
+                  <span class="badge badge-soft-success">En Fonction</span></div>
+                <div *ngIf="dossier?.debaucher" class="flex-grow-1"><span
+                    class="badge badge-soft-warning">Débaucher</span></div>
+                <div *ngIf="dossier?.retraiter" class="flex-grow-1"><span class="badge badge-soft-danger">En
+                    Retraite</span></div>
+                <button type="button" title="supprimer ce personnel" placement="top" ngbToolTip="supprimer ce personnel"
+                  (click)="supprimerPersonnel(dossier.id)" class="btn btn-danger btn-sm like-btn"
+                  data-bs-toggle="button"><i class="bx bx-trash-alt"></i></button>
+              </div>
+              <div class="text-center">
+                <div class="avatar-md mx-auto">
+                  <span class="avatar-title rounded-circle bg-soft bg-primary text-primary font-size-30">
+                    {{dossier?.nom?.charAt(0)}}
+                    {{dossier?.nom?.charAt(1)}}
+                    {{dossier?.nom?.charAt(2)}}
+                    {{dossier?.nom?.charAt(3)}}
+                  </span>
+                </div>
+                <h4 *ngIf="dossier?.matricule" class="mt-2 font-size-15">{{dossier?.matricule}}</h4>
+                <h4 *ngIf="!dossier?.matricule" class="mt-2 font-size-15">{{'Pas de Matricule'}}</h4>
+                <h5 class="font-size-15 mb-1">{{(dossier?.prenom?.length || 0) <= 13 ? dossier?.prenom :
+                    dossier?.prenom?.slice(0, 10) + "...  " }} {{(dossier?.nom?.length || 0) <=13 ? dossier?.nom :
+                    dossier?.nom?.slice(0, 10) + "..." }}</h5>
+                    <!-- <p class="mb-0 text-muted">{{dossier?.poste?.designation <= 15 ?dossier?.poste?.designation :dossier?.poste?.designation.substring(0, 24) + "..."}}</p> -->
+              </div>
+              <div class="d-flex mb-2 justify-content-center gap-2 text-muted">
+                <div></div>
+                <div *ngIf="!dossier?.adresse"><i class="bx bx-map align-middle text-primary"></i> {{'Pas d\'adresse '}}
+                </div>
+              </div>
+              <div class="hstack gap-2 justify-content-center"><span
+                  class="font-size-14 badge badge-soft-secondary">{{dossier?.poste?.service?.sigle}}</span></div>
+              <div class="mt-2">
+                <a [routerLink]="['details/'+ encodeId(dossier.id)]"
+                  class="font-size-18 btn badge badge-soft-primary d-block">Voir le Profil</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="row" *ngIf="!listeDossierPage.length">
+        <p class="text-center" style="font-size: xx-large">
+          <i style="color: red; font-size: 150px" class='bx bxs-data'></i><br>Aucun Personnel
+        </p>
+      </div>
+      <div class="row justify-content-between align-items-center mb-3" *ngIf="totalDossier > 8">
+        <div class="col-auto me-auto"></div>
+        <div class="col-auto">
+          <div class="d-flex align-items-center">
+            <button class="btn btn-primary mr-2 mx-3 btn-sm" (click)="currentPage = currentPage - 1; handleClick()"
+              [disabled]="currentPage === 0">
+              Précédent
+            </button>
+            <ng-container *ngIf="pages.length > 1">
+              <ng-container *ngIf="pages.length <= 11">
+                <ng-container *ngFor="let page of pages">
+                  <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                    [disabled]="currentPage === page">
+                    {{ page + 1 }}
+                  </button>
+                </ng-container>
+              </ng-container>
+              <ng-container *ngIf="pages.length > 11">
+                <ng-container *ngIf="currentPage <= 6">
+                  <ng-container *ngFor="let page of pages.slice(0, 5)">
+                    <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                      [disabled]="currentPage === page">
+                      {{ page + 1 }}
+                    </button>
+                  </ng-container>
+                  <button class="btn btn-primary btn-sm mx-1" disabled>
+                    ...
+                  </button>
+                  <ng-container *ngFor="let page of pages.slice(-5)">
+                    <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                      [disabled]="currentPage === page">
+                      {{ page + 1 }}
+                    </button>
+                  </ng-container>
+                </ng-container>
+                <ng-container *ngIf="currentPage > 6 && currentPage < pages.length - 5">
+                  <ng-container *ngFor="
+                      let page of pages.slice(currentPage - 4, currentPage)
+                    ">
+                    <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                      [disabled]="currentPage === page">
+                      {{ page + 1 }}
+                    </button>
+                  </ng-container>
+                  <button class="btn btn-primary btn-sm mx-1" disabled>
+                    ...
+                  </button>
+                  <ng-container *ngFor="
+                      let page of pages.slice(currentPage, currentPage + 4)
+                    ">
+                    <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                      [disabled]="currentPage === page">
+                      {{ page + 1 }}
+                    </button>
+                  </ng-container>
+                </ng-container>
+                <ng-container *ngIf="currentPage >= pages.length - 5">
+                  <ng-container *ngFor="let page of pages.slice(0, 5)">
+                    <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                      [disabled]="currentPage === page">
+                      {{ page + 1 }}
+                    </button>
+                  </ng-container>
+                  <button class="btn btn-primary btn-sm mx-1" disabled>
+                    ...
+                  </button>
+                  <ng-container *ngFor="let page of pages.slice(-5)">
+                    <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                      [disabled]="currentPage === page">
+                      {{ page + 1 }}
+                    </button>
+                  </ng-container>
+                </ng-container>
+              </ng-container>
+            </ng-container>
+            <button class="btn btn-primary btn-sm mx-3" (click)="currentPage = currentPage + 1; handleClick()"
+              [disabled]="currentPage+1 === totalPages">
+              Suivant
+            </button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>
+
+
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title mt-0">{{formulaireDossier.get('id')?.value ? 'Modifier': 'Créer'}}</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cliquer pour fermer')">
+    </button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="formulaireDossier" (ngSubmit)="creerModifierPersonnel()">
+      <mat-stepper  #stepper class="kycwizard">
+        
+        <mat-step [stepControl]="formulaireDossier.get('identitePersonnelGroupe')!" label="Identité du  personnel">
+          <div formGroupName="identitePersonnelGroupe">
+          <div class="kyc-tab-content">
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Matricule *</label>
+                  <input class="form-control" placeholder="Veillez svp entrer le matricule du personnel"
+                    formControlName="matricule" type="number" [ngClass]="{'is-invalid': formPersonnel.identitePersonnelGroupe.controls.matricule.invalid && (formPersonnel.identitePersonnelGroupe.controls.matricule.dirty  || formPersonnel.identitePersonnelGroupe.controls.matricule.touched),
+                        'is-valid': formPersonnel.identitePersonnelGroupe.controls.matricule.valid}">
+                  <div
+                    *ngIf="formulaireDossier.get('identitePersonnelGroupe.matricule')?.invalid && (formulaireDossier.get('identitePersonnelGroupe.matricule')?.dirty  || formulaireDossier.get('identitePersonnelGroupe.matricule')?.touched)"
+                    class="text-danger">
+                    <div *ngIf="formulaireDossier.get('identitePersonnelGroupe.matricule')?.errors?.['required']">le
+                      matricule est obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Nom *</label>
+                  <input class="form-control" placeholder="Veillez svp entrer le nom du personnel" formControlName="nom"
+                    type="text" [ngClass]="{'is-invalid': formPersonnel.identitePersonnelGroupe.controls.nom.invalid && (formPersonnel.identitePersonnelGroupe.controls.nom.dirty  || formPersonnel.identitePersonnelGroupe.controls.nom.touched),
+                        'is-valid': formPersonnel.identitePersonnelGroupe.controls.nom.valid}">
+                  <div
+                    *ngIf="formulaireDossier.get('identitePersonnelGroupe.nom')?.invalid && (formulaireDossier.get('identitePersonnelGroupe.nom')?.dirty  || formulaireDossier.get('identitePersonnelGroupe.nom')?.touched)"
+                    class="text-danger">
+                    <div *ngIf="formulaireDossier.get('identitePersonnelGroupe.nom')?.errors?.['required']">le nom est
+                      obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Prenom *</label>
+                  <input class="form-control" placeholder="Veillez svp entrer le prenom du personnel"
+                    formControlName="prenom" type="text" [ngClass]="{'is-invalid': formPersonnel.identitePersonnelGroupe.controls.prenom.invalid && (formPersonnel.identitePersonnelGroupe.controls.prenom.dirty  || formPersonnel.identitePersonnelGroupe.controls.prenom.touched),
+                        'is-valid': formPersonnel.identitePersonnelGroupe.controls.prenom.valid}">
+                  <div
+                    *ngIf="formulaireDossier.get('identitePersonnelGroupe.prenom')?.invalid && (formulaireDossier.get('identitePersonnelGroupe.prenom')?.dirty  || formulaireDossier.get('identitePersonnelGroupe.prenom')?.touched)"
+                    class="text-danger">
+                    <div *ngIf="formulaireDossier.get('identitePersonnelGroupe.prenom')?.errors?.['required']">le prenom
+                      est obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Civilité *</label>
+                  <select formControlName="civilite" class="form-select" [ngClass]="{'is-invalid': formPersonnel.identitePersonnelGroupe.controls.civilite.invalid && (formPersonnel.identitePersonnelGroupe.controls.civilite.dirty  || formPersonnel.identitePersonnelGroupe.controls.civilite.touched),
+                        'is-valid': formPersonnel.identitePersonnelGroupe.controls.civilite.valid}">
+                    <option [value]=null selected disabled>Choisir la civilité</option>
+                    <option *ngFor="let typeCivilite of typeCivilites" [value]="typeCivilite">{{[typeCivilite]}}
+                    </option>
+                  </select>
+                  <p *ngIf="formPersonnel.identitePersonnelGroupe['controls'].civilite.invalid && (formPersonnel.identitePersonnelGroupe['controls'].civilite.dirty || formPersonnel.identitePersonnelGroupe['controls'].civilite.touched)"
+                    class="text-danger mt-2">
+                    la civilite est obligatoire, Veuillez bien choisir la civilité
+                  </p>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Date de Naissance *</label>
+                  <input class="form-control" placeholder="Veillez svp entrer la date de naissance du personnel"
+                    formControlName="dateDeNaissance" type="date" [ngClass]="{'is-invalid': formPersonnel.identitePersonnelGroupe.controls.dateDeNaissance.invalid && (formPersonnel.identitePersonnelGroupe.controls.dateDeNaissance.dirty  || formPersonnel.identitePersonnelGroupe.controls.dateDeNaissance.touched),
+                        'is-valid': formPersonnel.identitePersonnelGroupe.controls.dateDeNaissance.valid}">
+                  <div
+                    *ngIf="formulaireDossier.get('identitePersonnelGroupe.dateDeNaissance')?.invalid && (formulaireDossier.get('identitePersonnelGroupe.dateDeNaissance')?.dirty  || formulaireDossier.get('identitePersonnelGroupe.dateDeNaissance')?.touched)"
+                    class="text-danger">
+                    <div *ngIf="formulaireDossier.get('identitePersonnelGroupe.dateDeNaissance')?.errors?.['required']">
+                      la date de naissance est obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Reference Comptable *</label>
+                  <input class="form-control" placeholder="Veillez svp entrer la référence comptable du personnel"
+                    formControlName="referenceComptable" type="number" [ngClass]="{'is-invalid': formPersonnel.identitePersonnelGroupe.controls.referenceComptable.invalid && (formPersonnel.identitePersonnelGroupe.controls.referenceComptable.dirty  || formPersonnel.identitePersonnelGroupe.controls.referenceComptable.touched),
+                        'is-valid': formPersonnel.identitePersonnelGroupe.controls.referenceComptable.valid}">
+                  <div
+                    *ngIf="formulaireDossier.get('identitePersonnelGroupe.referenceComptable')?.invalid && (formulaireDossier.get('identitePersonnelGroupe.referenceComptable')?.dirty  || formulaireDossier.get('identitePersonnelGroupe.referenceComptable')?.touched)"
+                    class="text-danger">
+                    <div
+                      *ngIf="formulaireDossier.get('identitePersonnelGroupe.referenceComptable')?.errors?.['required']">
+                      la référence comptable est obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-12">
+                <div class="mb-3">
+                  <label>Situation Matrimoniale *</label>
+                  <select formControlName="situationMatrimoniale" class="form-select" [ngClass]="{'is-invalid': formPersonnel.identitePersonnelGroupe.controls.situationMatrimoniale.invalid && (formPersonnel.identitePersonnelGroupe.controls.situationMatrimoniale.dirty  || formPersonnel.identitePersonnelGroupe.controls.situationMatrimoniale.touched),
+                        'is-valid': formPersonnel.identitePersonnelGroupe.controls.situationMatrimoniale.valid}">
+                    <option [value]=null selected disabled>Choisir la situation matrimoniale</option>
+                    <option *ngFor="let situationMatrimoniale of situationMatrimoniales"
+                      [value]="situationMatrimoniale">{{[situationMatrimoniale]}}</option>
+                  </select>
+                  <p *ngIf="formPersonnel.identitePersonnelGroupe['controls'].situationMatrimoniale.invalid && (formPersonnel.identitePersonnelGroupe['controls'].situationMatrimoniale.dirty || formPersonnel.identitePersonnelGroupe['controls'].situationMatrimoniale.touched)"
+                    class="text-danger mt-2">
+                    la situation matrimoniale est obligatoire, Veuillez bien choisir la situation matrimoniale
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ul class="list-inline wizard mb-0">
+            <li class="next list-inline-item float-end">
+              <!-- <button class="btn btn-primary" type="button" awNextStep>Suivant</button> -->
+              <button class="btn btn-primary" type="button" (click)="onNext(stepper)">Suivant</button>
+
+            </li>
+          </ul>
+          </div>
+        </mat-step>
+
+        <!-- <mat-step formGroupName="identitePersonnelGroupe" stepTitle="'Identité du personnel 2'" label="symbol: '02'"> -->
+        <mat-step [stepControl]="formulaireDossier.get('identitePersonnelGroupe')!" label="Identité du  personnel">
+          <div formGroupName="identitePersonnelGroupe">
+          <div class="kyc-tab-content">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="statutPersonnel">Statut personnel</label>
+                  <ng-select [searchable]=true autofocus="true" (search)="onSearchStatutPersonnel($event.term)"
+                    [loading]="loading" formControlName="statutPersonnel" id="statutPersonnel" [ngClass]="{'is-invalid': formPersonnel.identitePersonnelGroupe.controls.statutPersonnel.invalid && (formPersonnel.identitePersonnelGroupe.controls.statutPersonnel.dirty  || formPersonnel.identitePersonnelGroupe.controls.statutPersonnel.touched),
+                        'is-valid': formPersonnel.identitePersonnelGroupe.controls.statutPersonnel.valid}"
+                    placeholder="Tapez les trois premières lettres de la désignation">
+                    <ng-option *ngFor="let statutPersonnel of listeStatutPersonnel" [value]="statutPersonnel.id">
+                      {{ statutPersonnel.designation}}
+                    </ng-option>
+                  </ng-select>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Nombre d'enfant *</label>
+                  <input class="form-control" placeholder="Veillez svp entrer le nombre d'enfant du personnel"
+                    formControlName="nombreEnfant" type="number" [ngClass]="{'is-invalid': formPersonnel.identitePersonnelGroupe.controls.nombreEnfant.invalid && (formPersonnel.identitePersonnelGroupe.controls.nombreEnfant.dirty  || formPersonnel.identitePersonnelGroupe.controls.nombreEnfant.touched),
+                        'is-valid': formPersonnel.identitePersonnelGroupe.controls.nombreEnfant.valid}">
+                  <div
+                    *ngIf="formulaireDossier.get('identitePersonnelGroupe.nombreEnfant')?.invalid && (formulaireDossier.get('identitePersonnelGroupe.nombreEnfant')?.dirty  || formulaireDossier.get('identitePersonnelGroupe.nombreEnfant')?.touched)"
+                    class="text-danger">
+                    <div *ngIf="formulaireDossier.get('identitePersonnelGroupe.nombreEnfant')?.errors?.['required']">le
+                      nombre d'enfant est obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Numéro piece d'identite *</label>
+                  <input class="form-control"
+                    placeholder="Veillez svp entrer le numéro de la pièce d'identité du personnel"
+                    formControlName="pieceIdentite" type="text" [ngClass]="{'is-invalid': formPersonnel.identitePersonnelGroupe.controls.pieceIdentite.invalid && (formPersonnel.identitePersonnelGroupe.controls.pieceIdentite.dirty  || formPersonnel.identitePersonnelGroupe.controls.pieceIdentite.touched),
+                        'is-valid': formPersonnel.identitePersonnelGroupe.controls.pieceIdentite.valid}">
+                  <div
+                    *ngIf="formulaireDossier.get('identitePersonnelGroupe.pieceIdentite')?.invalid && (formulaireDossier.get('identitePersonnelGroupe.pieceIdentite')?.dirty  || formulaireDossier.get('identitePersonnelGroupe.pieceIdentite')?.touched)"
+                    class="text-danger">
+                    <div *ngIf="formulaireDossier.get('identitePersonnelGroupe.pieceIdentite')?.errors?.['required']">le
+                      numéro de la pièce d'identité est obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Numéro CNSS *</label>
+                  <input class="form-control" placeholder="Veillez svp entrer le numéro de la cnss du personnel"
+                    formControlName="numeroCnss" type="text" [ngClass]="{'is-invalid': formPersonnel.identitePersonnelGroupe.controls.numeroCnss.invalid && (formPersonnel.identitePersonnelGroupe.controls.numeroCnss.dirty  || formPersonnel.identitePersonnelGroupe.controls.numeroCnss.touched),
+                        'is-valid': formPersonnel.identitePersonnelGroupe.controls.numeroCnss.valid}">
+                  <div
+                    *ngIf="formulaireDossier.get('identitePersonnelGroupe.numeroCnss')?.invalid && (formulaireDossier.get('identitePersonnelGroupe.numeroCnss')?.dirty  || formulaireDossier.get('identitePersonnelGroupe.numeroCnss')?.touched)"
+                    class="text-danger">
+                    <div *ngIf="formulaireDossier.get('identitePersonnelGroupe.numeroCnss')?.errors?.['required']">le
+                      numéro de la cnss est obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Télephone *</label>
+                  <input class="form-control" placeholder="Veillez svp entrer le numéro de telephone du personnel"
+                    formControlName="telephone" type="text" [ngClass]="{'is-invalid': formPersonnel.identitePersonnelGroupe.controls.telephone.invalid && (formPersonnel.identitePersonnelGroupe.controls.telephone.dirty  || formPersonnel.identitePersonnelGroupe.controls.telephone.touched),
+                        'is-valid': formPersonnel.identitePersonnelGroupe.controls.telephone.valid}">
+                  <div
+                    *ngIf="formulaireDossier.get('identitePersonnelGroupe.telephone')?.invalid && (formulaireDossier.get('identitePersonnelGroupe.telephone')?.dirty  || formulaireDossier.get('identitePersonnelGroupe.telephone')?.touched)"
+                    class="text-danger">
+                    <div *ngIf="formulaireDossier.get('identitePersonnelGroupe.telephone')?.errors?.['required']">le
+                      numéro de telephone est obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Date d'embauchage *</label>
+                  <input class="form-control" placeholder="Veillez svp entrer la date d'embauche du personnel"
+                    formControlName="dateEmbauchage" type="date" [ngClass]="{'is-invalid': formPersonnel.identitePersonnelGroupe.controls.dateEmbauchage.invalid && (formPersonnel.identitePersonnelGroupe.controls.dateEmbauchage.dirty  || formPersonnel.identitePersonnelGroupe.controls.dateEmbauchage.touched),
+                        'is-valid': formPersonnel.identitePersonnelGroupe.controls.dateEmbauchage.valid}">
+                  <div
+                    *ngIf="formulaireDossier.get('identitePersonnelGroupe.dateEmbauchage')?.invalid && (formulaireDossier.get('identitePersonnelGroupe.dateEmbauchage')?.dirty  || formulaireDossier.get('identitePersonnelGroupe.dateEmbauchage')?.touched)"
+                    class="text-danger">
+                    <div *ngIf="formulaireDossier.get('identitePersonnelGroupe.dateEmbauchage')?.errors?.['required']">
+                      la date d'embauche est obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-12">
+                <div class="mb-3">
+                  <label>Adresse *</label>
+                  <textarea class="form-control" placeholder="Veillez svp entrer l'adresse du personnel"
+                    formControlName="adresse" rows="5" type="text" [ngClass]="{'is-invalid': formPersonnel.identitePersonnelGroupe.controls.adresse.invalid && (formPersonnel.identitePersonnelGroupe.controls.adresse.dirty  || formPersonnel.identitePersonnelGroupe.controls.adresse.touched),
+                        'is-valid': formPersonnel.identitePersonnelGroupe.controls.adresse.valid}"></textarea>
+                  <div
+                    *ngIf="formulaireDossier.get('identitePersonnelGroupe.adresse')?.invalid && (formulaireDossier.get('identitePersonnelGroupe.adresse')?.dirty  || formulaireDossier.get('identitePersonnelGroupe.adresse')?.touched)"
+                    class="text-danger">
+                    <div *ngIf="formulaireDossier.get('identitePersonnelGroupe.adresse')?.errors?.['required']">
+                      l'adresse est obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <ul class="list-inline wizard mb-0">
+            <li class="previous list-inline-item">
+              <button class="btn btn-primary" type="button" matStepperPrevious>Précédent</button>
+            </li>
+            <li class="next list-inline-item float-end">
+              <!-- <button class="btn btn-primary" type="button" matStepperNext
+                [disabled]="formPersonnel.identitePersonnelGroupe.invalid">Suivant</button> -->
+                <button class="btn btn-primary" type="button" (click)="onNext(stepper)">Suivant</button>
+            </li>
+          </ul>
+          </div>
+        </mat-step>
+
+        <!-- <mat-step formGroupName="personneContacterGroupe" stepTitle="'Personne à contacter'" label="symbol: '03'"> -->
+        <mat-step [stepControl]="formulaireDossier.get('personneContacterGroupe')!" label="Personne à contacter'">
+          <div formGroupName="personneContacterGroupe">
+          <div class="kyc-tab-content">
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Contact télephone *</label>
+                  <input class="form-control" placeholder="Veillez svp entrer le contact telephone du personnel"
+                    formControlName="telephoneContact" type="text" [ngClass]="{'is-invalid': formPersonnel.personneContacterGroupe.controls.telephoneContact.invalid && (formPersonnel.personneContacterGroupe.controls.telephoneContact.dirty  || formPersonnel.personneContacterGroupe.controls.telephoneContact.touched),
+                        'is-valid': formPersonnel.personneContacterGroupe.controls.telephoneContact.valid}">
+                  <div
+                    *ngIf="formulaireDossier.get('personneContacterGroupe.telephoneContact')?.invalid && (formulaireDossier.get('personneContacterGroupe.telephoneContact')?.dirty  || formulaireDossier.get('personneContacterGroupe.telephoneContact')?.touched)"
+                    class="text-danger">
+                    <div
+                      *ngIf="formulaireDossier.get('personneContacterGroupe.telephoneContact')?.errors?.['required']">le
+                      contact telephone est obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Prenom contact *</label>
+                  <input class="form-control" placeholder="Veillez svp entrer le prénom contact du personnel"
+                    formControlName="prenomContact" type="text" [ngClass]="{'is-invalid': formPersonnel.personneContacterGroupe.controls.prenomContact.invalid && (formPersonnel.personneContacterGroupe.controls.prenomContact.dirty  || formPersonnel.personneContacterGroupe.controls.prenomContact.touched),
+                        'is-valid': formPersonnel.personneContacterGroupe.controls.prenomContact.valid}">
+                  <div
+                    *ngIf="formulaireDossier.get('personneContacterGroupe.prenomContact')?.invalid && (formulaireDossier.get('personneContacterGroupe.prenomContact')?.dirty  || formulaireDossier.get('personneContacterGroupe.prenomContact')?.touched)"
+                    class="text-danger">
+                    <div *ngIf="formulaireDossier.get('personneContacterGroupe.prenomContact')?.errors?.['required']">le
+                      prénom contact est obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-12">
+                <div class="mb-3">
+                  <label>Nom contact *</label>
+                  <input class="form-control" placeholder="Veillez svp entrer le nom contact du personnel"
+                    formControlName="nomContact" type="text" [ngClass]="{'is-invalid': formPersonnel.personneContacterGroupe.controls.nomContact.invalid && (formPersonnel.personneContacterGroupe.controls.nomContact.dirty  || formPersonnel.personneContacterGroupe.controls.nomContact.touched),
+                        'is-valid': formPersonnel.personneContacterGroupe.controls.nomContact.valid}">
+                  <div
+                    *ngIf="formulaireDossier.get('personneContacterGroupe.nomContact')?.invalid && (formulaireDossier.get('personneContacterGroupe.nomContact')?.dirty  || formulaireDossier.get('personneContacterGroupe.nomContact')?.touched)"
+                    class="text-danger">
+                    <div *ngIf="formulaireDossier.get('personneContacterGroupe.nomContact')?.errors?.['required']">le
+                      nom contact est obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ul class="list-inline wizard mb-0">
+            <li class="previous list-inline-item">
+              <button class="btn btn-primary" type="button" matStepperPrevious>Précédent</button>
+            </li>
+            <li class="next list-inline-item float-end">
+              <!-- <button class="btn btn-primary" type="button" matStepperNext
+                [disabled]="formPersonnel.personneContacterGroupe.invalid">Suivant</button>
+            </li> -->
+            <button class="btn btn-primary" type="button" (click)="onNext(stepper)">Suivant</button>
+
+          </ul>
+          </div>
+        </mat-step>
+
+        <mat-step [stepControl]="formulaireDossier.get('identiteBanquePersonneGroupe')!" label="Identité de la banque">
+          <div formGroupName="identiteBanquePersonneGroupe">
+          <div class="kyc-tab-content">
+            <div class="row">
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Banque *</label>
+                  <ng-select [searchable]=true autofocus="true" (search)="onSearchBanque($event.term)"
+                    [loading]="loading" formControlName="banque" id="banque" [ngClass]="{'is-invalid': formPersonnel.identiteBanquePersonneGroupe.controls.banque.invalid && (formPersonnel.identiteBanquePersonneGroupe.controls.banque.dirty  || formPersonnel.identiteBanquePersonneGroupe.controls.banque.touched),
+                        'is-valid': formPersonnel.identiteBanquePersonneGroupe.controls.banque.valid}"
+                    placeholder="Tapez le sigle de la banque">
+                    <ng-option *ngFor="let banque of listeBanque" [value]="banque.id">
+                      {{ banque.designation}}
+                    </ng-option>
+                  </ng-select>
+                  <div
+                    *ngIf="formulaireDossier.get('identiteBanquePersonneGroupe.banque')?.invalid && (formulaireDossier.get('identiteBanquePersonneGroupe.banque')?.dirty  || formulaireDossier.get('identiteBanquePersonneGroupe.banque')?.touched)"
+                    class="text-danger">
+                    <div *ngIf="formulaireDossier.get('identiteBanquePersonneGroupe.banque')?.errors?.['required']">la
+                      banque est obligatoire, Veuillez bien la renseigner</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Cle rib *</label>
+                  <input class="form-control" placeholder="Veillez svp entrer la clé rib du personnel"
+                    formControlName="cleRib" type="text" [ngClass]="{'is-invalid': formPersonnel.identiteBanquePersonneGroupe.controls.cleRib.invalid && (formPersonnel.identiteBanquePersonneGroupe.controls.cleRib.dirty  || formPersonnel.identiteBanquePersonneGroupe.controls.cleRib.touched),
+                        'is-valid': formPersonnel.identiteBanquePersonneGroupe.controls.cleRib.valid}">
+                  <div
+                    *ngIf="formulaireDossier.get('identiteBanquePersonneGroupe.cleRib')?.invalid && (formulaireDossier.get('identiteBanquePersonneGroupe.cleRib')?.dirty  || formulaireDossier.get('identiteBanquePersonneGroupe.cleRib')?.touched)"
+                    class="text-danger">
+                    <div *ngIf="formulaireDossier.get('identiteBanquePersonneGroupe.cleRib')?.errors?.['required']">la
+                      clé rib est obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Code banque *</label>
+                  <input class="form-control" placeholder="Veillez svp entrer le code banque du personnel"
+                    formControlName="codeBanque" type="text" [ngClass]="{'is-invalid': formPersonnel.identiteBanquePersonneGroupe.controls.codeBanque.invalid && (formPersonnel.identiteBanquePersonneGroupe.controls.codeBanque.dirty  || formPersonnel.identiteBanquePersonneGroupe.controls.codeBanque.touched),
+                        'is-valid': formPersonnel.identiteBanquePersonneGroupe.controls.codeBanque.valid}">
+                  <div
+                    *ngIf="formulaireDossier.get('identiteBanquePersonneGroupe.codeBanque')?.invalid && (formulaireDossier.get('identiteBanquePersonneGroupe.codeBanque')?.dirty  || formulaireDossier.get('identiteBanquePersonneGroupe.codeBanque')?.touched)"
+                    class="text-danger">
+                    <div *ngIf="formulaireDossier.get('identiteBanquePersonneGroupe.codeBanque')?.errors?.['required']">
+                      le code banque est obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Code guichet *</label>
+                  <input class="form-control" placeholder="Veillez svp entrer le code guichet du personnel"
+                    formControlName="codeGuichet" type="text" [ngClass]="{'is-invalid': formPersonnel.identiteBanquePersonneGroupe.controls.codeGuichet.invalid && (formPersonnel.identiteBanquePersonneGroupe.controls.codeGuichet.dirty  || formPersonnel.identiteBanquePersonneGroupe.controls.codeGuichet.touched),
+                        'is-valid': formPersonnel.identiteBanquePersonneGroupe.controls.codeGuichet.valid}">
+                  <div
+                    *ngIf="formulaireDossier.get('identiteBanquePersonneGroupe.codeGuichet')?.invalid && (formulaireDossier.get('identiteBanquePersonneGroupe.codeGuichet')?.dirty  || formulaireDossier.get('identiteBanquePersonneGroupe.codeGuichet')?.touched)"
+                    class="text-danger">
+                    <div
+                      *ngIf="formulaireDossier.get('identiteBanquePersonneGroupe.codeGuichet')?.errors?.['required']">le
+                      code guichet est obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Numero compte *</label>
+                  <input class="form-control" placeholder="Veillez svp entrer le numéro de compte du personnel"
+                    formControlName="numeroCompte" type="text" [ngClass]="{'is-invalid': formPersonnel.identiteBanquePersonneGroupe.controls.numeroCompte.invalid && (formPersonnel.identiteBanquePersonneGroupe.controls.numeroCompte.dirty  || formPersonnel.identiteBanquePersonneGroupe.controls.numeroCompte.touched),
+                        'is-valid': formPersonnel.identiteBanquePersonneGroupe.controls.numeroCompte.valid}">
+                  <div
+                    *ngIf="formulaireDossier.get('identiteBanquePersonneGroupe.numeroCompte')?.invalid && (formulaireDossier.get('identiteBanquePersonneGroupe.numeroCompte')?.dirty  || formulaireDossier.get('identiteBanquePersonneGroupe.numeroCompte')?.touched)"
+                    class="text-danger">
+                    <div
+                      *ngIf="formulaireDossier.get('identiteBanquePersonneGroupe.numeroCompte')?.errors?.['required']">
+                      le numero de compte est obligatoire, Veuillez bien le renseigner</div>
+                  </div>
+                </div>
+              </div>
+              <div class="col-lg-6">
+                <div class="mb-3">
+                  <label>Mode de paiement *</label>
+                  <ng-select [searchable]=true autofocus="true" (search)="onSearchModeDePaiement($event.term)"
+                    [loading]="loading" formControlName="modePaiement" id="modePaiement" [ngClass]="{'is-invalid': formPersonnel.identiteBanquePersonneGroupe.controls.modePaiement.invalid && (formPersonnel.identiteBanquePersonneGroupe.controls.modePaiement.dirty  || formPersonnel.identiteBanquePersonneGroupe.controls.modePaiement.touched),
+                        'is-valid': formPersonnel.identiteBanquePersonneGroupe.controls.modePaiement.valid}"
+                    placeholder="Tapez les trois premières lettres de la désignation">
+                    <ng-option *ngFor="let modePaiement of listeModeDePaiement" [value]="modePaiement.id">
+                      {{ modePaiement.designation}}
+                    </ng-option>
+                  </ng-select>
+                  <p *ngIf="formPersonnel.identiteBanquePersonneGroupe['controls'].modePaiement.invalid && (formPersonnel.identiteBanquePersonneGroupe['controls'].modePaiement.dirty || formPersonnel.identiteBanquePersonneGroupe['controls'].modePaiement.touched)"
+                    class="text-danger mt-2">
+                    Veuillez bien choisir le mode de paiement personnel
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ul class="list-inline wizard mb-0">
+            <li class="previous list-inline-item">
+              <button class="btn btn-primary" type="button" matStepperPrevious>Précédent</button>
+            </li>
+            <li class="next list-inline-item float-end">
+              <!-- <button class="btn btn-primary" type="button" awNextStep
+                [disabled]="formPersonnel.identiteBanquePersonneGroupe.invalid">Suivant</button> -->
+              <button class="btn btn-primary" type="button" (click)="onNext(stepper)">Suivant</button>
+
+            </li>
+          </ul>
+          </div>
+        </mat-step>
+
+        <!-- <mat-step formGroupName="autrePersonnelGroupe" stepTitle="'Autres'" label="symbol: '05'"> -->
+        <mat-step [stepControl] = "formulaireDossier.get('autrePersonnelGroupe')!"  label="Identité des autres">
+           <div formGroupName="autrePersonnelGroupe">
+          <div class="kyc-tab-content">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="poste">Poste</label>
+                  <ng-select [searchable]=true autofocus="true" (search)="onSearchPoste($event.term)"
+                    [loading]="loading" formControlName="poste" id="poste" [ngClass]="{'is-invalid': formPersonnel.autrePersonnelGroupe.controls.poste.invalid && (formPersonnel.autrePersonnelGroupe.controls.poste.dirty  || formPersonnel.autrePersonnelGroupe.controls.poste.touched),
+                        'is-valid': formPersonnel.autrePersonnelGroupe.controls.poste.valid}"
+                    placeholder="Tapez les trois premières lettres de la désignation">
+                    <ng-option *ngFor="let poste of listePoste" [value]="poste.id">
+                      {{ poste.designation}}
+                    </ng-option>
+                  </ng-select>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="mb-3">
+                  <label for="entite">Entite</label>
+                  <ng-select [searchable]=true autofocus="true" (search)="onSearchEntite($event.term)"
+                    [loading]="loading" formControlName="entite" id="entite" [ngClass]="{'is-invalid': formPersonnel.autrePersonnelGroupe.controls.entite.invalid && (formPersonnel.autrePersonnelGroupe.controls.entite.dirty  || formPersonnel.autrePersonnelGroupe.controls.entite.touched),
+                        'is-valid': formPersonnel.autrePersonnelGroupe.controls.entite.valid}"
+                    placeholder="Tapez les trois premières lettres de la désignation">
+                    <ng-option *ngFor="let entite of listeEntite" [value]="entite.id">
+                      {{ entite.designation}}
+                    </ng-option>
+                  </ng-select>
+                </div>
+              </div>
+              <div class="col-md-12">
+                <div class="mb-3">
+                  <label for="indice">Indice</label>
+                  <ng-select [searchable]=true autofocus="true" (search)="onSearchIndice($event.term)"
+                    [loading]="loading" formControlName="indice" id="indice" [ngClass]="{'is-invalid': formPersonnel.autrePersonnelGroupe.controls.indice.invalid && (formPersonnel.autrePersonnelGroupe.controls.indice.dirty  || formPersonnel.autrePersonnelGroupe.controls.indice.touched),
+                        'is-valid': formPersonnel.autrePersonnelGroupe.controls.indice.valid}"
+                    placeholder="Tapez les trois premières lettres du nom">
+                    <ng-option *ngFor="let indice of listeIndice" [value]="indice.id">
+                      {{ indice.nom}}
+                    </ng-option>
+                  </ng-select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <ul class="list-inline wizard mb-0">
+            <li class="previous list-inline-item">
+              <button class="btn btn-primary" type="button" matStepperPrevious>Précédent</button>
+            </li>
+            <li class="next list-inline-item float-end">
+              <button class="btn btn-primary" type="submit"
+                [disabled]="formPersonnel.autrePersonnelGroupe.invalid">{{formulaireDossier.get('id')?.value ?
+                'Modifier': 'Créer'}}</button>
+            </li>
+          </ul>
+          </div>
+        </mat-step>
+
+      </mat-stepper>
+    </form>
+  </div>
+</ng-template>

@@ -1,7 +1,7 @@
 import {Personnel} from "./personnel";
 
 export interface Avenant {
-  id: number
+  id: number ;
   date: Date
   fichier: string
   estActif: boolean

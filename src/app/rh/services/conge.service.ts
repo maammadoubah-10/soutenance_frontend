@@ -49,7 +49,7 @@ export class CongeService {
 
 
   telechargerTitreConge(id:number): Observable<any> {
-    const url = `${this.contextPath+'/'+id+'/titreconge'}`;
+    const url = `${this.contextPath+'/'+id+'/telecharger'}`;
     const headers = new HttpHeaders({ 'Content-Type': 'application/pdf' });
     return this.httpClient.get(url, { responseType: 'arraybuffer', headers: headers });
   }

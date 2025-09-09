@@ -11,16 +11,13 @@
           </p>
           <div class="row " style="display: flex">
             <div class="col-sm-4">
-              <button
-                class="btn btn-darkblue btn-label"
-                (click)="openModal(content)"
-              >
+              <button class="btn btn-darkblue btn-label" (click)="openModal(content)">
                 <i class="mdi mdi-plus label-icon"></i>
                 Ajouter un utilisateur
               </button>
             </div>
 
-            <div class="col-sm-2" >
+            <div class="col-sm-2">
               <select name="perPage" id="" class="form-control">
                 <option value="10">10</option>
                 <option value="25">25</option>
@@ -32,192 +29,142 @@
             <div class="col-sm-4">
               <div class="search-box me-2 mb-2 d-inline-block">
                 <input type="text" class="form-control" placeholder="Rechercher un utilisateur .."
-                       [(ngModel)]="designation"
-                       (keyup)="onPageChange(currentPage)"
-                       name="searchValue">
+                  [(ngModel)]="designation" (keyup)="onPageChange(currentPage)" name="searchValue">
                 <i class="bx bx-search-alt search-icon"></i>
               </div>
             </div>
 
           </div>
           <hr />
-          <ng-container
-  *ngIf="utilisateursStates$ | async as response"
-  [ngSwitch]="response.dataState"
->
-  <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
-    <div class="alert alert-info" role="alert">
-      {{ dataStateEnum.CHARGEMENT }}
-    </div>
-  </ng-container>
+          <ng-container *ngIf="utilisateursStates$ | async as response" [ngSwitch]="response.dataState">
+            <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+              <div class="alert alert-info" role="alert">
+                {{ dataStateEnum.CHARGEMENT }}
+              </div>
+            </ng-container>
 
-  <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
-    <div class="alert alert-danger" role="alert">
-      Erreur de chargement.
-    </div>
-  </ng-container>
+            <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+              <div class="alert alert-danger" role="alert">
+                Erreur de chargement.
+              </div>
+            </ng-container>
 
-  <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
-    <div class="table-responsive mt-2">
-      <table class="table table-bordered no-wrap align-middle">
-        <thead>
-          <tr class="text-center justify-content-center">
-            <th>#</th>
-            <th>Nom</th>
-            <th>Prénoms</th>
-            <th>Email</th>
-            <th>Rôle(s)</th>
-            <th>Statut</th>
-            <th>Admin</th>
-            <th>Action</th>
-          </tr>
-        </thead>
+            <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+              <div class="table-responsive mt-2">
+                <table class="table table-bordered no-wrap align-middle">
+                  <thead>
+                    <tr class="text-center justify-content-center">
+                      <th>#</th>
+                      <th>Nom</th>
+                      <th>Prénoms</th>
+                      <th>Email</th>
+                      <th>Rôle(s)</th>
+                      <th>Statut</th>
+                      <th>Admin</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
 
-        <tbody>
-          <tr
-            class="text-center justify-content-center"
-            *ngFor="let utilisateur of (response?.data ?? []); let i = index"          >
-            <td>{{ i + 1 }}</td>
-            <td>{{ utilisateur?.personnel?.etatCivil?.nom }}</td>
-            <td>{{ utilisateur?.personnel?.etatCivil?.prenom }}</td>
-            <td>{{ utilisateur?.email }}</td>
+                  <tbody>
+                    <tr class="text-center justify-content-center"
+                      *ngFor="let utilisateur of (response?.data ?? []); let i = index">
+                      <td>{{ i + 1 }}</td>
+                      <td>{{ utilisateur?.personnel?.etatCivil?.nom }}</td>
+                      <td>{{ utilisateur?.personnel?.etatCivil?.prenom }}</td>
+                      <td>{{ utilisateur?.email }}</td>
 
-            <td>
-              <button
-                style="--bs-btn-padding-y:.25rem; --bs-btn-padding-x:.5rem; --bs-btn-font-size:.75rem;"
-                *ngIf="(utilisateur?.roles?.length ?? 0) > 0"
-                type="button"
-                class="btn btn-darkblue"
-                (click)="openModalDetails(details, utilisateur?.roles)"
-              >
-                Aperçu
-              </button>
-            </td>
+                      <td>
+                        <button style="--bs-btn-padding-y:.25rem; --bs-btn-padding-x:.5rem; --bs-btn-font-size:.75rem;"
+                          *ngIf="(utilisateur?.roles?.length ?? 0) > 0" type="button" class="btn btn-darkblue"
+                          (click)="openModalDetails(details, utilisateur?.roles)">
+                          Aperçu
+                        </button>
+                      </td>
 
-            <td>
-              <i *ngIf="utilisateur?.est_actif" class="mdi mdi-lock-open font-size-18 text-success"> Actif</i>
-              <i *ngIf="!utilisateur?.est_actif" class="mdi mdi-lock-remove font-size-18 text-danger"> Inactif</i>
-            </td>
+                      <td>
+                        <i *ngIf="utilisateur?.est_actif" class="mdi mdi-lock-open font-size-18 text-success"> Actif</i>
+                        <i *ngIf="!utilisateur?.est_actif" class="mdi mdi-lock-remove font-size-18 text-danger">
+                          Inactif</i>
+                      </td>
 
-            <td>
-              <i *ngIf="utilisateur?.estAdmin" class="mdi mdi-lock-open font-size-18 text-success"> Admin</i>
-              <i *ngIf="!utilisateur?.estAdmin" class="mdi mdi-lock-remove font-size-18 text-danger"> InAdmin</i>
-            </td>
+                      <td>
+                        <i *ngIf="utilisateur?.estAdmin" class="mdi mdi-lock-open font-size-18 text-success"> Admin</i>
+                        <i *ngIf="!utilisateur?.estAdmin" class="mdi mdi-lock-remove font-size-18 text-danger">
+                          InAdmin</i>
+                      </td>
 
-            <td>
-              <button
-                placement="top"
-                ngbTooltip="Ajouter le/les rôle(s)"
-                class="btn btn-outline-success mx-1 mt-1 btn-sm"
-                (click)="openModalAjouterRolesUtilisateur(utilisateur, contentAjouter)"
-              >
-                <i class="mdi mdi-plus"></i>
-              </button>
+                      <td>
+                        <button placement="top" ngbTooltip="Ajouter le/les rôle(s)"
+                          class="btn btn-outline-success mx-1 mt-1 btn-sm"
+                          (click)="openModalAjouterRolesUtilisateur(utilisateur, contentAjouter)">
+                          <i class="mdi mdi-plus"></i>
+                        </button>
 
-              <button
-                placement="top"
-                ngbTooltip="Retirer le/les rôle(s)"
-                class="btn btn-outline-danger mx-1 mt-1 btn-sm"
-                (click)="openModalRetirerRolesUtilisateur(utilisateur, contentRetirer)"
-              >
-                <i class="bx bx-x"></i>
-              </button>
+                        <button placement="top" ngbTooltip="Retirer le/les rôle(s)"
+                          class="btn btn-outline-danger mx-1 mt-1 btn-sm"
+                          (click)="openModalRetirerRolesUtilisateur(utilisateur, contentRetirer)">
+                          <i class="bx bx-x"></i>
+                        </button>
 
-              <button
-                *ngIf="!utilisateur?.est_actif"
-                placement="top"
-                ngbTooltip="Activer"
-                title="Activer l'utilisateur"
-                class="btn btn-success mx-1 mt-1 btn-sm"
-                (click)="inverserEstActif(utilisateur)"
-              >
-                <i class="mdi mdi-lock-open"></i>
-              </button>
+                        <button *ngIf="!utilisateur?.est_actif" placement="top" ngbTooltip="Activer"
+                          title="Activer l'utilisateur" class="btn btn-success mx-1 mt-1 btn-sm"
+                          (click)="inverserEstActif(utilisateur)">
+                          <i class="mdi mdi-lock-open"></i>
+                        </button>
 
-              <button
-                *ngIf="utilisateur?.est_actif"
-                placement="top"
-                ngbTooltip="Désactiver"
-                title="Désactiver l'utilisateur"
-                class="btn btn-danger mx-1 mt-1 btn-sm"
-                (click)="inverserEstActif(utilisateur)"
-              >
-                <i class="mdi mdi-lock-remove"></i>
-              </button>
+                        <button *ngIf="utilisateur?.est_actif" placement="top" ngbTooltip="Désactiver"
+                          title="Désactiver l'utilisateur" class="btn btn-danger mx-1 mt-1 btn-sm"
+                          (click)="inverserEstActif(utilisateur)">
+                          <i class="mdi mdi-lock-remove"></i>
+                        </button>
 
-              <button
-                *ngIf="!utilisateur?.estAdmin"
-                placement="top"
-                ngbTooltip="Nommer Administrateur"
-                title="Nommer Administrateur"
-                class="btn btn-outline-success mx-1 mt-1 btn-sm"
-                (click)="inverserEstAdmin(utilisateur)"
-              >
-                <i class="bx bx-user-plus"></i>
-              </button>
+                        <button *ngIf="!utilisateur?.estAdmin" placement="top" ngbTooltip="Nommer Administrateur"
+                          title="Nommer Administrateur" class="btn btn-outline-success mx-1 mt-1 btn-sm"
+                          (click)="inverserEstAdmin(utilisateur)">
+                          <i class="bx bx-user-plus"></i>
+                        </button>
 
-              <button
-                *ngIf="utilisateur?.estAdmin"
-                placement="top"
-                ngbTooltip="Révoquer Administrateur"
-                title="Révoquer Administrateur"
-                class="btn btn-outline-danger mx-1 mt-1 btn-sm"
-                (click)="inverserEstAdmin(utilisateur)"
-              >
-                <i class="bx bx-user-x"></i>
-              </button>
+                        <button *ngIf="utilisateur?.estAdmin" placement="top" ngbTooltip="Révoquer Administrateur"
+                          title="Révoquer Administrateur" class="btn btn-outline-danger mx-1 mt-1 btn-sm"
+                          (click)="inverserEstAdmin(utilisateur)">
+                          <i class="bx bx-user-x"></i>
+                        </button>
 
-              <button
-                placement="top"
-                ngbTooltip="Modifier"
-                class="btn btn-darkblue mx-1 mt-1 btn-sm"
-                (click)="openModal(content, utilisateur)"
-              >
-                <i class="mdi mdi-pencil"></i>
-              </button>
+                        <button placement="top" ngbTooltip="Modifier" class="btn btn-darkblue mx-1 mt-1 btn-sm"
+                          (click)="openModal(content, utilisateur)">
+                          <i class="mdi mdi-pencil"></i>
+                        </button>
 
-              <button
-                placement="top"
-                ngbTooltip="Supprimer"
-                class="btn btn-danger mx-1 mt-1 btn-sm"
-                (click)="supprimerFormat(utilisateur.id)"
-              >
-                <i class="bx bx-trash-alt"></i>
-              </button>
-            </td>
-          </tr>
+                        <button placement="top" ngbTooltip="Supprimer" class="btn btn-danger mx-1 mt-1 btn-sm"
+                          (click)="supprimerFormat(utilisateur.id)">
+                          <i class="bx bx-trash-alt"></i>
+                        </button>
+                      </td>
+                    </tr>
 
-          <tr *ngIf="(response.data?.length || 0) === 0">
-            <td colspan="8" class="text-center">
-              <i style="color:#d9534f;font-size:xxx-large" class="bx bxs-data btn btn-lg"></i><br>
-              Aucun Utilisateurs
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    
-                <div class="row justify-content-between align-items-center mb-3"
-                     *ngIf="totalUtilisateurs > 10"
-                >
+                    <tr *ngIf="(response.data?.length || 0) === 0">
+                      <td colspan="8" class="text-center">
+                        <i style="color:#d9534f;font-size:xxx-large" class="bx bxs-data btn btn-lg"></i><br>
+                        Aucun Utilisateurs
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <div class="row justify-content-between align-items-center mb-3" *ngIf="totalUtilisateurs > 10">
 
                   <div class="col-auto me-auto"></div>
                   <div class="col-auto">
                     <div class="d-flex align-items-center">
-                      <button
-                        class="btn btn-primary mr-2 mx-3 btn-sm"
-                        (click)="currentPage = currentPage - 1; handleClick()"
-                        [disabled]="currentPage === 0"
-                      >
+                      <button class="btn btn-primary mr-2 mx-3 btn-sm"
+                        (click)="currentPage = currentPage - 1; handleClick()" [disabled]="currentPage === 0">
                         Précédent
                       </button>
                       <ng-container *ngIf="pages.length > 1">
                         <ng-container *ngIf="pages.length <= 11">
                           <ng-container *ngFor="let page of pages">
-                            <button
-                              class="btn btn-primary btn-sm mx-1"
-                              (click)="currentPage = page; handleClick()"
-                              [disabled]="currentPage === page"
-                            >
+                            <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                              [disabled]="currentPage === page">
                               {{ page +1}}
                             </button>
                           </ng-container>
@@ -225,11 +172,8 @@
                         <ng-container *ngIf="pages.length > 11">
                           <ng-container *ngIf="currentPage <= 6">
                             <ng-container *ngFor="let page of pages.slice(0, 5)">
-                              <button
-                                class="btn btn-primary btn-sm mx-1"
-                                (click)="currentPage = page; handleClick()"
-                                [disabled]="currentPage === page"
-                              >
+                              <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page">
                                 {{ page + 1 }}
                               </button>
                             </ng-container>
@@ -237,44 +181,29 @@
                               ...
                             </button>
                             <ng-container *ngFor="let page of pages.slice(-5)">
-                              <button
-                                class="btn btn-primary btn-sm mx-1"
-                                (click)="currentPage = page; handleClick()"
-                                [disabled]="currentPage === page"
-                              >
+                              <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page">
                                 {{ page + 1 }}
                               </button>
                             </ng-container>
                           </ng-container>
-                          <ng-container
-                            *ngIf="currentPage > 6 && currentPage < pages.length - 5"
-                          >
-                            <ng-container
-                              *ngFor="
+                          <ng-container *ngIf="currentPage > 6 && currentPage < pages.length - 5">
+                            <ng-container *ngFor="
                       let page of pages.slice(currentPage - 4, currentPage)
-                    "
-                            >
-                              <button
-                                class="btn btn-primary btn-sm mx-1"
-                                (click)="currentPage = page; handleClick()"
-                                [disabled]="currentPage === page"
-                              >
+                    ">
+                              <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page">
                                 {{ page + 1 }}
                               </button>
                             </ng-container>
                             <button class="btn btn-primary btn-sm mx-1" disabled>
                               ...
                             </button>
-                            <ng-container
-                              *ngFor="
+                            <ng-container *ngFor="
                       let page of pages.slice(currentPage, currentPage + 4)
-                    "
-                            >
-                              <button
-                                class="btn btn-primary btn-sm mx-1"
-                                (click)="currentPage = page; handleClick()"
-                                [disabled]="currentPage === page"
-                              >
+                    ">
+                              <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page">
                                 {{ page + 1 }}
                               </button>
                             </ng-container>
@@ -283,11 +212,8 @@
 
                           <ng-container *ngIf="currentPage >= pages.length - 5">
                             <ng-container *ngFor="let page of pages.slice(0, 5)">
-                              <button
-                                class="btn btn-primary btn-sm mx-1"
-                                (click)="currentPage = page; handleClick()"
-                                [disabled]="currentPage === page"
-                              >
+                              <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page">
                                 {{ page + 1 }}
                               </button>
                             </ng-container>
@@ -295,22 +221,16 @@
                               ...
                             </button>
                             <ng-container *ngFor="let page of pages.slice(-5)">
-                              <button
-                                class="btn btn-primary btn-sm mx-1"
-                                (click)="currentPage = page; handleClick()"
-                                [disabled]="currentPage === page"
-                              >
+                              <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                                [disabled]="currentPage === page">
                                 {{ page + 1 }}
                               </button>
                             </ng-container>
                           </ng-container>
                         </ng-container>
                       </ng-container>
-                      <button
-                        class="btn btn-primary btn-sm mx-3"
-                        (click)="currentPage = currentPage + 1; handleClick()"
-                        [disabled]="currentPage+1 === totalPages"
-                      >
+                      <button class="btn btn-primary btn-sm mx-3" (click)="currentPage = currentPage + 1; handleClick()"
+                        [disabled]="currentPage+1 === totalPages">
                         Suivant
                       </button>
                     </div>
@@ -330,74 +250,65 @@
 <ng-template #content let-modal>
   <div class="modal-header">
     <h4>{{formulaireUtilisateur.get('id')?.value ? 'Modifier': 'Créer'}}</h4>
-    <button type="button" class="btn-close" aria-label="Close"
-            (click)="modal.dismiss('Cliquer pour fermer')">
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cliquer pour fermer')">
     </button>
   </div>
   <div class="modal-body">
-    <form  [formGroup]="formulaireUtilisateur"
-           (ngSubmit)="creerModifierUtilisateur()" >
+    <form [formGroup]="formulaireUtilisateur" (ngSubmit)="creerModifierUtilisateur()">
 
       <div class="row">
         <div class="col-md-6">
           <div class="mb-3">
             <label for="email">Adresse Email</label>
-            <input type="email" class="form-control" placeholder="Veillez svp entrer l'email de l'utilisateur"  formControlName="email" id="email"
-                   [ngClass]="{'is-invalid': formulaireUtilisateur.get('email')?.invalid && formulaireUtilisateur.get('email'), 'is-valid': formulaireUtilisateur.get('email')?.valid}"
-            >
-            <div *ngIf="formulaireUtilisateur.get('email')?.invalid && formulaireUtilisateur.get('email')?.dirty" class="text-danger">
+            <input type="email" class="form-control" placeholder="Veillez svp entrer l'email de l'utilisateur"
+              formControlName="email" id="email"
+              [ngClass]="{'is-invalid': formulaireUtilisateur.get('email')?.invalid && formulaireUtilisateur.get('email'), 'is-valid': formulaireUtilisateur.get('email')?.valid}">
+            <div *ngIf="formulaireUtilisateur.get('email')?.invalid && formulaireUtilisateur.get('email')?.dirty"
+              class="text-danger">
               <div *ngIf="formulaireUtilisateur.get('email')?.errors?.['required']">L'email est obligatoire</div>
             </div>
           </div>
         </div>
 
-       <div class="col-md-6">
-  <div class="mb-3">
-    <label for="personnelid">Personnel</label>
-    <select
-      formControlName="personnelid"
-      id="personnelid"
-      class="form-control"
-      [ngClass]="{'is-invalid': formulaireUtilisateur.get('personnelid')?.invalid && formulaireUtilisateur.get('personnelid')?.dirty,
-                   'is-valid': formulaireUtilisateur.get('personnelid')?.valid}"
-    >
-      <option value="">Sélectionnez un personnel</option>
-      <option *ngFor="let personnel of personnels" [value]="personnel.id">
-        {{ personnel?.etatCivil?.prenom + ' ' + personnel?.etatCivil?.nom }}
-      </option>
-    </select>
-    <div *ngIf="formulaireUtilisateur.get('personnelid')?.invalid && formulaireUtilisateur.get('personnelid')?.dirty" class="text-danger">
-      <div *ngIf="formulaireUtilisateur.get('personnelid')?.errors?.['required']">Le Personnel est obligatoire</div>
-    </div>
-  </div>
-</div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="personnelid">Personnel</label>
+            <select formControlName="personnelid" id="personnelid" class="form-control" [ngClass]="{'is-invalid': formulaireUtilisateur.get('personnelid')?.invalid && formulaireUtilisateur.get('personnelid')?.dirty,
+                   'is-valid': formulaireUtilisateur.get('personnelid')?.valid}">
+              <option value="">Sélectionnez un personnel</option>
+              <option *ngFor="let personnel of personnels" [value]="personnel.id">
+                {{ personnel?.etatCivil?.prenom + ' ' + personnel?.etatCivil?.nom }}
+              </option>
+            </select>
+            <div
+              *ngIf="formulaireUtilisateur.get('personnelid')?.invalid && formulaireUtilisateur.get('personnelid')?.dirty"
+              class="text-danger">
+              <div *ngIf="formulaireUtilisateur.get('personnelid')?.errors?.['required']">Le Personnel est obligatoire
+              </div>
+            </div>
+          </div>
+        </div>
 
-        <div class="col-md-12" >
+        <div class="col-md-12">
           <label for="role">Le/Les Rôle(s)</label>
-          <ng-select
-            [searchable] = true
-            autofocus="true"
-            [multiple]="true"
-            (search) = "onSearchRole($event.term)"
-            [loading]="loading"
-            formControlName="role"
-            id="role"
-            [ngClass]="{'is-invalid': formulaireUtilisateur.get('role')?.invalid && formulaireUtilisateur.get('role')?.dirty,
-      'is-valid': formulaireUtilisateur.get('role')?.valid}"
-            placeholder="Tapez les trois premières lettres"
-          >
+          <ng-select [searchable]=true autofocus="true" [multiple]="true" (search)="onSearchRole($event.term)"
+            [loading]="loading" formControlName="role" id="role" [ngClass]="{'is-invalid': formulaireUtilisateur.get('role')?.invalid && formulaireUtilisateur.get('role')?.dirty,
+      'is-valid': formulaireUtilisateur.get('role')?.valid}" placeholder="Tapez les trois premières lettres">
             <ng-option *ngFor="let role of roles" [value]="role.id">
               {{ role.nom}}
             </ng-option>
-            <div *ngIf="formulaireUtilisateur.get('role')?.invalid && formulaireUtilisateur.get('role')?.dirty" class="text-danger">
-              <div *ngIf="formulaireUtilisateur.get('role')?.errors?.['required']">Le/Les Rôle(s) est/sont obligatoire</div>
+            <div *ngIf="formulaireUtilisateur.get('role')?.invalid && formulaireUtilisateur.get('role')?.dirty"
+              class="text-danger">
+              <div *ngIf="formulaireUtilisateur.get('role')?.errors?.['required']">Le/Les Rôle(s) est/sont obligatoire
+              </div>
             </div>
           </ng-select>
         </div>
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-primary" [disabled]="formulaireUtilisateur.invalid" type="submit">{{formulaireUtilisateur.get('id')?.value ? 'Modifier': 'Créer'}}</button>
+        <button class="btn btn-primary" [disabled]="formulaireUtilisateur.invalid"
+          type="submit">{{formulaireUtilisateur.get('id')?.value ? 'Modifier': 'Créer'}}</button>
       </div>
     </form>
   </div>
@@ -410,8 +321,7 @@
   </div>
   <div class="modal-body">
     <div class="button-items">
-      <button *ngFor="let role of listeRole"
-              type="button" class="btn btn-light">
+      <button *ngFor="let role of listeRole" type="button" class="btn btn-light">
         {{role?.nom}}
       </button>
     </div>
@@ -434,20 +344,9 @@
       <div class="row">
         <div class="col-md-12">
           <label for="roleIds">Le/Les Rôle(s)</label>
-          <ng-select
-            [multiple]="true"
-            [closeOnSelect]="false"
-            [clearable]="true"
-            bindLabel="name"
-            bindValue="id"
-            [(ngModel)]="roleIds"
-            name="roleIds"
-            required
-            [searchable]="true"
-            (search)="onSearchRole($event.term)"
-            [loading]="loading"
-            id="roleIds"
-          >
+          <ng-select [multiple]="true" [closeOnSelect]="false" [clearable]="true" bindLabel="name" bindValue="id"
+            [(ngModel)]="roleIds" name="roleIds" required [searchable]="true" (search)="onSearchRole($event.term)"
+            [loading]="loading" id="roleIds">
             <ng-option *ngFor="let role of rolesDuPersonnel" [value]="role.id">
               {{ role.nom }}
             </ng-option>
@@ -472,20 +371,9 @@
       <div class="row">
         <div class="col-md-12">
           <label for="roleIds">Le/Les Rôle(s)</label>
-          <ng-select
-            [multiple]="true"
-            [closeOnSelect]="false"
-            [clearable]="true"
-            bindLabel="name"
-            bindValue="id"
-            [(ngModel)]="roleIds"
-            name="roleIds"
-            required
-            [searchable]="true"
-            (search)="onSearchRole($event.term)"
-            [loading]="loading"
-            id="roleIds"
-          >
+          <ng-select [multiple]="true" [closeOnSelect]="false" [clearable]="true" bindLabel="name" bindValue="id"
+            [(ngModel)]="roleIds" name="roleIds" required [searchable]="true" (search)="onSearchRole($event.term)"
+            [loading]="loading" id="roleIds">
             <ng-option *ngFor="let role of roles" [value]="role.id">
               {{ role.nom }}
             </ng-option>

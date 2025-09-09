@@ -33,9 +33,6 @@
               "src/styles.scss",
               "node_modules/@mdi/font/css/materialdesignicons.min.css",
               "node_modules/bootstrap/scss/bootstrap.scss",
-              "node_modules/angular-archwizard/styles/archwizard.css",
-              "node_modules/ng-wizard/themes/ng_wizard.min.css",
-              "ng-wizard/themes/ng_wizard_theme_arrows.min.css",
                "node_modules/boxicons/css/boxicons.min.css",
               "@angular/material/prebuilt-themes/indigo-pink.css",
               "node_modules/bootstrap/dist/css/bootstrap.min.css"

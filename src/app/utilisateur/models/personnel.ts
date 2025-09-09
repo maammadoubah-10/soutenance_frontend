@@ -7,4 +7,5 @@ export interface Personnel {
   prenom : string;
   etatCivil:EtatCivil;
   poste:Poste;
+  adresse:string
 }
