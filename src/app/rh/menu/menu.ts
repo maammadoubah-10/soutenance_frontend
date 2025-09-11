@@ -47,12 +47,18 @@ export const MENU: MenuItem[] = [
         icon: 'bx bx-bookmark',
         link: 'services',
       },
-    //   {
-    //     id: 4,
-    //     label: 'Organigramme',
-    //     icon: 'bx bx-line-chart',
-    //     link: 'organigrammes',
-    //   },
+      {
+        id: 4,
+        label: 'Contrats',
+        icon: 'bx bx-line-chart',
+        link: 'contrats',
+      },
+      {
+        id: 1.1,
+        label: 'Indices',
+        icon: 'bx bx-line-chart',
+        link: 'indices',
+      },
       {
         id: 4,
         label: 'Mission',

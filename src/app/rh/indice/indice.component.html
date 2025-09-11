@@ -1,0 +1,257 @@
+<div class="container-fluid px-3 main">
+  <app-titredepage title="Indices" [items]="items"></app-titredepage>
+  <div class="row">
+    <div class="col">
+      <div class="card">
+        <div class="card-header bg-success"></div>
+        <div class="card-body">
+          <h4 class="card-title">Liste des indices</h4>
+          <p class="card-title-desc">
+            Le tableau suivant présente la liste des indices
+          </p>
+          <div class="row " style="display: flex">
+            <div class="col-sm-2">
+              <button
+                class="btn btn-darkblue btn-label"
+                (click)="openModal(content)"
+              >
+                <i class="mdi mdi-plus label-icon"></i>
+                Ajouter
+              </button>
+            </div>
+
+            <div class="col-sm-2" >
+              <select name="perPage" [(ngModel)]="dossierPerPage" id="" class="form-control">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+              </select>
+            </div>
+
+            <div class="col-sm-2">
+              <div class="search-box me-2 mb-2 d-inline-block">
+                <input type="text" class="form-control" placeholder="Rechercher .." [(ngModel)]="searchValue" name="searchValue">
+                <i class="bx bx-search-alt search-icon"></i>
+              </div>
+            </div>
+
+          </div>
+          <hr />
+          <ng-container
+            [ngSwitch]="response.dataState"
+            *ngIf="dossiers | async as response"
+          >
+            <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+              <div class="alert alert-info" role="alert">
+                {{ dataStateEnum.CHARGEMENT }}
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+              <div class="alert alert-info" role="alert">
+                {{ response.dataState }}
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+              <div class="table-responsive mt-2">
+                <table class="table table-bordered no-wrap align-middle">
+                  <thead>
+                  <tr class="text-center justify-content-center">
+                    <th>#</th>
+                    <th>Nom</th>
+                    <th>Action</th>
+                  </tr>
+                  </thead>
+
+                  <tbody>
+                  <tr class="text-center justify-content-center" *ngFor="let dossier of listeDossierPage ?? []
+                 ; let i=index">
+                    <td>{{ i + 1 }}</td>
+                    <td>{{dossier.nom}}</td>
+                    <td>
+                      <button
+                        placement="top"
+                        ngbTooltip="Modifier"
+                        class="btn btn-darkblue mx-1 mt-1 btn-sm"
+                        (click)="openModal(content,dossier)"
+                      >
+                        <i class="mdi mdi-pencil"></i>
+                      </button>
+                      <button
+                        placement="top"
+                        ngbToolTip="Supprimer"
+                        class="btn btn-danger mx-1 mt-1 btn-sm"
+                        (click)="supprimerDossier(dossier.id)"
+                      >
+                        <i class="bx bx-trash-alt"></i>
+                      </button>
+                    </td>
+                  </tr>
+                  <tr *ngIf="response.data?.length == 0">
+                    <td colspan="3" class="text-center"><i style="color: #d9534f;font-size: xxx-large" class='bx bxs-data btn btn-lg'></i><br>Aucun indice</td>
+                  </tr>
+                  </tbody>
+                </table>
+                <div class="row justify-content-between align-items-center mb-3"
+                     *ngIf="totalDossier > 10"
+                >
+
+                  <div class="col-auto me-auto"></div>
+                  <div class="col-auto">
+                    <div class="d-flex align-items-center">
+                      <button
+                        class="btn btn-primary mr-2 mx-3 btn-sm"
+                        (click)="currentPage = currentPage - 1; chargerListeIndicePage()"
+                        [disabled]="currentPage === 0"
+                      >
+                        Précédent
+                      </button>
+                      <ng-container *ngIf="pages.length > 1">
+                        <ng-container *ngIf="pages.length <= 11">
+                          <ng-container *ngFor="let page of pages">
+                            <button
+                              class="btn btn-primary btn-sm mx-1"
+                              (click)="currentPage = page; chargerListeIndicePage()"
+                              [disabled]="currentPage === page"
+                            >
+                              {{ page +1}}
+                            </button>
+                          </ng-container>
+                        </ng-container>
+                        <ng-container *ngIf="pages.length > 11">
+                          <ng-container *ngIf="currentPage <= 6">
+                            <ng-container *ngFor="let page of pages.slice(0, 5)">
+                              <button
+                                class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; chargerListeIndicePage()"
+                                [disabled]="currentPage === page"
+                              >
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                            <button class="btn btn-primary btn-sm mx-1" disabled>
+                              ...
+                            </button>
+                            <ng-container *ngFor="let page of pages.slice(-5)">
+                              <button
+                                class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; chargerListeIndicePage()"
+                                [disabled]="currentPage === page"
+                              >
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                          </ng-container>
+                          <ng-container
+                            *ngIf="currentPage > 6 && currentPage < pages.length - 5"
+                          >
+                            <ng-container
+                              *ngFor="
+                      let page of pages.slice(currentPage - 4, currentPage)
+                    "
+                            >
+                              <button
+                                class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; chargerListeIndicePage()"
+                                [disabled]="currentPage === page"
+                              >
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                            <button class="btn btn-primary btn-sm mx-1" disabled>
+                              ...
+                            </button>
+                            <ng-container
+                              *ngFor="
+                      let page of pages.slice(currentPage, currentPage + 4)
+                    "
+                            >
+                              <button
+                                class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; chargerListeIndicePage()"
+                                [disabled]="currentPage === page"
+                              >
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                          </ng-container>
+
+
+                          <ng-container *ngIf="currentPage >= pages.length - 5">
+                            <ng-container *ngFor="let page of pages.slice(0, 5)">
+                              <button
+                                class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; chargerListeIndicePage()"
+                                [disabled]="currentPage === page"
+                              >
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                            <button class="btn btn-primary btn-sm mx-1" disabled>
+                              ...
+                            </button>
+                            <ng-container *ngFor="let page of pages.slice(-5)">
+                              <button
+                                class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; chargerListeIndicePage()"
+                                [disabled]="currentPage === page"
+                              >
+                                {{ page + 1 }}
+                              </button>
+                            </ng-container>
+                          </ng-container>
+                        </ng-container>
+                      </ng-container>
+                      <button
+                        class="btn btn-primary btn-sm mx-3"
+                        (click)="currentPage = currentPage + 1; chargerListeIndicePage()"
+                        [disabled]="currentPage+1 === totalPages"
+                      >
+                        Suivant
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- end row -->
+
+<!-- modal ajouter modifier distributeur -->
+<ng-template #content let-modal>
+  <div class="modal-header">
+    <h4>{{formulaireDossier.get('id')?.value ? 'Modifier': 'Créer'}}</h4>
+    <button type="button" class="btn-close" aria-label="Close"
+            (click)="modal.dismiss('Cliquer pour fermer')">
+    </button>
+  </div>
+  <div class="modal-body">
+    <form  [formGroup]="formulaireDossier"
+           (ngSubmit)="creeModifierIndice()" >
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="mb-3">
+            <label for="nom">Nom</label>
+            <input type="text" class="form-control" placeholder="Veillez svp entrer le nom de l'indice"  formControlName="nom" id="nom"
+                   [ngClass]="{'is-invalid': formulaireDossier.get('nom')?.invalid && formulaireDossier.get('nom')?.dirty, 'is-valid': formulaireDossier.get('nom')?.valid}"
+            >
+            <div *ngIf="formulaireDossier.get('nom')?.invalid && formulaireDossier.get('nom')?.dirty" class="text-danger">
+              <div *ngIf="formulaireDossier.get('nom')?.errors?.['required']">Le nom est obligatoire</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" [disabled]="formulaireDossier.invalid" type="submit">{{formulaireDossier.get('id')?.value ? 'Modifier': 'Créer'}}</button>
+      </div>
+    </form>
+  </div>
+</ng-template>

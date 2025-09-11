@@ -1,0 +1,397 @@
+<div class="container-fluid px-3">
+  <div class="row">
+    <div class="col-lg-12">
+      <div class="card">
+        <div class="card-body">
+          <h4 class="card-title">Liste des demandes</h4>
+          <p class="card-title-desc">
+            Le tableau suivant présente la liste des demandes du personnel
+          </p>
+          <div class="row justify-content-end" style="margin-top: -30px">
+            <div class="col-md-6 col-xl-4">
+              <form class="app-search">
+                <div class="position-relative">
+                  <div class="position-relative h-100 hstack gap-3">
+                    <button (click)="openModal(contente)" type="submit" class="btn btn-darkblue h-100 w-100"><i
+                        class="mdi mdi-plus align-middle"></i> Ajouter une demande
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+            <div class="col-md-6 col-xl-4">
+              <form class="app-search">
+                <div class="position-relative">
+                  <input type="date" class="form-control" placeholder="Tapez ou selectionnez la date"
+                    name="searchValue">
+                  <span class="bx bx-search-alt"></span>
+                </div>
+              </form>
+            </div>
+
+          </div>
+          <ng-container [ngSwitch]="response.dataState" *ngIf="dossiers | async as response">
+            <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+              <div class="alert alert-info" role="alert">
+                {{ dataStateEnum.CHARGEMENT }}
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+              <div class="alert alert-info" role="alert">
+                {{ response.dataState }}
+              </div>
+            </ng-container>
+            <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+              <div class="table-responsive mb-0">
+                <table class="table align-middle table-nowrap">
+                  <thead class="table-light">
+                    <tr>
+                      <th style="width: 20px;">
+                        <div class="form-check font-size-16 align-middle"><input class="form-check-input"
+                            type="checkbox" id="transactionCheck01"><label class="form-check-label"
+                            for="transactionCheck01"></label></div>
+                      </th>
+                      <th class="align-middle">Action</th>
+                      <th class="align-middle">#</th>
+                      <th class="align-middle"> Personnel</th>
+                      <th class="align-middle"> Date de Début</th>
+                      <th class="align-middle"> Nombr de jour</th>
+                      <th class="align-middle">Pieces</th>
+                      <th class="align-middle">Type demande</th>
+                      <th class="align-middle">Nombre De Jours</th>
+                      <th class="align-middle">Motif</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr [ngClass]="{'table-success': demande?.statutDemande?.id === 2,
+          'table-warning': demande?.statutDemande?.id === 3 || demande?.statutDemande?.id === 1,
+          'table-danger': demande?.statutDemande?.id === 4 || demande?.statutDemande?.id === 5 }"
+                      *ngFor="let demande of listeDossierPage ?? [] ; let i=index">
+                      <td>
+                        <div class="form-check font-size-16"><input class="form-check-input" type="checkbox"
+                            id="transactionCheck1"><label class="form-check-label" for="transactionCheck1"></label>
+                        </div>
+                      </td>
+                      <td>
+                        <button placement="top" ngbTooltip="Visualiser les détails" class="btn btn-primary mx-1 btn-sm"
+                          style="font-size: 8px" (click)="openModalDetailDemande(demande,detailDemande)">
+                          <i class="mdi mdi-eye"></i>
+                        </button>
+                        <button placement="top" ngbTooltip="Modifier la demande" class="btn btn-darkblue mx-1 btn-sm"
+                          style="font-size: 8px" (click)="openModal(contente, demande)">
+                          <i class="mdi mdi-pencil"></i>
+                        </button>
+                        <button placement="top" ngbTooltip="Supprimer la demande" class="btn btn-danger mx-1 btn-sm"
+                          style="font-size: 8px" (click)="supprimerDossier(demande?.id)">
+                          <i class="bx bx-trash-alt"></i>
+                        </button>
+                      </td>
+                      <td>{{i+1}}</td>
+                      <td>
+                        <a [routerLink]="['personnels/details/' +  encodeId(demande?.personnel?.id)]">
+                          {{(demande?.personnel?.prenom?.length || 0) <= 13 ? demande?.personnel?.prenom :
+                            demande?.personnel?.prenom?.slice(0, 10) + "...  " }} {{(demande?.personnel?.nom?.length ||
+                            0) <=13 ? demande?.personnel?.nom : demande?.personnel?.nom?.slice(0, 10) + "..." }} </a>
+                      </td>
+                      <td>{{demande?.dateDebut| date:'dd MMMM yyyy':'?':'fr-FR'}}</td>
+                      <td>{{demande?.dateFin| date:'dd MMMM yyyy':'?':'fr-FR'}}</td>
+                      <ng-container *ngIf="demande?.pieces != null; else templateA">
+                        <td class="text-center"><a target="_blank" href="{{ telechargerFicheDemande(demande?.id) }}"
+                            (click)="showPopOnDownloadFicheDemande()" class="btn btn-secondary btn-label btn-sm"
+                            style="font-size: 10px;">
+                            <i class="mdi mdi-download label-icon"></i>
+                            Télécharger
+                          </a></td>
+                      </ng-container>
+                      <ng-template #templateA>
+                        <th class="text-center">Aucun Fichier</th>
+                      </ng-template>
+                      <td>{{demande?.typeDemande}}</td>
+                      <td>{{demande?.nbreJour}}</td>
+                      <td style="text-align: justify">{{ (demande?.motif ?? '').length <= 15 ? (demande?.motif ?? '') :
+                          (demande?.motif?? '')?.slice(0, 14) + "..." }}</td>
+                    </tr>
+                    <tr *ngIf="response.data?.length == 0">
+                      <td colspan="9" class="text-center"><i style="color: #d9534f;font-size: xxx-large"
+                          class='bx bxs-data btn btn-lg'></i><br>Aucune demande</td>
+                    </tr>
+                  </tbody>
+                </table>
+                <div class="row justify-content-between align-items-center mb-3" *ngIf="totalDossier > 10">
+                  <div class="col-auto me-auto"></div>
+                  <div class="col-auto">
+                    <div class="d-flex align-items-center">
+                      <button class="btn btn-primary mr-2 mx-3 btn-sm"
+                        (click)="currentPage = currentPage - 1; chargerListeDemandePage()"
+                        [disabled]="currentPage === 0">
+                        Précédent
+                      </button>
+                      <ng-container *ngIf="pages.length > 1">
+                        <ng-container *ngIf="pages.length <= 11">
+                          <ng-container *ngFor="let page of pages">
+                            <button class="btn btn-primary btn-sm mx-1"
+                              (click)="currentPage = page; chargerListeDemandePage()" [disabled]="currentPage === page">
+                              {{ page +1}}
+                            </button>
+                          </ng-container>
+                        </ng-container>
+                        <ng-container *ngIf="pages.length > 11">
+                          <ng-container *ngIf="currentPage <= 6">
+                            <ng-container *ngFor="let page of pages.slice(0, 5)">
+                              <button class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; chargerListeDemandePage()"
+                                [disabled]="currentPage === page">
+                                {{ page }}
+                              </button>
+                            </ng-container>
+                            <button class="btn btn-primary btn-sm mx-1" disabled>
+                              ...
+                            </button>
+                            <ng-container *ngFor="let page of pages.slice(-5)">
+                              <button class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; chargerListeDemandePage()"
+                                [disabled]="currentPage === page">
+                                {{ page }}
+                              </button>
+                            </ng-container>
+                          </ng-container>
+                          <ng-container *ngIf="currentPage > 6 && currentPage < pages.length - 5">
+                            <ng-container *ngFor="
+                      let page of pages.slice(currentPage - 4, currentPage)
+                    ">
+                              <button class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; chargerListeDemandePage()"
+                                [disabled]="currentPage === page">
+                                {{ page }}
+                              </button>
+                            </ng-container>
+                            <button class="btn btn-primary btn-sm mx-1" disabled>
+                              ...
+                            </button>
+                            <ng-container *ngFor="
+                      let page of pages.slice(currentPage, currentPage + 4)
+                    ">
+                              <button class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; chargerListeDemandePage()"
+                                [disabled]="currentPage === page">
+                                {{ page }}
+                              </button>
+                            </ng-container>
+                          </ng-container>
+                          <ng-container *ngIf="currentPage >= pages.length - 5">
+                            <ng-container *ngFor="let page of pages.slice(0, 5)">
+                              <button class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; chargerListeDemandePage()"
+                                [disabled]="currentPage === page">
+                                {{ page }}
+                              </button>
+                            </ng-container>
+                            <button class="btn btn-primary btn-sm mx-1" disabled>
+                              ...
+                            </button>
+                            <ng-container *ngFor="let page of pages.slice(-5)">
+                              <button class="btn btn-primary btn-sm mx-1"
+                                (click)="currentPage = page; chargerListeDemandePage()"
+                                [disabled]="currentPage === page">
+                                {{ page }}
+                              </button>
+                            </ng-container>
+                          </ng-container>
+                        </ng-container>
+                      </ng-container>
+                      <button class="btn btn-primary btn-sm mx-3"
+                        (click)="currentPage = currentPage + 1; chargerListeDemandePage()"
+                        [disabled]="currentPage+1 === totalPages">
+                        Suivant
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </ng-container>
+          </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<ng-template #detailDemande let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Détails de la Demande</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cliquer pour fermer')">
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label>Personnel</label>
+          <p><a [routerLink]="['personnels/details/' +  encodeId(demande?.personnel?.id)]">{{ demande?.personnel?.prenom
+              + ' ' + demande?.personnel?.nom}}</a></p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label>Date de début</label>
+          <p>
+            {{ demande?.dateDebut| date:'dd MMMM yyyy':'?':'fr-FR'}}
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label>Date de fin</label>
+          <p>
+            {{ demande?.dateFin| date:'dd MMMM yyyy':'?':'fr-FR'}}
+          </p>
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label>Fichier</label>
+          <p>
+            <ng-container *ngIf="demande?.pieces != null; else templateA">
+              <td class="text-center"><a target="_blank" href="{{ telechargerFicheDemande(demande?.id) }}"
+                  (click)="showPopOnDownloadFicheDemande()" class="btn btn-secondary btn-label btn-sm"
+                  style="font-size: 10px;">
+                  <i class="mdi mdi-download label-icon"></i>
+                  Télécharger
+                </a></td>
+            </ng-container>
+            <ng-template #templateA>
+              <th class="text-center">Aucun Fichier</th>
+            </ng-template>
+          </p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label>Type de demande</label>
+          <p>{{ demande?.personnel?.nom }}</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label>Statut de demande</label>
+          <p>{{ demande?.personnel?.nom }}</p>
+        </div>
+      </div>
+    </div>
+
+    <label>Motif</label>
+    <p style="text-align: justify">{{ demande?.motif }}</p>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss('cancel click')">
+      Fermer
+    </button>
+  </div>
+</ng-template>
+
+
+<ng-template #contente let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title mt-0">{{formulaireDossier.get('id')?.value ? 'Modifier': 'Ajouter'}}</h5>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cliquer pour fermer')"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="formulaireDossier" (ngSubmit)="creeModifierDemande()">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="dateDebut">Date de debut</label>
+            <input type="date" class="form-control" placeholder="Veuillez entrer ou sélectionner la date de debut"
+              formControlName="dateDebut" id="dateDebut"
+              [ngClass]="{'is-invalid': formulaireDossier.get('dateDebut')?.invalid && formulaireDossier.get('dateDebut')?.dirty, 'is-valid': formulaireDossier.get('dateDebut')?.valid}">
+            <div *ngIf="formulaireDossier.get('dateDebut')?.invalid && formulaireDossier.get('dateDebut')?.dirty"
+              class="text-danger">
+              <div *ngIf="formulaireDossier.get('dateDebut')?.errors?.['required']">La date de debut est obligatoire
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="nbreJour">Nombre Jour</label>
+            <input type="number" class="form-control" placeholder="Veuillez entrer ou sélectionner la date de fin"
+              formControlName="nbreJour" id="nbreJour"
+              [ngClass]="{'is-invalid': formulaireDossier.get('nbreJour')?.invalid && formulaireDossier.get('nbreJour')?.dirty, 'is-valid': formulaireDossier.get('nbreJour')?.valid}">
+            <div *ngIf="formulaireDossier.get('nbreJour')?.invalid && formulaireDossier.get('nbreJour')?.dirty"
+              class="text-danger">
+              <div *ngIf="formulaireDossier.get('nbreJour')?.errors?.['required']">La date de fin est obligatoire</div>
+            </div>
+          </div>
+        </div>
+
+       <div class="col-md-6">
+          <div class="mb-3">
+              <label for="typeDemande">Type de demande *</label>
+              <select 
+                class="form-control"
+                formControlName="typeDemande"
+                id="typeDemande"
+                [ngClass]="{
+                  'is-invalid': formulaireDossier.get('typeDemande')?.invalid && formulaireDossier.get('typeDemande')?.dirty, 
+                  'is-valid': formulaireDossier.get('typeDemande')?.valid
+                }">
+                <option value="">Sélectionnez un type de demande</option>
+                <option value="CONGE_PAYE">Congé payé</option>
+                <option value="CONGE_SANS_SOLDE">Congé sans solde</option>
+                <option value="AUTORISATION_ABSENCE">Autorisation d'absence</option>
+              </select>
+              
+              <div *ngIf="formulaireDossier.get('typeDemande')?.invalid && formulaireDossier.get('typeDemande')?.dirty" 
+                  class="invalid-feedback">
+                <div *ngIf="formulaireDossier.get('typeDemande')?.errors?.['required']">
+                  Le type de demande est obligatoire
+                </div>
+              </div>
+          </div>
+      </div>
+
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="personnel">Personnel</label>
+            <ng-select [searchable]=true autofocus="true" (search)="onSearchPersonnel($event.term)" [loading]="loading"
+              formControlName="personnelId" id="personnelId"
+              [ngClass]="{'is-invalid': formulaireDossier.get('personnelId')?.invalid && formulaireDossier.get('personnelId')?.dirty, 'is-valid': formulaireDossier.get('personnelId')?.valid}"
+              placeholder="Tapez les trois première lettres du nom">
+              <ng-option *ngFor="let personnels of listePersonnel" [value]="personnels.id">
+                {{personnels?.prenom + ' ' + personnels?.nom}}
+              </ng-option>
+            </ng-select>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label for="pieces">Pieces</label>
+            <input type="file" class="form-control" (change)="uploaderFicher($event)" id="pieces"
+              [ngClass]="!pieces ? 'invalid-input' : '.valid-input'">
+          </div>
+        </div>
+
+        <div class="col-md-12">
+          <div class="form-group mb-2 mt-3">
+            <label>Motif</label>
+            <textarea type="text" class="form-control" formControlName="motif" rows="5"
+              [ngClass]="{'is-invalid': formulaireDossier.get('motif')?.invalid && formulaireDossier.get('motif')?.dirty, 'is-valid': formulaireDossier.get('motif')?.valid}">
+            </textarea>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="clearfix modal-footer">
+        <button class="btn btn-primary float-end" [disabled]="formulaireDossier.invalid"
+          type="submit">{{formulaireDossier.get('id')?.value ? 'Modifier' : 'Créer'}}</button>
+      </div>
+    </form>
+  </div>
+</ng-template>

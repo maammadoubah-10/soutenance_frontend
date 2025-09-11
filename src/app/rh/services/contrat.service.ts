@@ -15,7 +15,7 @@ export class ContratService {
   constructor(private httpClient: HttpClient) {}
 
   public listerContratPage(page: number, size: number, sort: string): Observable<Contrat> {
-    const url = `${this.contextPath}?page=${page}&size=${size}&sort=${sort}`;
+    const url = `${this.contextPath}/all?page=${page}&size=${size}&sort=${sort}`;
     // @ts-ignore
     return this.httpClient.get<Contrat>(url, { observe: 'response' });
   }
@@ -34,14 +34,9 @@ export class ContratService {
   //   );
   // }
 
-  public creerContrat(id: number, piece: any): Observable<Contrat> {
-    const url = `${this.contextPath}/create/${id}`;
-
-    return this.httpClient.post<Contrat>(
-      url,
-      piece
-    );
-  }
+  creerContrat(personnelId: number, formData: FormData): Observable<any> {
+  return this.httpClient.post(`${this.contextPath}/create/${personnelId}`, formData);
+}
 
 
   public modifierContrat(id:any, data:any):Observable<Contrat>{

@@ -24,6 +24,9 @@ import { DetailpersonnelComponent } from './listedepersonnels/detailpersonnel/de
 import { NumberWithSpacesPipe } from './pipe/number-with-spaces.pipe';
 import { FormatPhoneNumberPipe } from './pipe/format-phone-number.pipe';
 import { CongeComponent } from './conge/conge.component';
+import { ContratComponent } from './contrat/contrat.component';
+import { IndiceComponent } from './indice/indice.component';
+import { DemandeComponent } from './demande/demande.component';
 
 @NgModule({
   declarations: [
@@ -37,6 +40,9 @@ import { CongeComponent } from './conge/conge.component';
     NumberWithSpacesPipe,
     FormatPhoneNumberPipe,
     CongeComponent,
+    ContratComponent,
+    IndiceComponent,
+    DemandeComponent
   ],
   imports: [
     CommonModule,

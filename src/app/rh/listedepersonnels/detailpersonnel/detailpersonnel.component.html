@@ -1234,14 +1234,14 @@
                         <th scope="row">{{ (mission?.accompagne??'').length <= 15 ? (mission?.accompagne ?? '')
                             : (mission?.accompagne ?? '')?.substring(0, 14) + "..." }}</th>
                         <th scope="row">
-                          {{ (mission?.conducteur?.prenom??'').length <= 7 ? 
+                          {{ (mission?.conducteur?.prenom ?? '').length <= 7 ? 
                             (mission?.conducteur?.prenom ?? ''): 
-                            (mission?.conducteur?.prenom?? '')?.substring(0, 6) + "..." }}
+                            (mission?.conducteur?.prenom ?? '')?.substring(0, 6) + "..." }}
                         </th>
                         <th scope="row">
                           {{ (mission?.moyenTransport ?? '').length <= 15
                               ? (mission?.moyenTransport ?? '')
-                              : (mission?.moyenTransport ?? '').substring(0, 14) + '...' }}
+                              : (mission?.moyenTransport ?? '')?.substring(0, 14) + '...' }}
                         </th>
                         <th>{{mission?.dateDebut| date:'dd MMMM yyyy':'':'fr-FR'}}</th>
                         <th>{{mission?.dateFin| date:'dd MMMM yyyy':'':'fr-FR'}}</th>

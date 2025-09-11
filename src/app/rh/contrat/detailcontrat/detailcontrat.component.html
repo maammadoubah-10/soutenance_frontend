@@ -1,0 +1,980 @@
+<div class="container-fluid px-3 main">
+  <app-titredepage title="Détail"  [items]="items"></app-titredepage>
+  <button
+    class="btn btn-secondary btn-label mb-5"
+    (click)="goBack()"
+  >
+    <i class="mdi mdi-chevron-left label-icon"></i>
+    Retour
+  </button>
+  <ng-container
+    [ngSwitch]="response.dataState"
+    *ngIf="contrat$ | async as response"
+  >
+    <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+      <div class="alert alert-info" role="alert">
+        {{ dataStateEnum.CHARGEMENT }}
+      </div>
+    </ng-container>
+    <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+      <div class="alert alert-danger" role="alert">Erreur:</div>
+    </ng-container>
+    <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+
+
+      <div class="row">
+        <div class="col-lg-12">
+          <div class="mx-n4 mt-n4 bg-info bg-soft card">
+            <div class="card-body">
+              <div class="text-center mb-4"><img src="assets/images/pic1.jpg" alt=""
+                                                 class="avatar-md rounded-circle mx-auto d-block"><h5 class="mt-3 mb-1">{{contrat.numero}}</h5>
+                <p class="text-muted mb-3">{{contrat.nom}}</p>
+                <div class="mx-auto">
+                  <span class="badge me-1 text-bg-success font-size-13" *ngIf="contrat.statut === 'EN_COURS'">EN COURS</span>
+                  <span class="badge me-1 text-bg-danger font-size-13" *ngIf="contrat.statut === 'Expirer'">EXPIRER</span>
+                </div>
+                <div class="mx-auto mt-3">
+                  <h6>Progression de paiement :
+                    <span class="pull-right">{{progresse?.pourcentage_paye || 0 | number: '1.0-0' }}%</span>
+                  </h6>
+                  <div class="progress">
+                    <div class="progress-bar bg-success progress-animated" [style.width.%]="progresse?.pourcentage_paye || 0 | number: '1.0-0' " style="height:10px;" role="progressbar"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="d-flex align-items-center">
+                <ul class="list-unstyled hstack gap-3 mb-0 flex-grow-1">
+<!--                  <li> <button type="button"-->
+<!--                               class="btn btn-info"-->
+<!--                               (click)="openModal(content,contrat)"-->
+<!--                               title="Modifier le contrat">-->
+<!--                    Modifier-->
+<!--                    <i class="fa fa-edit align-baseline ms-1">-->
+<!--                    </i>-->
+<!--                  </button></li>-->
+                  <li> <button type="button"
+                               class="btn btn-success"
+                               *ngIf="!contrat.statut"
+                               (click)="validerContrat()"
+                               title="Valider le contrat">
+                    Valider
+                    <i class="fa fa-check-double align-baseline ms-1">
+                    </i>
+                  </button></li>
+                  <li> <button type="button"
+                               *ngIf="contrat.type_contrat.id != 2"
+                               class="btn btn-secondary"
+                               (click)="openModalAbonnement(contentAbonnement, service)"
+                               title="Ajouter un service de type abonnement au contrat">
+                    Abonnement
+                    <i class="fa fa-server align-baseline ms-1">
+                    </i>
+                  </button></li>
+                  <li> <button type="button"
+                               *ngIf="contrat.type_contrat.id != 1"
+                               (click)="openModalInsertion(contentDevis, service)"
+                               class="btn btn-warning"
+                               title="Ajouter un service de type insertion au contrat">
+                    Insertion
+                    <i class="fa fa-blender align-baseline ms-1">
+                    </i>
+                  </button></li>
+                </ul>
+                <div class="hstack gap-2">
+
+                  <ng-container *ngIf="contrat?.fichier != null; else templateA">
+                    <a target="_blank" href="{{telechargerFichierContrat(contrat) }}"
+                       (click)="showPopOnDownloadFichierContrat()"
+                    >
+                      <button type="button"
+                              class="btn btn-primary"
+                              title="Télécharger le contrat">
+                        Télécharger
+                        <i class="bx bx-download align-baseline ms-1">
+                        </i>
+                      </button>
+                    </a>
+                  </ng-container>
+                  <ng-template #templateA>
+                    <p type="button" class="btn btn-primary">Aucun Fichier</p>
+                  </ng-template>
+                  <button type="button"
+                          class="btn btn-light"
+                          (click)="supprimerContrat()"
+                  ><i class="fa fa-trash-alt align-baseline">
+                    Supprimer</i></button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-3">
+          <div class="card">
+            <div class="card-body">
+              <ul class="list-unstyled vstack gap-3 mb-0">
+                <li *ngIf="contrat.type_contrat.id != 2">
+                  <div class="d-flex"><i class="mdi mdi-bullet font-size-18 text-primary"></i>
+                    <div class="ms-3"><h6 class="mb-1 fw-semibold">Total  Abonnement:</h6><span
+                      class="text-muted">{{statistiques?.nombre_abonnement_par_contrat}}</span></div>
+                  </div>
+                </li>
+                <li *ngIf="contrat.type_contrat.id != 1">
+                  <div class="d-flex"><i class="mdi mdi-bulletin-board font-size-18 text-primary"></i>
+                    <div class="ms-3"><h6 class="mb-1 fw-semibold">Totale  Insertion:</h6><span
+                      class="text-muted">{{statistiques?.nombre_insertion_par_contrat}}</span></div>
+                  </div>
+                </li>
+                <li>
+                  <div class="d-flex"><i class="bx bx-calendar font-size-18 text-primary"></i>
+                    <div class="ms-3"><h6 class="mb-1 fw-semibold">Client:</h6><span class="text-muted">
+                <a [routerLink]="['client/details/'+encodeId(contrat?.client?.id)]">
+                  {{ contrat.client.raison_social ? contrat.client.raison_social : contrat.client.nom_complet }}
+                </a>
+              </span>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="d-flex"><i class="mdi mdi-book-education font-size-18 text-primary"></i>
+                    <div class="ms-3"><h6 class="mb-1 fw-semibold">Type Contrat:</h6><span
+                      class="text-muted">{{contrat.type_contrat.designation}}</span></div>
+                  </div>
+                </li>
+                <li>
+                  <div class="d-flex"><i class="mdi mdi-calendar font-size-18 text-primary"></i>
+                    <div class="ms-3"><h6 class="mb-1 fw-semibold">Date de début:</h6><span
+                      class="text-muted">{{contrat.date_debut| date:'dd MMMM yyyy':'':'fr-FR'}}</span></div>
+                  </div>
+                </li>
+                <li >
+                  <div class="d-flex"><i class="mdi mdi-calendar-alert font-size-18 text-primary"></i>
+                    <div class="ms-3"><h6 class="mb-1 fw-semibold">Date de Fin:</h6><span
+                      class="text-muted">{{contrat.date_fin| date:'dd MMMM yyyy':'':'fr-FR'}}</span></div>
+                  </div>
+                </li>
+                <li>
+                  <div class="d-flex"><i class="bx bx-money font-size-18 text-primary"></i>
+                    <div class="ms-3"><h6 class="mb-1 fw-semibold">Montant Total:</h6><span class="text-muted">{{progresse?.montant_total_apayer| currency:'XOF':'code':'1.': 'fr-FR'}}</span>
+                    </div>
+                  </div>
+                </li>
+                <li>
+                  <div class="d-flex"><i class="bx bx-money font-size-18 text-primary"></i>
+                    <div class="ms-3"><h6 class="mb-1 fw-semibold">Montant Payer:</h6><span
+                      class="text-muted">{{progresse?.montant_total_paye| currency:'XOF':'code':'1.': 'fr-FR'}}</span></div>
+                  </div>
+                </li>
+
+                <li>
+                  <div class="d-flex"><i class="bx bx-money font-size-18 text-primary"></i>
+                    <div class="ms-3"><h6 class="mb-1 fw-semibold">Montant Restante:</h6>{{progresse?.montant_total_restant_apayer| currency:'XOF':'code':'1.': 'fr-FR'}}</div>
+                  </div>
+                </li>
+
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-9">
+          <div class="card">
+            <div class="card-body"><h4 class="mb-3">Description</h4>
+              <p class="text-muted" style="text-align: justify">{{contrat?.description}}</p>
+
+              <h4 class="mb-3">Services</h4>
+              <div>
+                <ul class="verti-timeline list-unstyled" *ngFor="let service of listeService ?? []">
+                  <li class="event-list" *ngIf="service?.abonnement && (contrat.type_contrat.id != 2)">
+                    <div class="event-timeline-dot"><i class="bx bx-right-arrow-circle"></i></div>
+                    <div class="d-flex">
+                      <div class="flex-grow-1">
+                        <div><h6 class="font-size-14 mb-1"><a [routerLink]="['abonnements/details/'+encodeId(service?.abonnement?.id)]">{{service?.abonnement?.numero_abonnement}}</a></h6>
+                          <p class="text-muted">Date de créaction : {{service?.abonnement?.date| date:'dd MMMM yyyy':'':'fr-FR'}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+
+                  <li class="event-list" *ngIf="service?.devis && (contrat.type_contrat.id != 1)">
+                    <div class="event-timeline-dot"><i class="bx bx-right-arrow-circle"></i></div>
+                    <div class="d-flex">
+                      <div class="flex-grow-1">
+                        <div><h6 class="font-size-14 mb-1"><a [routerLink]="['insertion/commande/details/'+encodeId(service?.devis?.id)]">{{service?.devis?.reference}}</a></h6>
+                          <p class="text-muted">Date de créaction : {{service?.devis?.date| date:'dd MMMM yyyy':'':'fr-FR'}}</p>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                </ul>
+              </div>
+              <div   *ngIf="!listeService.length">
+                <ul class="verti-timeline list-unstyled" >
+                  <li class="event-list">
+                    <p  class="text-center" style="font-size: large">
+                      <i style="color: red; font-size: 100px" class='bx bxs-data'></i><br>Aucun Service</p>
+                  </li>
+                </ul>
+              </div>
+
+            </div>
+
+          </div>
+          <div class="row">
+            <button type="button"
+                    class="btn btn-success mb-3"
+                    (click)="openModalAvenant(contentAvenant)"
+                    title=" Ajouter un Avenant">
+              Ajouter un Avenant
+              <i class="mdi mdi-bag-suitcase align-baseline ms-1"></i>
+            </button>
+            <div class="col-lg-12">
+              <div class="card">
+                <div class="border-bottom card-body"><h5 class="mb-3">Avenants</h5>
+                  <div class="hstack gap-2" *ngFor="let avenant of listeAvenant ?? []"  >
+                    <ul class="verti-timeline list-unstyled" >
+                      <li class="event-list">
+                        <div class="event-timeline-dot"><i class="bx bx-right-arrow-circle"></i></div>
+                        <div class="d-flex">
+                          <div class="flex-grow-1">
+                            <div><h6 class="font-size-14 mb-1"><a [routerLink]="['avenant/details/'+encodeId(avenant?.id)]">{{avenant?.reference}}</a></h6>
+                              <p class="text-muted">Date de créaction : {{avenant?.date_avenant| date:'dd MMMM yyyy':'':'fr-FR'}}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </li>
+                    </ul>
+                  </div>
+
+                  <div class="hstack gap-2 justify-content-center" *ngIf="!listeAvenant.length">
+                    <ul class="verti-timeline list-unstyled" >
+                      <li class="event-list">
+                        <p  class="text-center" style="font-size: large">
+                          <i style="color: red; font-size: 100px" class='bx bxs-data'></i><br>Aucun Avenant</p>
+                      </li>
+                    </ul>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row">
+            <button type="button"
+                    class="btn btn-warning mb-3"
+                    (click)="openModalPlainte(contentPlainte)"
+                    title="Ajouter une plainte">
+              Ajouter une plainte
+              <i class="mdi mdi-comment-plus align-baseline ms-1">
+              </i>
+            </button>
+            <ng-container
+              [ngSwitch]="response.dataState"
+              *ngIf="plaintes | async as response"
+            >
+              <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+                <div class="alert alert-info" role="alert">
+                  {{ dataStateEnum.CHARGEMENT }}
+                </div>
+              </ng-container>
+              <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+                <div class="alert alert-info" role="alert">
+                  {{ response.dataState }}
+                </div>
+              </ng-container>
+              <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+                <div class="col-lg-12">
+                  <div class="card">
+                    <div class="border-bottom card-body"><h5 class="mb-3">Plaintes</h5>
+                      <div class="card" *ngFor="let plainte of listePlainte ?? []
+                    | paginate: { itemsPerPage: perPagePlainte, currentPage: p }">
+                        <div class="border-bottom card-body">
+                          <div class="d-flex">
+                            <div class="avatar-sm">
+                      <span class="avatar-title rounded-circle bg-soft bg-primary text-danger font-size-20">
+                        <i class="bx bxs-error"></i>
+                      </span>
+                            </div>
+                            <div class="flex-grow-1 ms-3"><h5 class="fw-semibold">Réf : <span style="font-size: small">{{plainte.reference}}</span></h5>
+                              <ul class="list-unstyled hstack gap-2 mb-0">
+                                <li><i class="bx bx-calendar"></i> <span class="text-muted" title="date de la plainte">{{'  ' + plainte.date| date:'dd MMMM yyyy':'':'fr-FR'}}</span></li>
+                                <li *ngIf="plainte.etat === true" > <span class="text-muted badge bg-success font-size-11 m-1">{{'Traiter'}}</span></li>
+                                <li *ngIf="plainte.etat === false" > <span class="text-muted badge bg-danger font-size-11 m-1">{{'Non Traiter'}}</span></li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                        <div class="card-body"><h5 class="fw-semibold mb-3">Description</h5>
+                          <p class="text-muted " style="text-align: justify">{{plainte.description?.length<= 300 ? plainte?.description : plainte?.description.substring(0, 300)+'...'}}</p>
+                          <div class="mt-4">
+                            <ul class="list-inline mb-0">
+                              <li class="list-inline-item mt-1">Action :</li>
+                              <li class="list-inline-item mt-1"><a class="btn btn-outline-success btn-hover"
+                                                                   (click)="openModalPlainteDetail(plainte, plainteDetail)"><i
+                                class="mdi mdi-eye"></i> Détail</a></li>
+                              <li class="list-inline-item mt-1"><a class="btn btn-outline-info btn-hover"
+                                                                   (click)="openModalPlainte(contentPlainte, plainte)"><i
+                                class="bx bx-pencil"></i> Modifier</a></li>
+                              <li class="list-inline-item mt-1"><a class="btn btn-outline-danger btn-hover"
+                                                                   (click)="supprimerPlainte(plainte.id)" ><i
+                                class="bx bx-trash-alt"></i> Supprimer</a></li>
+                            </ul>
+                          </div>
+                        </div>
+
+                      </div>
+                      <div class="card" *ngIf="!listePlainte.length">
+                        <div class="card-body text-center">
+                          <p><i style="color: #d9534f;font-size: xxx-large"  class='bx bxs-data btn btn-lg'></i><br>Aucune Plainte</p>
+                        </div>
+
+                      </div>
+                      <pagination-controls
+                        (pageChange)="p = $event"
+                        previousLabel="Precedent"
+                        nextLabel="Suivant">
+                      </pagination-controls>
+                    </div>
+                  </div>
+                </div>
+              </ng-container>
+            </ng-container>
+          </div>
+
+        </div>
+      </div>
+    </ng-container>
+  </ng-container>
+</div>
+
+<ng-template #content>
+  <div class="modal-header">
+    <h4>{{formulaireContrat.get('id').value ? 'Modifier': 'Créer'}}</h4>
+  </div>
+  <div class="modal-body">
+    <form  [formGroup]="formulaireContrat"
+           (ngSubmit)="creerModifierContrat()" >
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="mb-3">
+            <label>Nom du Comtrat</label>
+            <input type="text"
+                   class="form-control"
+                   formControlName="nom"
+                   id="nom"
+                   placeholder="Veillez svp saisir le nom du contrat"
+                   [ngClass]="{'is-invalid': formulaireContrat.get('nom').invalid && formulaireContrat.get('nom').dirty,
+              'is-valid': formulaireContrat.get('nom').valid}"
+            >
+            <div *ngIf="formulaireContrat.get('nom').invalid && formulaireContrat.get('nom').dirty" class="text-danger">
+              <div *ngIf="formulaireContrat.get('nom').errors.required">Le nom est obligatoire</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label>Date de Debut</label>
+            <input type="date"
+                   class="form-control"
+                   formControlName="dateDebut"
+                   id="date_debut"
+                   placeholder="Veillez svp selectionner la date de début"
+                   [ngClass]="{'is-invalid': formulaireContrat.get('dateDebut').invalid && formulaireContrat.get('dateDebut').dirty,
+              'is-valid': formulaireContrat.get('dateDebut').valid}"            >
+            <div *ngIf="formulaireContrat.get('dateDebut').invalid && formulaireContrat.get('dateDebut').dirty" class="text-danger">
+              <div *ngIf="formulaireContrat.get('dateDebut').errors.required">La date de debut est obligatoire</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label>Date de Fin</label>
+            <input type="date"
+                   class="form-control"
+                   formControlName="dateFin"
+                   id="date_fin"
+                   placeholder="Veillez svp selectionner la date de fin"
+                   [ngClass]="{'is-invalid': formulaireContrat.get('dateFin').invalid && formulaireContrat.get('dateFin').dirty,
+              'is-valid': formulaireContrat.get('dateFin').valid}"            >
+            <div *ngIf="formulaireContrat.get('dateFin').invalid && formulaireContrat.get('dateFin').dirty" class="text-danger">
+              <div *ngIf="formulaireContrat.get('dateFin').errors.required">La date de fin est obligatoire</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="client">Client</label>
+            <ng-select
+              formControlName="client"
+              id="client"
+              [searchable] = true
+              autofocus="true"
+              [typeahead]="searchItem"
+              (search) = "onSearch($event.term)"
+              [loading]="loading"
+              [ngClass]="{'is-invalid': formulaireContrat.get('client').invalid && formulaireContrat.get('client').dirty,
+              'is-valid': formulaireContrat.get('client').valid}"
+              placeholder="Tapez les trois premières lettres"
+            >
+              <!-- <option value="0" disabled selected>Choisissez un client</option> -->
+              <ng-option *ngFor="let client of listeclient" [value]="client.id">
+                {{ client.raison_social ? client.raison_social : client.nom_complet}}
+              </ng-option>
+            </ng-select>
+            <div *ngIf="formulaireContrat.get('client').invalid && formulaireContrat.get('client').dirty" class="text-danger">
+              <div *ngIf="formulaireContrat.get('client').errors.required">Le client est obligatoire</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="type_contrat_id">Type de Contrat</label>
+            <select
+              class="form-select"
+              formControlName="type_contrat_id"
+              id="type_contrat_id"
+              [ngClass]="{'is-invalid': formulaireContrat.get('type_contrat_id').invalid && formulaireContrat.get('type_contrat_id').dirty,
+              'is-valid': formulaireContrat.get('type_contrat_id').valid}">
+              <option [value]=null disabled selected>Choisissez le type de contrat</option>
+              <option *ngFor="let typeContrat of listeTypeContrat" [value]="typeContrat.id">
+                {{ typeContrat.designation}}
+              </option>
+              <div *ngIf="formulaireContrat.get('type_contrat_id').invalid && formulaireContrat.get('type_contrat_id').dirty" class="text-danger">
+                <div *ngIf="formulaireContrat.get('type_contrat_id').errors.required">Le type de contrat est obligatoire</div>
+              </div>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group mb-2">
+        <label for="fichier_contrat">Fichier</label>
+        <input type="file" class="form-control" (change)="uploaderFicher($event)" id="fichier_contrat"
+               [ngClass]="{'is-invalid': !fichier_contrat && formulaireContrat.invalid && !fichier_contrat && formulaireContrat.dirty,
+              'is-valid': !fichier_contrat && formulaireContrat.valid}"
+        >
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="mb-3">
+            <label>Description contrat</label>
+            <textarea type="text"
+                      rows="5"
+                      class="form-control"
+                      formControlName="description"
+                      id="description"
+                      placeholder="Veillez svp entrer une petit description pour ce contrat"
+                      [ngClass]="{'is-invalid': formulaireContrat.get('description').invalid && formulaireContrat.get('description').dirty,
+              'is-valid': formulaireContrat.get('description').valid}"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary"
+                [disabled]="formulaireContrat.invalid"
+                type="submit">
+          {{formulaireContrat.get('id').value ? 'Modifier': 'Créer'}}
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #contentAvenant>
+  <div class="modal-header">
+    <h4>{{formulaireAvenant.get('id').value ? 'Modifier': 'Créer'}}</h4>
+  </div>
+  <div class="modal-body">
+    <form  [formGroup]="formulaireAvenant"
+           (ngSubmit)="creerModifierAvenant()" >
+
+      <div class="form-group mb-2">
+        <label for="fichier_avenant">Fichier</label>
+        <input type="file" class="form-control" (change)="uploaderFicher($event)" id="fichier_avenant"
+               [ngClass]="{'is-invalid': !fichier_avenant && formulaireAvenant.invalid && !fichier_avenant && formulaireAvenant.dirty,
+              'is-valid': !fichier_avenant && formulaireAvenant.valid}"
+        >
+      </div>
+
+      <div class="row">
+        <div class="col-md-12">
+          <div class="mb-3">
+            <label>Description contrat</label>
+            <textarea type="text"
+                      rows="5"
+                      class="form-control"
+                      formControlName="description"
+                      id="description"
+                      placeholder="Veillez svp entrer une petit description pour ce contrat"
+                      [ngClass]="{'is-invalid': formulaireAvenant.get('description').invalid && formulaireAvenant.get('description').dirty,
+              'is-valid': formulaireAvenant.get('description').valid}"
+            ></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" type="submit">{{formulaireAvenant.get('id').value ? 'Modifier': 'Créer'}}</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #contentAbonnement>
+  <div class="modal-header">
+    <h4>Créer service Abonnement</h4>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="formulaireServiceAbonnement"
+          (ngSubmit)="creerModifierAbonnement()">
+      <div formGroupName="abonnement_dto">
+
+        <hr>
+        <h5 style="text-align: center">Abonnement</h5>
+        <hr>
+
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-6">
+              <label for="distributeur">Distributeur</label>
+              <ng-select
+                [searchable]=true
+                autofocus="true"
+                [typeahead]="searchItemDistributeur"
+                (search)="onSearchDistributaire($event.term)"
+                [loading]="loading"
+                formControlName="distributeur"
+                id="distributeur"
+                [ngClass]="{'is-invalid': formulaireServiceAbonnement.get('abonnement_dto').get('distributeur').invalid && formulaireServiceAbonnement.get('abonnement_dto').get('distributeur').dirty,
+      'is-valid': formulaireServiceAbonnement.get('abonnement_dto').get('distributeur').valid}"
+                placeholder="Tapez les trois premières lettres"
+              >
+                <ng-option *ngFor="let distributeur of listedistributeur" [value]="distributeur.id">
+                  {{ distributeur.nom_complet}}
+                </ng-option>
+                <div
+                  *ngIf="formulaireServiceAbonnement.get('abonnement_dto').get('distributeur').invalid && formulaireServiceAbonnement.get('abonnement_dto').get('distributeur').dirty"
+                  class="text-danger">
+                  <div *ngIf="formulaireServiceAbonnement.get('abonnement_dto').get('distributeur').errors.required">Le
+                    distributeur est obligatoire
+                  </div>
+                </div>
+              </ng-select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="parrain">Parrain</label>
+              <select
+                class="form-select"
+                formControlName="parrain"
+                id="parrain"
+                [ngClass]="{'is-invalid': formulaireServiceAbonnement.get('abonnement_dto').get('parrain').invalid && formulaireServiceAbonnement.get('abonnement_dto').get('parrain').dirty,
+              'is-valid': formulaireServiceAbonnement.get('abonnement_dto').get('parrain').valid}"
+              >
+                <option [value]=null disabled selected>Choisissez un parrain</option>
+                <option *ngFor="let parrain of listeparrain" [value]="parrain.id">
+                  {{ parrain.nom_complet }}
+                </option>
+                <div
+                  *ngIf="formulaireServiceAbonnement.get('abonnement_dto').get('parrain').invalid && formulaireServiceAbonnement.get('abonnement_dto').get('parrain').dirty"
+                  class="text-danger">
+                  <div *ngIf="formulaireServiceAbonnement.get('abonnement_dto').get('parrain').errors.required">Le
+                    parrain est obligatoire
+                  </div>
+                </div>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="type_abonnement_id">Type d'Abonnement</label>
+              <select
+                class="form-select"
+                formControlName="type_abonnement_id"
+                id="type_abonnement_id"
+                [ngClass]="{'is-invalid': formulaireServiceAbonnement.get('abonnement_dto').get('type_abonnement_id').invalid && formulaireServiceAbonnement.get('abonnement_dto').get('type_abonnement_id').dirty,
+              'is-valid': formulaireServiceAbonnement.get('abonnement_dto').get('type_abonnement_id').valid}"
+              >
+                <option [value]=null disabled selected>
+                  Choisissez un type d'abonnement
+                </option>
+                <option
+                  *ngFor="let typeAbonnement of listeTypeAbonnement"
+                  [value]="typeAbonnement.id"
+                >
+                  {{ typeAbonnement.designation }}
+                </option>
+                <div
+                  *ngIf="formulaireServiceAbonnement.get('abonnement_dto').get('type_abonnement_id').invalid && formulaireServiceAbonnement.get('abonnement_dto').get('type_abonnement_id').dirty"
+                  class="text-danger">
+                  <div
+                    *ngIf="formulaireServiceAbonnement.get('abonnement_dto').get('type_abonnement_id').errors.required">
+                    Le type d'abonnement est obligatoire
+                  </div>
+                </div>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="mb-6">
+              <label for="type_journal_id">Type Journal</label>
+              <select
+                class="form-select"
+                formControlName="type_journal_id"
+                id="type_journal_id"
+                [ngClass]="{'is-invalid': formulaireServiceAbonnement.get('abonnement_dto').get('type_journal_id').invalid && formulaireServiceAbonnement.get('abonnement_dto').get('type_journal_id').dirty,
+              'is-valid': formulaireServiceAbonnement.get('abonnement_dto').get('type_journal_id').valid}"
+              >
+                <option [value]=null disabled selected>
+                  Choisissez un type de journal
+                </option>
+                <option
+                  *ngFor="let typeJournal of listeTypeJournal"
+                  [value]="typeJournal.id"
+                >
+                  {{ typeJournal.designation }}
+                </option>
+                <optgroup label="Gratuit">
+                  <option
+                    *ngFor="let typeJournal of listeSousTypeJournal"
+                    [value]="typeJournal.id"
+                  >
+                    {{ typeJournal.designation }}
+                  </option>
+                </optgroup>
+                <div
+                  *ngIf="formulaireServiceAbonnement.get('abonnement_dto').get('type_journal_id').invalid && formulaireServiceAbonnement.get('abonnement_dto').get('type_journal_id').dirty"
+                  class="text-danger">
+                  <div *ngIf="formulaireServiceAbonnement.get('abonnement_dto').get('type_journal_id').errors.required">
+                    Le type de journal est obligatoire
+                  </div>
+                </div>
+              </select>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="mb-3">
+              <label for="titre_lettre">Titre de la Lettre de relance</label>
+              <textarea
+                [ngClass]="{'is-invalid': formulaireServiceAbonnement.get('abonnement_dto').get('titre_lettre').invalid && formulaireServiceAbonnement.get('abonnement_dto').get('titre_lettre').dirty,
+              'is-valid': formulaireServiceAbonnement.get('abonnement_dto').get('titre_lettre').valid}"
+                class="form-control"
+                placeholder="Veillez svp entrer le titre a mettre sur la lettre de relance"
+                formControlName="titre_lettre"
+                id="titre_lettre"
+                type="text"
+              ></textarea>
+              <div
+                *ngIf="formulaireServiceAbonnement.get('abonnement_dto').get('titre_lettre').invalid && formulaireServiceAbonnement.get('abonnement_dto').get('titre_lettre').dirty"
+                class="text-danger">
+                <div *ngIf="formulaireServiceAbonnement.get('abonnement_dto').get('titre_lettre').errors.required">Le
+                  titre de la lettre de relance est obligatoire
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div formGroupName="souscription" class="mt-3">
+          <hr>
+          <h5 style="text-align: center">Souscription</h5>
+          <hr>
+          <div class="row">
+
+            <div class="col-md-12">
+              <div class="mb-3">
+                <label for="produit">Produit</label>
+                <select
+                  class="form-select"
+                  formControlName="produit"
+                  id="produit"
+                  [ngClass]="{'is-invalid': formulaireServiceAbonnement.get('abonnement_dto.souscription.produit').invalid && formulaireServiceAbonnement.get('abonnement_dto.souscription.produit').dirty,
+            'is-valid': formulaireServiceAbonnement.get('abonnement_dto.souscription.produit').valid}"
+                >
+                  <option [value]=null disabled selected>Choisissez en un</option>
+                  <option *ngFor="let product of listeProduitFiltre" [value]="product.id">
+                    {{ product.designation }}
+                  </option>
+                  <div
+                    *ngIf="formulaireServiceAbonnement.get('abonnement_dto.souscription.produit').invalid && formulaireServiceAbonnement.get('abonnement_dto.souscription.produit').dirty"
+                    class="text-danger">
+                    <div *ngIf="formulaireServiceAbonnement.get('abonnement_dto.souscription.produit').errors.required">
+                      Le produit est obligatoire
+                    </div>
+                  </div>
+                </select>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-3">
+                <label for="detail_produit">Détail produit</label>
+                <select
+                  class="form-select"
+                  formControlName="detail_produit"
+                  id="detail_produit"
+                  [ngClass]="{'is-invalid': formulaireServiceAbonnement.get('abonnement_dto.souscription.detail_produit').invalid && formulaireServiceAbonnement.get('abonnement_dto.souscription.detail_produit').dirty,
+            'is-valid': formulaireServiceAbonnement.get('abonnement_dto.souscription.detail_produit').valid}"
+                >
+                  <option [value]=null disabled selected>Choisissez en un</option>
+                  <option
+                    *ngFor="let productDetail of productDetails"
+                    [value]="productDetail.id"
+                  >
+                    {{
+                    productDetail.designation +
+                    " - " +
+                    productDetail.duree +
+                    " " +
+                    productDetail.type_duree
+                    }}
+                  </option>
+                </select>
+                <div
+                  *ngIf="formulaireServiceAbonnement.get('abonnement_dto.souscription.detail_produit').invalid && formulaireServiceAbonnement.get('abonnement_dto.souscription.detail_produit').dirty"
+                  class="text-danger">
+                  <div
+                    *ngIf="formulaireServiceAbonnement.get('abonnement_dto.souscription.detail_produit').errors.required">
+                    Le detail du produit est obligatoire
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="mb-6">
+                <label>Nombre de journaux</label>
+                <input
+                  [ngClass]="{'is-invalid': formulaireServiceAbonnement.get('abonnement_dto.souscription.nombre_journaux').invalid && formulaireServiceAbonnement.get('abonnement_dto.souscription.nombre_journaux').dirty,
+            'is-valid': formulaireServiceAbonnement.get('abonnement_dto.souscription.nombre_journaux').valid}"
+                  class="form-control"
+                  placeholder="Veillez svp entrer le nombre de journal"
+                  formControlName="nombre_journaux"
+                  type="number"
+                />
+                <div
+                  *ngIf="formulaireServiceAbonnement.get('abonnement_dto.souscription.nombre_journaux').invalid && formulaireServiceAbonnement.get('abonnement_dto.souscription.nombre_journaux').dirty"
+                  class="text-danger">
+                  <div
+                    *ngIf="formulaireServiceAbonnement.get('abonnement_dto.souscription.nombre_journaux').errors.required">
+                    Le numbre de journal est obligatoire
+                  </div>
+                </div>
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+      </div>
+
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" [disabled]="formulaireServiceAbonnement.invalid" type="submit">Créer le
+          Service
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #contentDevis>
+  <div class="modal-header">
+    <h4>Créer service Insertion</h4>
+  </div>
+  <div class="modal-body">
+    <form  [formGroup]="formulaireServiceInsertion"
+           (ngSubmit)="creerInsertion()" >
+      <div formGroupName="devis_dto">
+
+
+        <div class="row">
+
+          <div class="col-md-12 mt-3">
+            <div class="mb-6">
+              <label for="groupe_taxation">Groupe de taxation</label>
+              <select class="form-control" formControlName="groupe_taxation" id="groupe_taxation"
+                      class="form-select"
+                      [ngClass]="{'is-invalid': formulaireServiceInsertion.get('devis_dto.groupe_taxation').invalid && formulaireServiceInsertion.get('devis_dto.groupe_taxation').dirty, 'is-valid': formulaireServiceInsertion.get('devis_dto.groupe_taxation').valid}">
+                <option [value]=null disabled selected>Choisissez un groupe taxation</option>
+                <option *ngFor="let groupeTaxation of listeGroupe" [value]="groupeTaxation.id">
+                  {{ groupeTaxation.code + ' - ' + groupeTaxation.etiquette}}
+                </option>
+              </select>
+              <div *ngIf="formulaireServiceInsertion.get('devis_dto.groupe_taxation').invalid && formulaireServiceInsertion.get('devis_dto.groupe_taxation').dirty" class="text-danger">
+                <div *ngIf="formulaireServiceInsertion.get('devis_dto.groupe_taxation').errors.required">le groupe de taxation est obligatoire</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="modal-footer">
+        <button class="btn btn-primary" [disabled]="formulaireServiceInsertion.invalid" type="submit">Créer le Service</button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #contentPlainte let-modal>
+  <div class="modal-header">
+    <h4>
+      {{ formulairePlainteInsertion.get("id").value ? "Modifier" : "Créer" }}
+    </h4>
+    <button type="button" class="btn-close" aria-label="Close"
+            (click)="modal.dismiss('Cliquer pour fermer')">
+    </button>
+  </div>
+  <div class="modal-body">
+    <form
+      [formGroup]="formulairePlainteInsertion"
+      (ngSubmit)="creerModifierPlainteInsertion()"
+    >
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label>Canal</label>
+            <select
+              formControlName="type_relance_id"
+              name="ddlCreditCardType"
+              class="form-select"
+              [ngClass]="{'is-invalid': formulairePlainteInsertion.get('type_relance_id').invalid && formulairePlainteInsertion.get('type_relance_id').dirty,
+              'is-valid': formulairePlainteInsertion.get('type_relance_id').valid}"
+            >
+              <option [value]=null selected disabled>--Choisir un canal --</option>
+              <option
+                *ngFor="let typeRelance of listeTypeRelance"
+                [value]="typeRelance.id"
+              >
+                {{ typeRelance.designation }}
+              </option>
+            </select>
+            <div *ngIf="formulairePlainteInsertion.get('type_relance_id').invalid && formulairePlainteInsertion.get('type_relance_id').dirty" class="text-danger">
+              <div *ngIf="formulairePlainteInsertion.get('type_relance_id').errors.required">Le canal est obligatoire</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label >Motif</label>
+            <input
+              type="text"
+              class="form-control"
+              formControlName="motif"
+              placeholder="Veillez svp saisir le motif de la plainte"
+              [ngClass]="{'is-invalid': formulairePlainteInsertion.get('motif').invalid && formulairePlainteInsertion.get('motif').dirty,
+              'is-valid': formulairePlainteInsertion.get('motif').valid}"
+            />
+            <div *ngIf="formulairePlainteInsertion.get('motif').invalid && formulairePlainteInsertion.get('motif').dirty" class="text-danger">
+              <div *ngIf="formulairePlainteInsertion.get('motif').errors.required">Le motif est obligatoire</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group mb-2">
+        <label for="description">Description</label>
+        <textarea
+          type="text"
+          class="form-control"
+          formControlName="description"
+          id="description"
+          rows="5"
+          placeholder="Veillez svp saisir la description de la plainte"
+          [ngClass]="{'is-invalid': formulairePlainteInsertion.get('description').invalid && formulairePlainteInsertion.get('description').dirty,
+              'is-valid': formulairePlainteInsertion.get('description').valid}"
+        ></textarea>
+        <div *ngIf="formulairePlainteInsertion.get('description').invalid && formulairePlainteInsertion.get('description').dirty" class="text-danger">
+          <div *ngIf="formulairePlainteInsertion.get('description').errors.required">Le motif est obligatoire</div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" [disabled]="formulairePlainteInsertion.invalid" type="submit">
+          {{
+          formulairePlainteInsertion.get("id").value ? "Modifier" : "Créer"
+          }}
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<ng-template #plainteDetail let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Plainte Details</h5>
+    <button type="button" class="btn-close" aria-label="Close"
+            (click)="modal.dismiss('Cliquer pour fermer')">
+    </button>
+  </div>
+  <div class="modal-body">
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label>Référence</label>
+          <p>{{plainte?.reference}}</p>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label>Canal</label>
+          <p>{{plainte?.type_relance?.designation}}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="mb-3">
+          <label>Motif</label>
+          <p style="text-align: justify">{{plainte?.motif}}</p>
+        </div>
+      </div>
+      <div class="col-md-6" *ngIf="plainte.etat === true">
+        <div class="mb-3">
+          <label>Statut</label>
+          <p class="badge bg-success font-size-11 m-1">{{'Traiter'}}</p>
+        </div>
+      </div>
+
+      <div class="col-md-6" *ngIf="plainte.etat === false">
+        <div class="mb-3">
+          <label>Statut</label>
+          <p class="badge bg-danger font-size-11 m-1">{{'Non Traiter'}}</p>
+        </div>
+      </div>
+    </div>
+
+    <label>Date d'enregistrement de la plainte</label>
+    <p>{{plainte?.date| date:'dd MMMM yyyy':'':'fr-FR'}}</p>
+
+    <label>Description</label>
+    <p style="text-align: justify">{{plainte?.description}}</p>
+
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-success " type="submit"
+            *ngIf="plainte.etat !== true"
+            (click)="traiterPlainte(plainte.id)">
+      Traiter
+    </button>
+    <button type="button" class="btn btn-secondary" (click)="modal.dismiss('cancel click')">Fermer</button>
+  </div>
+</ng-template>

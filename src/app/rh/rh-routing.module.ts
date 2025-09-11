@@ -7,6 +7,9 @@ import { DetailComponent } from './service/detail/detail.component';
 import { ListedepersonnelsComponent } from './listedepersonnels/listedepersonnels.component';
 import { DetailpersonnelComponent } from './listedepersonnels/detailpersonnel/detailpersonnel.component';
 import { CongeComponent } from './conge/conge.component';
+import { ContratComponent } from './contrat/contrat.component';
+import { IndiceComponent } from './indice/indice.component';
+import { DemandeComponent } from './demande/demande.component';
 
 const routes: Routes = [{ path: '', component: RhComponent },
    {
@@ -28,6 +31,9 @@ const routes: Routes = [{ path: '', component: RhComponent },
 
      { path: 'services', component: ServiceComponent },
      { path: 'conges', component: CongeComponent },
+     { path: 'contrats', component: ContratComponent },
+     { path: 'indices', component: IndiceComponent },
+     { path: 'demandes', component: DemandeComponent },
 
     ]
   }
