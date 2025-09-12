@@ -53,10 +53,10 @@ export class MissionService {
   // }
   //
   //
-  // public ajouterLeRapport(id:any, data:any):Observable<Mission>{
-  //   return this.httpClient.patch<Mission>(
-  //     this.contextPath +"/"+id+"/rapport",data)
-  // }
+  public ajouterLeRapport(id:any, data:any):Observable<Mission>{
+    return this.httpClient.patch<Mission>(
+      this.contextPath +"/"+id+"/rapport",data)
+  }
   //
   // public supprimerMission(id: number) {
   //   return this.httpClient.delete<any>(this.contextPath + "/" + id);

@@ -1,4 +1,4 @@
-<div class="container-fluid px-3">
+<div class="container-fluid px-3 main">
   <div class="row">
     <div class="col-lg-12">
       <div class="card">
@@ -7,7 +7,7 @@
           <p class="card-title-desc">
             Le tableau suivant présente la liste des demandes du personnel
           </p>
-          <div class="row justify-content-end" style="margin-top: -30px">
+          <div class="row justify-content-end" style="margin-top: -18px">
             <div class="col-md-6 col-xl-4">
               <form class="app-search">
                 <div class="position-relative">
@@ -63,9 +63,9 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr [ngClass]="{'table-success': demande?.statutDemande?.id === 2,
-          'table-warning': demande?.statutDemande?.id === 3 || demande?.statutDemande?.id === 1,
-          'table-danger': demande?.statutDemande?.id === 4 || demande?.statutDemande?.id === 5 }"
+                    <tr [ngClass]="{'table-success': demande?.typeDemande != null,
+          'table-warning': demande?.typeDemande =='CONGE_PAYE',
+          'table-danger': demande?.typeDemande =='CONGE_SANS_SOLDE' }"
                       *ngFor="let demande of listeDossierPage ?? [] ; let i=index">
                       <td>
                         <div class="form-check font-size-16"><input class="form-check-input" type="checkbox"

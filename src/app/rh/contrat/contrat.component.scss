@@ -79,3 +79,14 @@ li {
   background-image: url('../../../assets/Groupe 786.png'); /* remplacer image.jpg par l'URL de votre image de fond */
 }
 
+
+.btn-darkblue {
+  background-color: #0d47a1; /* Bleu foncé */
+  color: white;
+  border: none;
+}
+
+.btn-darkblue:hover {
+  background-color: #08306b; /* Encore plus foncé au survol */
+}   
+

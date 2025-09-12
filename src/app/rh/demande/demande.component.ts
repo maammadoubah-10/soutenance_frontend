@@ -219,18 +219,17 @@ creeModifierDemande() {
               this.listeDossierPage.map(e =>{
                 if (e.id == response["data"].id){
                   e.dateDebut = response["data"].dateDebut
-                  e.dateFin = response["data"].dateFin
-                  e.commentaire = response["data"].commentaire
-                  e.personnel = response["data"].personnel
-                  e.statutDemande = response["data"].statutDemande
+                  e.nbreJour = response["data"].nbreJour
+                  e.motif = response["data"].motif
+                  e.personnel = response["data"].personnelId
                   e.typeDemande = response["data"].typeDemande
                 }
                 return e;
               })
+              this.formulaireDossier.reset()
               this.modalService.dismissAll()
               this.chargerListeDemandePage()
               this.successmsg("Demande modifier", "La Demande a été modifié avec succès")
-              this.formulaireDossier.reset()
             },
             (error)=> {
               const errors = error.error.errors;

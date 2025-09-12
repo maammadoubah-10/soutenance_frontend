@@ -59,11 +59,11 @@ export const MENU: MenuItem[] = [
         icon: 'bx bx-line-chart',
         link: 'indices',
       },
-      {
-        id: 4,
-        label: 'Mission',
-        icon: 'bx bx-briefcase',
-         subItems: [
+      // {
+      //   id: 4,
+      //   label: 'Mission',
+      //   icon: 'bx bx-briefcase',
+        // subItems: [
            {
              id: 4,
              label: 'Frais',
@@ -82,8 +82,8 @@ export const MENU: MenuItem[] = [
              icon: 'bx bxs-id-card',
              link: 'missionnaire-externes',
            },
-         ]
-      },
+        // ]
+      //},
       {
         id: 4,
         label: 'Absence & Congé',
