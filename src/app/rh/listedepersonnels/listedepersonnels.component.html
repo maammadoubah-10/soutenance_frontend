@@ -1,188 +1,202 @@
 <div class="container-fluid px-3 main">
   <app-titredepage title="Personnel" [items]="items"></app-titredepage>
-  <div class="row">
-    <div class="col-lg-12">
-      <div class="card job-filter">
-        <div class="card-body p-3">
-          <div class="row g-3">
-            <div class="col-xxl-4 col-lg-6">
-              <div class="position-relative"><input type="search" id="searchInput"
-                  placeholder="Taper les trois première lettre du nom ..." [(ngModel)]="nom"
-                  (keyup)="onPageChangenom(currentPage)" class="form-control ng-untouched ng-pristine ng-valid">
-              </div>
+<div class="row">
+  <div class="col-lg-12">
+    <div class="card job-filter">
+      <div class="card-body p-3">
+        <div class="row g-3">
+          <div class="col-xxl-4 col-lg-6">
+            <div class="position-relative">
+              <input type="search" id="searchInput" placeholder="Taper les trois première lettre du nom ..." 
+                [(ngModel)]="nom" (keyup)="onPageChangenom(currentPage)" 
+                class="form-control ng-untouched ng-pristine ng-valid">
             </div>
-            <div class="col-xxl-4 col-lg-6">
-              <div class="position-relative"><input type="search" id="searchInputP"
-                  placeholder="Taper les trois première lettre du prenom ..." [(ngModel)]="prenom"
-                  (keyup)="onPageChangePrenom(currentPage)" class="form-control ng-untouched ng-pristine ng-valid">
-              </div>
+          </div>
+          <div class="col-xxl-4 col-lg-6">
+            <div class="position-relative">
+              <input type="search" id="searchInputP" placeholder="Taper les trois première lettre du prenom ..." 
+                [(ngModel)]="prenom" (keyup)="onPageChangePrenom(currentPage)" 
+                class="form-control ng-untouched ng-pristine ng-valid">
             </div>
-            <div class="col-xxl-4 col-lg-6">
-              <div class="position-relative"><input type="search" id="searchInputM"
-                  placeholder="Taper les trois première chiffre du matricule ..." [(ngModel)]="matricule"
-                  (keyup)="onPageChangeMatricule(currentPage)" class="form-control ng-untouched ng-pristine ng-valid">
-              </div>
+          </div>
+          <div class="col-xxl-4 col-lg-6">
+            <div class="position-relative">
+              <input type="search" id="searchInputM" placeholder="Taper les trois première chiffre du matricule ..." 
+                [(ngModel)]="matricule" (keyup)="onPageChangeMatricule(currentPage)" 
+                class="form-control ng-untouched ng-pristine ng-valid">
             </div>
-            <div class="col-xxl-2 col-lg-6">
-              <div class="position-relative h-100 hstack gap-3">
-                <button (click)="openModal(content)" type="submit" class="btn-darkblue h-100 w-100"><i
-                    class="mdi mdi-plus align-middle"></i> Ajouter Un nouveau personnel
-                </button>
-                <button (click)="retraitePersonnelGroupe()" type="submit" class="btn btn-danger h-100 w-100"><i
-                    class="mdi mdi-alert-remove align-middle"></i> Mise en retraites
-                </button>
-              </div>
+          </div>
+          <div class="col-xxl-2 col-lg-6">
+            <div class="position-relative h-100 hstack gap-3">
+              <button (click)="openModal(content)" type="submit" class="btn-darkblue h-100 w-100">
+                <i class="mdi mdi-plus align-middle  me-2"></i> Ajouter Un nouveau personnel
+              </button>
+              <button (click)="retraitePersonnelGroupe()" type="submit" class="btn btn-danger h-100 w-100">
+                <i class="mdi mdi-alert-remove align-middle  me-2"></i> Mise en retraites
+              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
   </div>
-  <ng-container [ngSwitch]="response?.dataState" *ngIf="dossiers | async as response">
-    <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
-      <div class="alert alert-info" role="alert">
-        {{ dataStateEnum.CHARGEMENT }}
-      </div>
-    </ng-container>
-    <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
-      <div class="alert alert-danger" role="alert">Erreur:</div>
-    </ng-container>
-    <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
-      <div class="row" id="candidate-list">
-        <div class="col-xl-3 col-md-6" *ngFor="let dossier of listeDossierPage ?? []">
-          <div class="card">
-            <div class="card-body">
-              <div class="d-flex align-start mb-3">
-                <div *ngIf="dossier?.dateEmbauchage && !dossier?.debaucher && !dossier?.retraiter" class="flex-grow-1">
-                  <span class="badge badge-soft-success">En Fonction</span></div>
-                <div *ngIf="dossier?.debaucher" class="flex-grow-1"><span
-                    class="badge badge-soft-warning">Débaucher</span></div>
-                <div *ngIf="dossier?.retraiter" class="flex-grow-1"><span class="badge badge-soft-danger">En
-                    Retraite</span></div>
-                <button type="button" title="supprimer ce personnel" placement="top" ngbToolTip="supprimer ce personnel"
-                  (click)="supprimerPersonnel(dossier.id)" class="btn btn-danger btn-sm like-btn"
-                  data-bs-toggle="button"><i class="bx bx-trash-alt"></i></button>
+</div>
+
+<ng-container [ngSwitch]="response?.dataState" *ngIf="dossiers | async as response">
+  <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+    <div class="alert alert-info" role="alert">
+      {{ dataStateEnum.CHARGEMENT }}
+    </div>
+  </ng-container>
+  
+  <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+    <div class="alert alert-danger" role="alert">Erreur:</div>
+  </ng-container>
+  
+  <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+    <div class="row" id="candidate-list">
+      <div class="col-xl-3 col-md-6" *ngFor="let dossier of listeDossierPage ?? []">
+        <div class="card personnel-card">
+          <div class="card-body">
+            <div class="d-flex align-start mb-3">
+              <div *ngIf="dossier?.dateEmbauchage && !dossier?.debaucher && !dossier?.retraiter" class="flex-grow-1">
+                <span class="badge badge-soft-success">En Fonction</span>
               </div>
-              <div class="text-center">
-                <div class="avatar-md mx-auto">
-                  <span class="avatar-title rounded-circle bg-soft bg-primary text-primary font-size-30">
-                    {{dossier?.nom?.charAt(0)}}
-                    {{dossier?.nom?.charAt(1)}}
-                    {{dossier?.nom?.charAt(2)}}
-                    {{dossier?.nom?.charAt(3)}}
-                  </span>
-                </div>
-                <h4 *ngIf="dossier?.matricule" class="mt-2 font-size-15">{{dossier?.matricule}}</h4>
-                <h4 *ngIf="!dossier?.matricule" class="mt-2 font-size-15">{{'Pas de Matricule'}}</h4>
-                <h5 class="font-size-15 mb-1">{{(dossier?.prenom?.length || 0) <= 13 ? dossier?.prenom :
-                    dossier?.prenom?.slice(0, 10) + "...  " }} {{(dossier?.nom?.length || 0) <=13 ? dossier?.nom :
-                    dossier?.nom?.slice(0, 10) + "..." }}</h5>
-                    <!-- <p class="mb-0 text-muted">{{dossier?.poste?.designation <= 15 ?dossier?.poste?.designation :dossier?.poste?.designation.substring(0, 24) + "..."}}</p> -->
+              <div *ngIf="dossier?.debaucher" class="flex-grow-1">
+                <span class="badge badge-soft-warning">Débaucher</span>
               </div>
-              <div class="d-flex mb-2 justify-content-center gap-2 text-muted">
-                <div></div>
-                <div *ngIf="!dossier?.adresse"><i class="bx bx-map align-middle text-primary"></i> {{'Pas d\'adresse '}}
-                </div>
+              <div *ngIf="dossier?.retraiter" class="flex-grow-1">
+                <span class="badge badge-soft-danger">En Retraite</span>
               </div>
-              <div class="hstack gap-2 justify-content-center"><span
-                  class="font-size-14 badge badge-soft-secondary">{{dossier?.poste?.service?.sigle}}</span></div>
-              <div class="mt-2">
-                <a [routerLink]="['details/'+ encodeId(dossier.id)]"
-                  class="font-size-18 btn badge badge-soft-primary d-block">Voir le Profil</a>
+            </div>
+            
+            <div class="text-center">
+              <div class="avatar-md mx-auto">
+                <span class="avatar-title rounded-circle bg-soft btn-darkblue text-primary font-size-30">
+                  {{dossier?.nom?.charAt(0)}}
+                  {{dossier?.nom?.charAt(1)}}
+                  {{dossier?.nom?.charAt(2)}}
+                  {{dossier?.nom?.charAt(3)}}
+                </span>
               </div>
+              <h4 *ngIf="dossier?.matricule" class="mt-2 font-size-15">{{dossier?.matricule}}</h4>
+              <h4 *ngIf="!dossier?.matricule" class="mt-2 font-size-15">{{'Pas de Matricule'}}</h4>
+              <h5 class="font-size-15 mb-1">
+                {{(dossier?.prenom?.length || 0) <= 13 ? dossier?.prenom : dossier?.prenom?.slice(0, 10) + "...  " }} 
+                {{(dossier?.nom?.length || 0) <=13 ? dossier?.nom : dossier?.nom?.slice(0, 10) + "..." }}
+              </h5>
+            </div>
+            
+            <div class="d-flex mb-2 justify-content-center gap-2 text-muted">
+              <div></div>
+              <div *ngIf="!dossier?.adresse">
+                <i class="bx bx-map align-middle text-primary"></i> {{'Pas d\'adresse '}}
+              </div>
+            </div>
+            
+            <div class="hstack gap-2 justify-content-center">
+              <span class="font-size-14 badge badge-soft-secondary">{{dossier?.poste?.service?.sigle}}</span>
+            </div>
+            
+            <div class="personnel-card-actions mt-3">
+              <a [routerLink]="['details/'+ encodeId(dossier.id)]" class="btn btn-primary btn-sm view-profile-btn">
+                <i class="bx bx-user"></i> Voir le Profil
+              </a>
+              <button type="button" title="supprimer ce personnel" 
+                (click)="supprimerPersonnel(dossier.id)" class="btn btn-outline-danger btn-sm delete-btn">
+                <i class="bx bx-trash-alt"></i> Supprimer
+              </button>
             </div>
           </div>
         </div>
       </div>
-      <div class="row" *ngIf="!listeDossierPage.length">
-        <p class="text-center" style="font-size: xx-large">
-          <i style="color: red; font-size: 150px" class='bx bxs-data'></i><br>Aucun Personnel
-        </p>
-      </div>
-      <div class="row justify-content-between align-items-center mb-3" *ngIf="totalDossier > 8">
-        <div class="col-auto me-auto"></div>
-        <div class="col-auto">
-          <div class="d-flex align-items-center">
-            <button class="btn btn-primary mr-2 mx-3 btn-sm" (click)="currentPage = currentPage - 1; handleClick()"
-              [disabled]="currentPage === 0">
-              Précédent
-            </button>
-            <ng-container *ngIf="pages.length > 1">
-              <ng-container *ngIf="pages.length <= 11">
-                <ng-container *ngFor="let page of pages">
+    </div>
+    
+    <div class="row" *ngIf="!listeDossierPage.length">
+      <p class="text-center" style="font-size: xx-large">
+        <i style="color: red; font-size: 150px" class='bx bxs-data'></i><br>Aucun Personnel
+      </p>
+    </div>
+    
+    <div class="row justify-content-between align-items-center mb-3" *ngIf="totalDossier > 8">
+      <div class="col-auto me-auto"></div>
+      <div class="col-auto">
+        <div class="d-flex align-items-center">
+          <button class="btn btn-primary mr-2 mx-3 btn-sm" (click)="currentPage = currentPage - 1; handleClick()"
+            [disabled]="currentPage === 0">
+            Précédent
+          </button>
+          
+          <ng-container *ngIf="pages.length > 1">
+            <ng-container *ngIf="pages.length <= 11">
+              <ng-container *ngFor="let page of pages">
+                <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                  [disabled]="currentPage === page">
+                  {{ page + 1 }}
+                </button>
+              </ng-container>
+            </ng-container>
+            
+            <ng-container *ngIf="pages.length > 11">
+              <ng-container *ngIf="currentPage <= 6">
+                <ng-container *ngFor="let page of pages.slice(0, 5)">
+                  <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                    [disabled]="currentPage === page">
+                    {{ page + 1 }}
+                  </button>
+                </ng-container>
+                <button class="btn btn-primary btn-sm mx-1" disabled>...</button>
+                <ng-container *ngFor="let page of pages.slice(-5)">
                   <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
                     [disabled]="currentPage === page">
                     {{ page + 1 }}
                   </button>
                 </ng-container>
               </ng-container>
-              <ng-container *ngIf="pages.length > 11">
-                <ng-container *ngIf="currentPage <= 6">
-                  <ng-container *ngFor="let page of pages.slice(0, 5)">
-                    <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
-                      [disabled]="currentPage === page">
-                      {{ page + 1 }}
-                    </button>
-                  </ng-container>
-                  <button class="btn btn-primary btn-sm mx-1" disabled>
-                    ...
+              
+              <ng-container *ngIf="currentPage > 6 && currentPage < pages.length - 5">
+                <ng-container *ngFor="let page of pages.slice(currentPage - 4, currentPage)">
+                  <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                    [disabled]="currentPage === page">
+                    {{ page + 1 }}
                   </button>
-                  <ng-container *ngFor="let page of pages.slice(-5)">
-                    <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
-                      [disabled]="currentPage === page">
-                      {{ page + 1 }}
-                    </button>
-                  </ng-container>
                 </ng-container>
-                <ng-container *ngIf="currentPage > 6 && currentPage < pages.length - 5">
-                  <ng-container *ngFor="
-                      let page of pages.slice(currentPage - 4, currentPage)
-                    ">
-                    <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
-                      [disabled]="currentPage === page">
-                      {{ page + 1 }}
-                    </button>
-                  </ng-container>
-                  <button class="btn btn-primary btn-sm mx-1" disabled>
-                    ...
+                <button class="btn btn-primary btn-sm mx-1" disabled>...</button>
+                <ng-container *ngFor="let page of pages.slice(currentPage, currentPage + 4)">
+                  <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                    [disabled]="currentPage === page">
+                    {{ page + 1 }}
                   </button>
-                  <ng-container *ngFor="
-                      let page of pages.slice(currentPage, currentPage + 4)
-                    ">
-                    <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
-                      [disabled]="currentPage === page">
-                      {{ page + 1 }}
-                    </button>
-                  </ng-container>
                 </ng-container>
-                <ng-container *ngIf="currentPage >= pages.length - 5">
-                  <ng-container *ngFor="let page of pages.slice(0, 5)">
-                    <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
-                      [disabled]="currentPage === page">
-                      {{ page + 1 }}
-                    </button>
-                  </ng-container>
-                  <button class="btn btn-primary btn-sm mx-1" disabled>
-                    ...
+              </ng-container>
+              
+              <ng-container *ngIf="currentPage >= pages.length - 5">
+                <ng-container *ngFor="let page of pages.slice(0, 5)">
+                  <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                    [disabled]="currentPage === page">
+                    {{ page + 1 }}
                   </button>
-                  <ng-container *ngFor="let page of pages.slice(-5)">
-                    <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
-                      [disabled]="currentPage === page">
-                      {{ page + 1 }}
-                    </button>
-                  </ng-container>
+                </ng-container>
+                <button class="btn btn-primary btn-sm mx-1" disabled>...</button>
+                <ng-container *ngFor="let page of pages.slice(-5)">
+                  <button class="btn btn-primary btn-sm mx-1" (click)="currentPage = page; handleClick()"
+                    [disabled]="currentPage === page">
+                    {{ page + 1 }}
+                  </button>
                 </ng-container>
               </ng-container>
             </ng-container>
-            <button class="btn btn-primary btn-sm mx-3" (click)="currentPage = currentPage + 1; handleClick()"
-              [disabled]="currentPage+1 === totalPages">
-              Suivant
-            </button>
-          </div>
+          </ng-container>
+          
+          <button class="btn btn-primary btn-sm mx-3" (click)="currentPage = currentPage + 1; handleClick()"
+            [disabled]="currentPage+1 === totalPages">
+            Suivant
+          </button>
         </div>
       </div>
-    </ng-container>
+    </div>
   </ng-container>
+</ng-container>
 </div>
 
 

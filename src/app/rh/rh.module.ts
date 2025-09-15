@@ -28,6 +28,7 @@ import { ContratComponent } from './contrat/contrat.component';
 import { IndiceComponent } from './indice/indice.component';
 import { DemandeComponent } from './demande/demande.component';
 import { MissionComponent } from './mission/mission.component';
+import { DetailmissionComponent } from './mission/detailmission/detailmission.component';
 
 @NgModule({
   declarations: [
@@ -45,6 +46,7 @@ import { MissionComponent } from './mission/mission.component';
     IndiceComponent,
     DemandeComponent,
     MissionComponent,
+    DetailmissionComponent,
   ],
   imports: [
     CommonModule,

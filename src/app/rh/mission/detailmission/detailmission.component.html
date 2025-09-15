@@ -1,184 +1,167 @@
-<div class="container-fluid px-3 main">
+<div class="container-fluid px-3 main mission-details">
   <app-titredepage title="Détails mission" [items]="items"></app-titredepage>
-  <ng-container
-    [ngSwitch]="response.dataState"
-    *ngIf="mission$ | async as response"
-  >
+  
+  <ng-container [ngSwitch]="response.dataState" *ngIf="mission$ | async as response">
+    <!-- États de chargement -->
     <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
-      <div class="alert alert-info" role="alert">
-        {{ dataStateEnum.CHARGEMENT }}
+      <div class="d-flex justify-content-center align-items-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Chargement...</span>
+        </div>
+        <div class="ms-3">{{ dataStateEnum.CHARGEMENT }}</div>
       </div>
     </ng-container>
+    
+    <!-- État d'erreur -->
     <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
-      <div class="alert alert-danger" role="alert">Erreur:</div>
+      <div class="alert alert-danger d-flex align-items-center" role="alert">
+        <i class="bx bx-error-circle me-2 fs-4"></i>
+        <div>Une erreur s'est produite lors du chargement des données.</div>
+      </div>
     </ng-container>
+    
+    <!-- Données chargées -->
     <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
-
-      <div class="col-12">
-
-        <div class="email-leftbar card">
-          <button
-            class="btn btn-outline-secondary btn-label mb-2 "
-            (click)="goBack()"
-          >
-            <i class="mdi mdi-chevron-left label-icon"></i>
-            Retour
-          </button>
-          <button
-            class="btn btn-outline-success btn-label mb-2 "
-            (click)="genererLesEtats(mission)"
-          >
-            <i class="mdi mdi-download-multiple label-icon"></i>
-            Générer les états
-          </button>
-          <button
-            class="btn btn-outline-light btn-label mb-2 "
-            (click)="telechargerOrdre(mission)"
-          >
-            <i class="fa fa-download label-icon"></i>
-            Télécharger les ordres
-          </button>
-          <button
-            class="btn btn-outline-warning btn-label mb-2 "
-            (click)="telechargerFrais(mission)"
-          >
-            <i class="bx bx-download label-icon"></i>
-            Télécharger les frais
-          </button>
-          <a type="button"
-            target="_blank"
-            (click)="showPopOnDownloadRapportMission()"
-            href="{{telechargerRapportMission(mission)}}"
-            class="btn btn-outline-dark btn-label mb-2 "
-            *ngIf="mission.rapport"
-          >
-            <i class="mdi mdi-upload label-icon"></i>
-            Télécharger le rapport
-          </a>
-          <button
-            class="btn btn-outline-secondary btn-label mb-2 "
-            (click)="openModalRapport(rapport, mission)"
-            *ngIf="!mission.rapport"
-          >
-            <i class="mdi mdi-download label-icon"></i>
-            Ajouter le rapport
-          </button>
-          <button
-            class="btn btn-outline-info btn-label mb-2 "
-            (click)="openModal(content, mission)"
-          >
-            <i class="mdi mdi-pencil label-icon"></i>
-            Modifier
-          </button>
-          <button
-            class="btn btn-outline-danger btn-label mb-2 "
-            (click)="supprimerMission()"
-          >
-            <i class="bx bx-trash-alt label-icon"></i>
-            Supprimer
-          </button>
-
-        </div>
-
-        <div class="email-rightbar mb-2">
-          <div class="card">
-            <div class="btn-toolbar p-3" role="toolbar">
-              <div>
-                <div class="btn-group me-2 mb-2 mb-sm-0">
-                  <span *ngIf="mission?.isTodayBetweenDates" style="font-size: larger" class="badge mx-3  badge-soft-success">En Cours</span>
-                  <span *ngIf="!mission?.isTodayBetweenDates" style="font-size: larger" class="badge mx-3 badge-soft-danger">Terminer</span>
-                </div>
-              </div>
-            </div>
+      <div class="row">
+        <!-- Sidebar d'actions -->
+        <div class="col-lg-3">
+          <div class="card action-sidebar mb-4">
             <div class="card-body">
-              <div class="d-flex mb-4">
-
-                <div class="flex-grow-1">
-                  <div class="row">
-                    <div class="col-md-6">
-                      <h5 class="font-size-20 mt-1">Référence : <span class="font-size-15">{{mission?.reference}}</span></h5>
-                    </div>
-                    <div class="col-md-6">
-                      <h5 class="font-size-20 mt-1">Accompagner : <span class="font-size-15">{{mission?.accompagne}}</span></h5>
-                    </div>
-                    <div class="col-md-6">
-                      <h5 class="font-size-20 mt-1">Dates : <span class="font-size-15">Du {{mission?.dateDebut| date:'dd MMMM yyyy':'':'fr-FR'}} au {{mission?.dateFin| date:'dd MMMM yyyy':'':'fr-FR'}}</span></h5>
-                    </div>
-                    <div class="col-md-6">
-                      <h5 class="font-size-20 mt-1">Durée : <span class="font-size-15">{{mission?.duree}}</span></h5>
-                    </div>
-                    <div class="col-md-6">
-                      <h5 class="font-size-20 mt-1">Conducteur : <span class="font-size-15">{{mission?.conducteur?.prenom +' '+mission?.conducteur?.nom}}</span></h5>
-                    </div>
-                    <div class="col-md-6">
-                      <h5 class="font-size-20 mt-1">Moyen de Transport : <span class="font-size-15">{{mission?.moyenTransport}}</span></h5>
-                    </div>
-                    <div class="col-md-6">
-                      <h5 class="font-size-20 mt-1">Imputation : <span class="font-size-15">{{mission?.imputation?.nom}}</span></h5>
-                    </div>
-                    <div class="col-md-6">
-                      <h5 class="font-size-20 mt-1">Type de Mission : <span class="font-size-15">{{mission?.typeMission?.nom}}</span></h5>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <hr>
-              <h4 class="text-center mt-0 font-size-20">Objet</h4>
-              <hr>
-              <p>{{mission?.objet}}</p>
-              <div *ngIf="mission?.personnels.length !=0">
-              <hr>
-              <h4 class="text-center mt-0 font-size-20">Personnel(s)</h4>
-              <hr>
-              <div class="row" >
-                <div class="col-xl-2 col-6" *ngFor="let personnel of listePersonnelMission ?? []">
-                  <div class="card">
-                    <div class="avatar-md mx-auto">
-                 <span class="avatar-title rounded-circle bg-soft bg-primary text-primary font-size-30">
-                      {{personnel?.nom?.charAt(0)}}
-                      {{personnel?.nom?.charAt(1)}}
-                      {{personnel?.nom?.charAt(2)}}
-                      {{personnel?.nom?.charAt(3)}}
-                    </span>
-                    </div>
-                    <div class="text-center">
-                    <h4 *ngIf="personnel?.matricule" class="mt-2 font-size-15">{{personnel?.matricule}}</h4>
-                    <h4 *ngIf="!personnel?.matricule" class="mt-2 font-size-15">{{'Pas de Matricule'}}</h4>
-                    <h5 class="font-size-15 mb-1">{{(personnel?.prenom?.length || 0) <= 10 ? personnel?.prenom : personnel?.prenom?.slice(0, 10) + "...  "}} {{(personnel?.nom?.length || 0) <= 10 ? personnel?.nom : personnel?.nom?.slice(0, 10) + "..."}}</h5>
-                    </div>
-                    <div class="py-2 text-center"><a [routerLink]="['personnels/details/'+ encodeId(personnel.id)]"  class="fw-medium">Détail</a></div>
-                  </div>
-                </div>
-              </div>
-              </div>
-              <div *ngIf="mission?.missionnaireExternes.length !=0">
-              <hr>
-              <h4 class="text-center mt-0 font-size-20">Missionnaire(s) Externe(s)</h4>
-              <hr>
-                <div class="row" >
-                  <div class="col-xl-2 col-6" *ngFor="let missionaire of listeMissionnaireExterneMission ?? []">
-                    <div class="card">
-                      <div class="avatar-md mx-auto">
-                 <span class="avatar-title rounded-circle bg-soft bg-primary text-primary font-size-30">
-                      {{missionaire?.nom?.charAt(0)}}
-                   {{missionaire?.nom?.charAt(1)}}
-                   {{missionaire?.nom?.charAt(2)}}
-                   {{missionaire?.nom?.charAt(3)}}
-                    </span>
-                      </div>
-                      <div class="text-center">
-                        <h5 class="font-size-15 mb-1">{{(missionaire?.prenom?.length || 0) <= 10 ? missionaire?.prenom : missionaire?.prenom?.slice(0, 10) + "...  "}} {{(missionaire?.nom?.length || 0) <= 10 ? missionaire?.nom : missionaire?.nom?.slice(0, 10) + "..."}}</h5>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <h5 class="card-title mb-3">Actions</h5>
+              <div class="d-grid gap-2">
+                <button class="btn btn-outline-secondary btn-label mb-2" (click)="goBack()">
+                  <i class="mdi mdi-chevron-left label-icon"></i>
+                  Retour
+                </button>
+                <button class="btn btn-outline-success btn-label mb-2" (click)="genererLesEtats(mission!)">
+                  <i class="mdi mdi-download-multiple label-icon"></i>
+                  Générer les états
+                </button>
+                <button class="btn btn-outline-primary btn-label mb-2" (click)="telechargerOrdre(mission!)">
+                  <i class="fa fa-download label-icon"></i>
+                  Télécharger l'attestation
+                </button>
+                <button class="btn btn-outline-info btn-label mb-2" (click)="telechargerFrais(mission!)">
+                  <i class="bx bx-download label-icon"></i>
+                  Télécharger la mission
+                </button>
+                <button class="btn btn-outline-warning btn-label mb-2" 
+                        (click)="openModalRapport(rapport, mission!)"
+                        *ngIf="mission?.motif">
+                  <i class="mdi mdi-file-upload label-icon"></i>
+                  Ajouter le rapport
+                </button>
+                <button class="btn btn-outline-dark btn-label mb-2" (click)="openModal(content, mission)">
+                  <i class="mdi mdi-pencil label-icon"></i>
+                  Modifier
+                </button>
+                <button class="btn btn-outline-danger btn-label mb-2" (click)="supprimerMission()">
+                  <i class="bx bx-trash-alt label-icon"></i>
+                  Supprimer
+                </button>
               </div>
             </div>
           </div>
         </div>
-      </div>
+        
+        <!-- Contenu principal -->
+        <div class="col-lg-9">
+          <div class="card mission-card">
+            <div class="card-header bg-transparent border-bottom-0 pt-3">
+              <div class="d-flex justify-content-between align-items-center">
+                <h4 class="card-title mb-0">Détails de la mission</h4>
+                <span [ngClass]="{
+                  'badge bg-success': mission?.isTodayBetweenDates,
+                  'badge bg-secondary': !mission?.isTodayBetweenDates
+                }" class="fs-6">
+                  {{ mission?.isTodayBetweenDates ? 'En Cours' : 'Terminée' }}
+                </span>
+              </div>
+            </div>
+            
+            <div class="card-body">
+              <!-- Informations principales -->
+              <div class="row mb-4">
+                <div class="col-md-6 mb-3">
+                  <div class="info-item">
+                    <label class="fw-semibold text-muted">Référence</label>
+                    <p class="mb-0 fs-5">{{ mission?.reference }}</p>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <div class="info-item">
+                    <label class="fw-semibold text-muted">Motif</label>
+                    <p class="mb-0 fs-5">{{ mission?.motif }}</p>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <div class="info-item">
+                    <label class="fw-semibold text-muted">Dates</label>
+                    <p class="mb-0 fs-5">
+                      Du {{ mission?.dateDebut | date:'dd MMMM yyyy':'':'fr-FR' }} 
+                      au {{ mission?.dateFin | date:'dd MMMM yyyy':'':'fr-FR' }}
+                    </p>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <div class="info-item">
+                    <label class="fw-semibold text-muted">Durée</label>
+                    <p class="mb-0 fs-5">{{ mission?.duree }}</p>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <div class="info-item">
+                    <label class="fw-semibold text-muted">Moyen de Transport</label>
+                    <p class="mb-0 fs-5">{{ mission?.moyenDeplacement }}</p>
+                  </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                  <div class="info-item">
+                    <label class="fw-semibold text-muted">Type de Mission</label>
+                    <p class="mb-0 fs-5">{{ mission?.typeMission?.nom }}</p>
+                  </div>
+                </div>
+              </div>
+              
+              <hr>
+              
+              <!-- Objet de la mission -->
+              <div class="mb-4">
+                <h5 class="section-title">Objet de la mission</h5>
+                <div class="objet-content p-3 bg-light rounded">
+                  <p class="mb-0">{{ mission?.objet }}</p>
+                </div>
+              </div>
+              
+              <!-- Personnels -->
+              <div *ngIf="mission?.personnels?.length != 0" class="mb-4">
+                <h5 class="section-title">Personnel(s)</h5>
+                <div class="row">
+                  <div class="col-xl-3 col-md-4 col-sm-6 mb-3" *ngFor="let personnel of listePersonnel ?? []">
+                    <div class="card personnel-card h-100">
+                      <div class="card-body text-center">
+                        <div class="avatar-lg mx-auto mb-3">
+                          <span class="avatar-title rounded-circle btn-darkblue text-white fs-2">
+                            {{ personnel?.etatCivil?.nom?.charAt(0) || personnel?.nom?.charAt(0) }}
+                            {{ personnel?.prenom?.charAt(0) }}
+                          </span>
+                        </div>
+                        <h6 *ngIf="personnel?.matricule" class="text-muted small mb-1">{{ personnel?.matricule }}</h6>
+                        <h6 *ngIf="!personnel?.matricule" class="text-muted small mb-1">Pas de Matricule</h6>
+                        <h5 class="card-title mb-2">
+                          {{ (personnel?.prenom?.length || 0) <= 12 ? personnel?.prenom : (personnel?.prenom | slice:0:12) + '...' }} 
+                          {{ (personnel?.nom?.length || 0) <= 12 ? personnel?.nom : (personnel?.nom | slice:0:12) + '...' }}
+                        </h5>
+                        <a [routerLink]="['/rh/personnels/details/'+ encodeId(personnel.id)]" class="btn btn-sm btn-darkblue mt-2">
+                          Voir détails
+                        </a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
-      <div class="col-lg-12 d-flex">
+      <!-- <div class="col-lg-12 d-flex">
         <h2 class="mb-3">Pointage</h2>
         <div class="ms-auto">
           <button type="button"
@@ -190,8 +173,8 @@
             <i class="mdi mdi-auto-fix align-baseline ms-1"></i>
           </button>
         </div>
-      </div>
-      <div class="card">
+      </div> -->
+      <!-- <div class="card">
         <div class="card-body border-bottom">
           <div class="d-flex align-items-center">
             <h4 class="card-title">Liste des pointages de cette mission</h4>
@@ -199,7 +182,7 @@
         </div>
         <div class="card-body">
           <ng-container
-            [ngSwitch]="response.dataState"
+            [ngSwitch]="response?.dataState"
             *ngIf="pointages | async as response"
           >
             <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
@@ -230,7 +213,7 @@
                     <th scope="row">{{i+1}}</th>
                     <th >{{pointage?.date| date:'dd MMMM yyyy':'':'fr-FR'}}</th>
                     <th scope="row">
-                      <a [routerLink]="['personnels/details/'+ encodeId(pointage?.personnel?.id)]">
+                      <a [routerLink]="['personnels/details/'+ encodeId(pointage?.personnel?.id!)]">
                         {{pointage?.personnel?.prenom+ ' ' + pointage?.personnel?.nom}}
                       </a>
                     </th>
@@ -243,7 +226,7 @@
                         class="btn btn-info mx-1 mt-1 btn-sm"
                       >
                         <i class="bx bx-pencil"></i>
-                      </button>
+                      </button> 
                       <button
                         placement="top"
                         ngbToolTip="Supprimer"
@@ -255,7 +238,7 @@
                     </th>
                   </tr>
 
-                  <tr *ngIf="response.data.length == 0">
+                  <tr *ngIf="response.data?.length == 0">
                     <td colspan="5" class="text-center"><i style="color: #d9534f;font-size: xxx-large" class='bx bxs-data btn btn-lg'></i><br>Aucun pointage pour cette mission</td>
                   </tr>
                   </tbody>
@@ -383,185 +366,114 @@
             </ng-container>
           </ng-container>
         </div>
-      </div>
-
+      </div> -->
+    <!-- </div>
     </ng-container>
-  </ng-container>
+  </ng-container> -->
 </div>
 
 
 <ng-template #content let-modal>
   <div class="modal-header">
-    <h4>{{formulaireDossier.get('id').value ? 'Modifier': 'Créer'}}</h4>
-    <button type="button" class="btn-close" aria-label="Close"
-            (click)="modal.dismiss('Cliquer pour fermer')">
+    <h4>{{formulaireDossier.get('id')?.value ? 'Modifier': 'Créer'}}</h4>
+    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cliquer pour fermer')">
     </button>
   </div>
   <div class="modal-body">
-    <form  [formGroup]="formulaireDossier"
-           (ngSubmit)="creerModifierMission()" >
+    <form [formGroup]="formulaireDossier" (ngSubmit)="creerModifierMission()">
 
       <div class="row">
         <div class="col-md-6">
           <div class="mb-3">
             <label for="dateDebut">Date de debut</label>
-            <input type="date" class="form-control" placeholder="Veuillez entrer ou sélectionner la date de debut" formControlName="dateDebut" id="dateDebut"
-                   [ngClass]="{'is-invalid': formulaireDossier.get('dateDebut').invalid && formulaireDossier.get('dateDebut').dirty, 'is-valid': formulaireDossier.get('dateDebut').valid}">
-            <div *ngIf="formulaireDossier.get('dateDebut').invalid && formulaireDossier.get('dateDebut').dirty" class="text-danger">
-              <div *ngIf="formulaireDossier.get('dateDebut').errors.required">La date de debut est obligatoire</div>
+            <input type="date" class="form-control" placeholder="Veuillez entrer ou sélectionner la date de debut"
+              formControlName="dateDebut" id="dateDebut"
+              [ngClass]="{'is-invalid': formulaireDossier.get('dateDebut')?.invalid && formulaireDossier.get('dateDebut')?.dirty, 'is-valid': formulaireDossier.get('dateDebut')?.valid}">
+            <div *ngIf="formulaireDossier.get('dateDebut')?.invalid && formulaireDossier.get('dateDebut')?.dirty"
+              class="text-danger">
+              <div *ngIf="formulaireDossier.get('dateDebut')?.errors?.['required']">La date de debut est obligatoire
+              </div>
             </div>
           </div>
         </div>
 
         <div class="col-md-6">
           <div class="mb-3">
-            <label for="dateFin">Date de fin</label>
-            <input type="date" class="form-control" placeholder="Veuillez entrer ou sélectionner la date de fin" formControlName="dateFin" id="dateFin"
-                   [ngClass]="{'is-invalid': formulaireDossier.get('dateFin').invalid && formulaireDossier.get('dateFin').dirty, 'is-valid': formulaireDossier.get('dateFin').valid}">
-            <div *ngIf="formulaireDossier.get('dateFin').invalid && formulaireDossier.get('dateFin').dirty" class="text-danger">
-              <div *ngIf="formulaireDossier.get('dateFin').errors.required">La date de fin est obligatoire</div>
+            <label for="nbreJour">Nombre De Jour</label>
+            <input type="number" class="form-control" placeholder="Veuillez entrer ou sélectionner le nombre de jour"
+              formControlName="nbreJour" id="nbreJour"
+              [ngClass]="{'is-invalid': formulaireDossier.get('nbreJour')?.invalid && formulaireDossier.get('nbreJour')?.dirty, 'is-valid': formulaireDossier.get('nbreJour')?.valid}">
+            <div *ngIf="formulaireDossier.get('nbreJour')?.invalid && formulaireDossier.get('nbreJour')?.dirty"
+              class="text-danger">
+              <div *ngIf="formulaireDossier.get('nbreJour')?.errors?.['required']">Le nombre de jour est obligatoire
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label for="accompagne">Accompagner</label>
-            <input type="text" class="form-control" placeholder="Veuillez entrer l'accompagne " formControlName="accompagne" id="accompagne"
-                   [ngClass]="{'is-invalid': formulaireDossier.get('accompagne').invalid && formulaireDossier.get('accompagne').dirty, 'is-valid': formulaireDossier.get('accompagne').valid}">
-
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="personnel">Personnel</label>
+              <ng-select [searchable]=true autofocus="true" (search)="onSearchPersonnel($event.term)"
+                [loading]="loading" formControlName="personnelId" id="personnelId"
+                [ngClass]="{'is-invalid': formulaireDossier.get('personnelId')?.invalid && formulaireDossier.get('personnelId')?.dirty, 'is-valid': formulaireDossier.get('personnelId')?.valid}"
+                placeholder="Tapez les trois première lettres du nom">
+                <ng-option *ngFor="let personnels of listePersonnel" [value]="personnels.id">
+                  {{personnels?.prenom + ' ' + personnels?.nom}}
+                </ng-option>
+              </ng-select>
+            </div>
           </div>
-        </div>
 
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label for="conducteur">Conducteur</label>
-            <ng-select
-              [searchable] = true
-              autofocus="true"
-              [typeahead]="nom"
-              (search) = "onSearchPersonnel($event.term)"
-              [loading]="loading"
-              formControlName="conducteur"
-              id="conducteur"
-              [ngClass]="{'is-invalid': formulaireDossier.get('conducteur').invalid && formulaireDossier.get('conducteur').dirty, 'is-valid': formulaireDossier.get('conducteur').valid}"
-              placeholder="Tapez les trois première lettres du nom"
-            >
-              <ng-option *ngFor="let conducteurs of listePersonnel" [value]="conducteurs.id">
-                {{ conducteurs?.prenom + ' ' + conducteurs?.nom}}
-              </ng-option>
-            </ng-select>
-          </div>
-        </div>
-
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label for="personnels">Le(s) Personnel(s)</label>
-            <ng-select
-              [searchable] = true
-              autofocus="true"
-              [typeahead]="nom"
-              (search) = "onSearchPersonnel($event.term)"
-              [loading]="loading"
-              formControlName="personnels"
-              name="personnels"
-              id="personnels"
-              [multiple]="true">
-              <ng-option *ngFor="let personnel of listePersonnel" [value]="personnel.id">{{ personnel.prenom+" "+personnel.nom }}</ng-option>
-            </ng-select>
-          </div>
-        </div>
-
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label for="missionnaireExternes">Le(s) Missionnaire(s) Externe(s)</label>
-            <ng-select
-              [searchable] = true
-              autofocus="true"
-              [typeahead]="nom"
-              (search) = "onSearchMissionnaireExterne($event.term)"
-              [loading]="loading"
-              formControlName="missionnaireExternes"
-              name="missionnaireExternes"
-              id="missionnaireExternes"
-              [multiple]="true">
-              <ng-option *ngFor="let missionnaireExterne of listeMissionnaireExterne" [value]="missionnaireExterne.id">{{ missionnaireExterne.prenom+" "+missionnaireExterne.nom }}</ng-option>
-            </ng-select>
-          </div>
-        </div>
-
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label >Imputation</label>
-            <ng-select
-              [searchable] = true
-              autofocus="true"
-              [typeahead]="nom"
-              (search) = "onSearchImputation($event.term)"
-              [loading]="loading"
-              formControlName="imputation"
-              [ngClass]="{'is-invalid': formulaireDossier.get('imputation').invalid && formulaireDossier.get('imputation').dirty, 'is-valid': formulaireDossier.get('imputation').valid}"
-              placeholder="Tapez les trois première lettres du nom"
-            >
-              <ng-option *ngFor="let imputations of listeImputation" [value]="imputations.id">
-                {{ imputations?.nom}}
-              </ng-option>
-            </ng-select>
-          </div>
-        </div>
-
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label >Type de Mission</label>
-            <ng-select
-              [searchable] = true
-              autofocus="true"
-              [typeahead]="nom"
-              (search) = "onSearchTypeMission($event.term)"
-              [loading]="loading"
-              formControlName="typeMission"
-              [ngClass]="{'is-invalid': formulaireDossier.get('typeMission').invalid && formulaireDossier.get('typeMission').dirty, 'is-valid': formulaireDossier.get('typeMission').valid}"
-              placeholder="Tapez les trois première lettres du nom"
-            >
-              <ng-option *ngFor="let typeMissions of listeTypeMission" [value]="typeMissions.id">
-                {{ typeMissions?.nom}}
-              </ng-option>
-            </ng-select>
-          </div>
-        </div>
-
-        <div class="col-md-12">
-          <div class="mb-3">
-            <label for="moyenTransport">Moyen de Transport</label>
-            <input type="text" class="form-control" placeholder="Veuillez entrer le moyen de Transport" formControlName="moyenTransport" id="moyenTransport"
-                   [ngClass]="{'is-invalid': formulaireDossier.get('moyenTransport').invalid && formulaireDossier.get('moyenTransport').dirty, 'is-valid': formulaireDossier.get('moyenTransport').valid}">
-            <div *ngIf="formulaireDossier.get('moyenTransport').invalid && formulaireDossier.get('moyenTransport').dirty" class="text-danger">
-              <div *ngIf="formulaireDossier.get('moyenTransport').errors.required">Le moyen de Transport est obligatoire</div>
+          <div class="col-md-6">
+            <div class="mb-3">
+              <label for="moyenDeplacement">Moyen de Transport</label>
+              <input type="text" class="form-control" placeholder="Veuillez entrer le moyen de Transport"
+                formControlName="moyenDeplacement" id="moyenDeplacement"
+                [ngClass]="{'is-invalid': formulaireDossier.get('moyenDeplacement')?.invalid && formulaireDossier.get('moyenDeplacement')?.dirty, 'is-valid': formulaireDossier.get('moyenDeplacement')?.valid}">
+              <div
+                *ngIf="formulaireDossier.get('moyenDeplacement')?.invalid && formulaireDossier.get('moyenDeplacement')?.dirty"
+                class="text-danger">
+                <div *ngIf="formulaireDossier.get('moyenDeplacement')?.errors?.['required']">Le moyen de Transport est
+                  obligatoire</div>
+              </div>
             </div>
           </div>
         </div>
 
-        <div class="col-md-12">
-          <div class="form-group mb-3">
-            <label >Objet</label>
-            <textarea type="text"
-                      class="form-control"
-                      formControlName="objet"
-                      rows="4"
-                      [ngClass]="{'is-invalid': formulaireDossier.get('objet').invalid && formulaireDossier.get('objet').dirty, 'is-valid': formulaireDossier.get('objet').valid}">
+        <div class="row">
+          <div class="col-md-6">
+            <div class="mb-3">
+              <div class="form-group mb-3">
+                <label>Objet</label>
+                <textarea type="text" class="form-control" formControlName="objet" rows="4"
+                  [ngClass]="{'is-invalid': formulaireDossier.get('objet')?.invalid && formulaireDossier.get('objet')?.dirty, 'is-valid': formulaireDossier.get('objet')?.valid}">
             </textarea>
-            <div *ngIf="formulaireDossier.get('objet').invalid && formulaireDossier.get('objet').dirty" class="text-danger">
-              <div *ngIf="formulaireDossier.get('objet').errors.required">L'objet est obligatoire</div>
+                <div *ngIf="formulaireDossier.get('objet')?.invalid && formulaireDossier.get('objet')?.dirty"
+                  class="text-danger">
+                  <div *ngIf="formulaireDossier.get('objet')?.errors?.['required']">L'objet est obligatoire</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+
+          <div class="col-md-6">
+            <div class="mb-3">
+              <div class="form-group mb-3">
+                <label for="pieces">Pieces</label>
+                <input type="file" class="form-control" (change)="uploaderFicher($event)" id="pieces"
+                  [ngClass]="!pieces ? 'invalid-input' : '.valid-input'">
+              </div>
             </div>
           </div>
         </div>
-
-
-
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-primary" [disabled]="formulaireDossier.invalid" type="submit">{{formulaireDossier.get('id').value ? 'Modifier': 'Créer'}}</button>
+        <button class="btn btn-primary" [disabled]="formulaireDossier.invalid"
+          type="submit">{{formulaireDossier.get('id')?.value ? 'Modifier': 'Créer'}}</button>
       </div>
     </form>
   </div>
@@ -582,7 +494,7 @@
           <div class="form-group mb-2 mt-3">
             <label for="rapport">Rapport</label>
             <input type="file" class="form-control" (change)="uploaderFicher($event)" id="rapport"
-                   [ngClass]="!file ? 'invalid-input' : '.valid-input'"
+                   [ngClass]="!pieces  ? 'invalid-input' : '.valid-input'"
             >
           </div>
         </div>
@@ -597,9 +509,9 @@
 </ng-template>
 
 
-<ng-template #contentPointage let-modal>
+<!-- <ng-template #contentPointage let-modal>
   <div class="modal-header">
-    <h4>{{formulairePointage.get('id').value ? 'Modifier': 'Créer'}}</h4>
+    <h4>{{formulairePointage.get('id')?.value ? 'Modifier': 'Créer'}}</h4>
     <button type="button" class="btn-close" aria-label="Close"
             (click)="modal.dismiss('Cliquer pour fermer')">
     </button>
@@ -613,9 +525,9 @@
           <div class="mb-3">
             <label for="date">Date</label>
             <input type="date" class="form-control" placeholder="Veuillez entrer ou sélectionner la date" formControlName="date" id="date"
-                   [ngClass]="{'is-invalid': formulairePointage.get('date').invalid && formulairePointage.get('date').dirty, 'is-valid': formulairePointage.get('date').valid}">
+                   [ngClass]="{'is-invalid': formulairePointage.get('date')?.invalid && formulairePointage.get('date').dirty, 'is-valid': formulairePointage.get('date').valid}">
             <div *ngIf="formulairePointage.get('date').invalid && formulairePointage.get('date').dirty" class="text-danger">
-              <div *ngIf="formulairePointage.get('date').errors.required">La date est obligatoire</div>
+              <div *ngIf="formulairePointage.get('date')?.errors?.['required']">La date est obligatoire</div>
             </div>
           </div>
         </div>
@@ -665,4 +577,4 @@
       </div>
     </form>
   </div>
-</ng-template>
+</ng-template> -->

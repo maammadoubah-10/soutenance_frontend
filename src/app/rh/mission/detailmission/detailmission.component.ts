@@ -25,6 +25,7 @@ import {catchError, map, startWith} from "rxjs/operators";
 import Swal from "sweetalert2";
 import {Facteur} from "../../models/facteur";
 import {FacteurService} from "../../services/facteur.service";
+import { UtilisateurService } from '../../../utilisateur/services/utilisateur.service';
 
 @Component({
   selector: 'app-detailmission',
@@ -33,12 +34,12 @@ import {FacteurService} from "../../services/facteur.service";
 })
 export class DetailmissionComponent implements OnInit {
 
-  items: Array<{}>;
+  items: any[] = [];
   dataStateEnum = DataStateEnum
-  state: DataStateEnum
-  mission$: Observable<ModelDataState<Mission | undefined>>;
-  pointages: Observable<ModelDataState<MissionPointage[] >>;
-  mission: Mission;
+  state?: DataStateEnum
+  mission$?: Observable<ModelDataState<Mission | undefined>>;
+  pointages?: Observable<ModelDataState<MissionPointage[] >>;
+  mission?: Mission;
   listePointage: MissionPointage[] = []
   listeDossierPage: Mission[] = [] //listePersonnelPage
   listeImputation: Imputation[] = []
@@ -48,42 +49,40 @@ export class DetailmissionComponent implements OnInit {
   listePersonnelMission: Personnel[] = []
   listeFacteur: Facteur[] = []
   listeTypeMission: TypeMission[] = []
-  public nom:string;
-  public matricule:string;
-  public prenom: string;
+  public nom:string = '';
+  public matricule:string = '';
+  public prenom: string = '';
   public searchValue: string = '';
   public loading:boolean=false;
-  public id:number;
-  public designation:string;
-  public reference:string;
-  public sigle:string;
-  file:File|undefined
-  formulaireDossier = new FormGroup({
-    id: new  FormControl(),
-    objet: new FormControl('', [Validators.required]),
-    accompagne: new FormControl(''),
-    conducteur: new FormControl(null),
-    personnels: new FormControl(),
-    dateDebut: new FormControl(new Date, [Validators.required]),
-    dateFin: new FormControl(new Date, [Validators.required]),
-    imputation: new FormControl(null, [Validators.required]),
-    missionnaireExternes: new FormControl(),
-    moyenTransport: new FormControl(''),
-    typeMission: new FormControl(null, [Validators.required]),
+  public id?:number;
+  public designation:string = '';
+  public reference:string = '';
+  public sigle:string = '';
+  pieces:File|undefined
+
+ formulaireDossier = new FormGroup({
+    id: new FormControl(),
+    dateDebut: new FormControl(new Date(), [Validators.required]),
+    nbreJour: new FormControl<number | null>(null, [Validators.required]), // Changer à number
+    objet: new FormControl(''),
+    personnelId: new FormControl<number | null>(null, [Validators.required]),
+    moyenDeplacement: new FormControl('', [Validators.required]), // Changer à string
   });
+
   formulairePointage = new FormGroup({
     id: new  FormControl(),
     date: new FormControl('', [Validators.required]),
-    facteur: new FormControl(null, [Validators.required]),
-    personnel: new FormControl(null,[Validators.required]),
+    facteur: new FormControl<string | null>(null, [Validators.required]),
+    personnel: new FormControl<string | null>(null,[Validators.required]),
     mission: new FormControl(),
   })
+
   totalDossier : number = 0;
   currentPage: number = 0;
   dossierPerPage: number = 10;
   sort: string = "desc";
   public pages: number[] = [];
-  totalPages: number;
+  totalPages: number = 0;
   hashids : any
   private id$: any;
   devisSbj = new BehaviorSubject(0); // remove tab
@@ -95,6 +94,7 @@ export class DetailmissionComponent implements OnInit {
               private missionnaireExterneService:MissionnaireExterneService,
               private imputationService:ImputationService,
               private personnelService:PersonnelService,
+              private utilisateurService:UtilisateurService,
               private router:Router,
               private toastService:ToastrService,
               private modalService:NgbModal) { }
@@ -103,7 +103,12 @@ export class DetailmissionComponent implements OnInit {
     this.hashids = new Hashids('mysecretkey');
     this.activatedRoute.paramMap.subscribe((params) => {
       const encodedId = params.get('id');
-      this.id$ = this.decodeId(encodedId);
+      if (encodedId) {
+        this.id$ = this.decodeId(encodedId);
+      } else {
+        // Handle the null case appropriately
+        this.id$ = null; // or some default value
+      }
     });
     this.items = [
       { label: 'Ressources Humaines' },
@@ -111,6 +116,10 @@ export class DetailmissionComponent implements OnInit {
       { label: 'Details', active: true },
     ];
     this.chargerIdMission(this.id$);
+
+        this.utilisateurService.personnelNonUtilisateur().subscribe(x => {
+      this.listePersonnel = x;
+    });
   }
 
   decodeId(encodedId: string) {
@@ -182,23 +191,26 @@ export class DetailmissionComponent implements OnInit {
     return startDate <= today && endDate >= today;
   }
 
-  chargerIdMission(id) {
+  chargerIdMission(id:number) {
     this.activatedRoute.params.subscribe((params) => {
       this.chargeInformationMission(id);
       this.chargerListePointageMission()
     });
   }
+  
   chargeInformationMission(id: number) {
     this.mission$ = this.dossierService.voirMission(id)
       .pipe(
-        map((response) => {
+        map((response:any) => {
           this.mission = response;
           this.listePersonnelMission = response.personnels
           this.listeMissionnaireExterneMission = response.missionnaireExternes
-          const startDate = new Date(this.mission.dateDebut); // Date de début de la mission
-          const endDate = new Date(this.mission.dateFin); // Date de fin de la mission
-          this.mission.isTodayBetweenDates = this.isTodayBetweenDates(startDate, endDate);
-          this.mission.duree = this.calculerDureeMission(startDate, endDate);
+          if (this.mission && this.mission.dateDebut && this.mission.dateFin) {
+            const startDate = new Date(this.mission.dateDebut);
+            const endDate = new Date(this.mission.dateFin);
+            this.mission.isTodayBetweenDates = this.isTodayBetweenDates(startDate, endDate);
+            this.mission.duree = this.calculerDureeMission(startDate, endDate);
+          }
           return { dataState: DataStateEnum.CHARGE, data: { ...response } };
         }),
         startWith({ dataState: DataStateEnum.CHARGEMENT })
@@ -243,92 +255,108 @@ export class DetailmissionComponent implements OnInit {
     Swal.fire(title, message, 'success');
   }
 
-  errormsg(title = 'Erreur !', message) {
+  errormsg(title = 'Erreur !', message:string) {
     Swal.fire(title, message, 'error');
   }
 
   openModal(content: any, dossier: Mission | undefined = undefined) {
     if (dossier) {
       this.formulaireDossier.patchValue(dossier as any);
-      this.formulaireDossier.get('conducteur').setValue(dossier?.conducteur?.prenom + ' ' + dossier?.conducteur?.nom);
-      this.formulaireDossier.get('personnels').setValue(
-        this.formulaireDossier.get('personnels').value.map(personnel => personnel?.prenom + ' ' + personnel?.nom)
-      );
-      this.formulaireDossier.get('imputation').setValue(dossier?.imputation?.nom);
-      this.formulaireDossier.get('missionnaireExternes').setValue(
-        this.formulaireDossier.get('missionnaireExternes').value.map(missionnaireExterne =>
-          missionnaireExterne?.prenom + ' ' + missionnaireExterne?.nom
-        )
-      );
-      this.formulaireDossier.get('typeMission').setValue(dossier?.typeMission?.nom);
     } else {
       this.formulaireDossier.reset();
-      this.formulaireDossier.get('conducteur').setValue(null);
-      this.formulaireDossier.get('imputation').setValue(null);
-      this.formulaireDossier.get('typeMission').setValue(null);
     }
     this.modalService.open(content, { size: 'lg', centered: true });
   }
 
   creerModifierMission() {
     if (this.formulaireDossier.valid) {
-      if (this.formulaireDossier.get('id').value) {
-        this.dossierService.modifierMission(this.formulaireDossier.get("id").value, this.formulaireDossier.value)
-          .subscribe(
-            (response) => {
-              this.listeDossierPage.map(e => {
-                if (e.id == response["data"].id) {
-                  e.objet = response["data"].objet;
-                  e.accompagne = response["data"].accompagne;
-                  e.conducteur = response["data"].conducteur;
-                  e.personnels = response["data"].personnels;
-                  e.dateDebut = response["data"].dateDebut;
-                  e.dateFin = response["data"].dateFin;
-                  e.imputation = response["data"].imputation;
-                  e.missionnaireExternes = response["data"].missionnaireExternes;
-                  e.moyenTransport = response["data"].moyenTransport;
-                  e.typeMission = response["data"].typeMission;
+      const formData = new FormData();
+
+      // Ajouter tous les champs du formulaire
+      this.appendFormControlToFormData(formData, 'dateDebut', 'dateDebut');
+      this.appendFormControlToFormData(formData, 'nbreJour', 'nbreJour');
+      this.appendFormControlToFormData(formData, 'objet', 'objet');
+      this.appendFormControlToFormData(formData, 'personnelId', 'personnelId');
+      this.appendFormControlToFormData(formData, 'moyenDeplacement', 'moyenDeplacement');
+
+      // Ajouter le fichier si présent
+      if (this.pieces) {
+        formData.append('pieces', this.pieces);
+      }
+
+      // Vérifier si c'est une modification ou une création
+      const missionId = this.formulaireDossier.get('id')?.value;
+
+      if (missionId) {
+        // Modification
+        this.dossierService.modifierMission(this.formulaireDossier.get("id")?.value, formData).subscribe(
+           (response:any)=>{
+              this.listeDossierPage.map(e =>{
+                if (e.id == response["data"].id){
+                  e.dateDebut = response["data"].dateDebut
+                  e.nbreJour = response["data"].nbreJour
+                  e.objet = response["data"].objet
+                  e.personnel = response["data"].personnelId
+                  e.moyenDeplacement = response["data"].moyenDeplacement
                 }
                 return e;
-              });
-              this.modalService.dismissAll();
-              this.chargerIdMission(this.id$)
-              this.successmsg("Mission modifier", "La Mission a été modifié avec succès");
-              this.formulaireDossier.reset();
-            },
-            (error) => {
-              const errors = error.error.errors;
-              for (let i = 0; i < errors.length; i++) {
-                const currentError = errors[i];
-                this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
-              }
-            }
-          );
-      } else {
-        const personnels = this.formulaireDossier.get('personnels').value;
-        const missionnaireExternes = this.formulaireDossier.get('missionnaireExternes').value;
-        const formData = { ...this.formulaireDossier.value, personnels: personnels || [], missionnaireExternes: missionnaireExternes || [] };
-        this.dossierService.creerMission(formData).subscribe(
-          (response) => {
-            this.listeDossierPage.unshift(response['data']);
-            this.formulaireDossier.reset();
+            });
             this.modalService.dismissAll();
-            this.chargerIdMission(this.id$)
-            this.successmsg();
+            this.router.navigate(['/rh/missions/details/', this.encodeId(response.data?.id)]);
+            this.successmsg("Mission modifiée", "La mission a été modifiée avec succès");
+            this.formulaireDossier.reset();
           },
           (error) => {
-            const errors = error.error.errors;
-            for (let i = 0; i < errors.length; i++) {
-              const currentError = errors[i];
-              this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
-            }
+            this.handleError(error);
+          }
+        );
+      } else {
+        // Création
+        this.dossierService.creerMission(formData).subscribe(
+          (response: any) => {
+            this.listeDossierPage.unshift(response.data);
+            this.formulaireDossier.reset();
+            this.modalService.dismissAll();
+            this.chargerIdMission(this.id$);
+            this.successmsg("Mission créée", "La mission a été créée avec succès");
+          },
+          (error) => {
+            this.handleError(error);
           }
         );
       }
+    } else {
+      this.toastService.error('Veuillez remplir tous les champs obligatoires', 'Erreur!');
     }
   }
 
+    private handleError(error: any): void {
+    if (error.error?.errors) {
+      const errors = error.error.errors;
+      for (let i = 0; i < errors.length; i++) {
+        const currentError = errors[i];
+        this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
+      }
+    } else {
+      this.toastService.error(
+        error.error?.message || 'Erreur lors de l\'opération',
+        'Erreur!'
+      );
+    }
+  }
 
+  // Méthode utilitaire pour ajouter les champs au FormData
+  private appendFormControlToFormData(formData: FormData, fieldName: string, controlName: string): void {
+    const value = this.formulaireDossier.get(controlName)?.value;
+    if (value !== null && value !== undefined && value !== '') {
+      // Formater les dates correctement
+      if (value instanceof Date) {
+        formData.append(fieldName, value.toISOString().split('T')[0]);
+      } else {
+        formData.append(fieldName, value.toString());
+      }
+    }
+  }
 
   supprimerMission() {
     Swal.fire({
@@ -366,7 +394,7 @@ export class DetailmissionComponent implements OnInit {
 
   ajouterRapport(){
     const formData = new FormData(); //objet formdata
-    formData.append('file', this.file as File); //mettre le ifhcier dans le formulaire
+    formData.append('pieces', this.pieces as File); //mettre le ifhcier dans le formulaire
     this.dossierService.ajouterLeRapport(this.id, formData)
       .subscribe(
         (response)=>{
@@ -386,14 +414,38 @@ export class DetailmissionComponent implements OnInit {
 
   uploaderFicher($event: any) {
     if($event.target.files.length > 0){
-      this.file = $event.target.files[0];
+      this.pieces= $event.target.files[0];
     }
   }
 
 
-  telechargerRapportMission(mission: Mission) {
-    return `${this.dossierService.contextPath}/telecharger/` + mission?.rapport;
-  }
+  // telechargerRapportMission(mission: Mission) {
+  //   this.dossierService.telechargerappports(mission.id)
+  // }
+
+  //  telechargerRapport(mission:Mission) {
+  //   this.reference = mission.reference
+  //   Swal.fire({
+  //     title: 'Êtes-vous sûr ?',
+  //     text: 'Êtes-vous sûr de vouloir Télécharger la fiche  de la mission '+this.mission?.motif+' ? Il vous sera impossible de revenir en arrière !',
+  //     icon: 'warning',
+  //     showCancelButton: true,
+  //     confirmButtonColor: '#34c38f',
+  //     cancelButtonColor: '#f46a6a',
+  //     confirmButtonText: 'Oui, Télécharger les !',
+  //     cancelButtonText:  'Non, Annuler',
+  //   }).then((result) => {
+  //     if (result.isConfirmed) {
+  //       // this.showLoadingModalFrais(); // Afficher le modal de chargement
+  //       this.onDownloadFrais();
+  //     } else if (result.dismiss === Swal.DismissReason.cancel) {
+  //       // handle cancel action if necessary
+  //     }
+  //   }).catch((errors) => {
+  //     this.toastService.error(errors.message, 'Fiche Frais de mission non Télécharger');
+  //     this.errormsg('Fiche Frais de mission non Télécharger', errors.message);
+  //   });
+  // }
 
   showPopOnDownloadRapportMission() {
     this.successmsg(
@@ -436,17 +488,15 @@ export class DetailmissionComponent implements OnInit {
   openModalPiontage(content:any, missionPointage:MissionPointage | undefined = undefined){
     if (missionPointage){
       this.formulairePointage.patchValue(missionPointage as any)
-      this.formulairePointage.get('personnel').setValue(missionPointage?.personnel?.id.toString())
-      this.formulairePointage.get('facteur').setValue(missionPointage?.facteur?.nom?.toString())
+      this.formulairePointage.get('personnel')?.setValue(missionPointage?.personnel?.id.toString())
+      this.formulairePointage.get('facteur')?.setValue(missionPointage?.facteur?.nom?.toString())
     }else{
       this.formulairePointage.reset()
-      this.formulairePointage.get('mission').setValue(this.id$)
+      this.formulairePointage.get('mission')?.setValue(this.id$)
     }
     this.modalService.open(content)
 
   }
-
-
 
   pointerPersonnelMission() {
     Swal.fire({
@@ -460,7 +510,7 @@ export class DetailmissionComponent implements OnInit {
       cancelButtonText:  'Non, Annuler',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.creeModifierPointage();
+        //this.creeModifierPointage();
       } else if (result.dismiss === Swal.DismissReason.cancel) {
         // handle cancel action if necessary
       }
@@ -468,64 +518,64 @@ export class DetailmissionComponent implements OnInit {
     });
   }
 
-  creeModifierPointage() {
-    if (this.formulairePointage.valid) {
-      const datePointage = new Date(this.formulairePointage.get('date').value);
-      const dateDebutMission = new Date(this.mission.dateDebut);
-      const dateFinMission = new Date(this.mission.dateFin);
+  // creeModifierPointage() {
+  //   if (this.formulairePointage.valid) {
+  //     const datePointage = new Date(this.formulairePointage.get('date')?.value);
+  //     const dateDebutMission = new Date(this.mission.dateDebut);
+  //     const dateFinMission = new Date(this.mission.dateFin);
 
-      if (datePointage >= dateDebutMission && datePointage <= dateFinMission) {
-        // La date de pointage est valide, vous pouvez enregistrer le pointage
-        if (this.formulairePointage.get('id').value) {
-          this.missionPointageService.modifierMissionPointage(this.formulairePointage.get('id').value, this.formulairePointage.value)
-            .subscribe(
-              (response) => {
-                this.listePointage.map((e) => {
-                  if (e.id == response['data'].id) {
-                    e.date = response['data'].date;
-                    e.personnel = response['data'].personnel;
-                    e.facteur = response['data'].facteur;
-                  }
-                  return e;
-                });
-                this.modalService.dismissAll();
-                this.chargerIdMission(this.id$);
-                this.successmsg('Pointage modifié', 'Le Pointage a été modifié avec succès');
-                this.formulairePointage.reset();
-              },
-              (error) => {
-                const errors = error.error.errors;
-                for (let i = 0; i < errors.length; i++) {
-                  const currentError = errors[i];
-                  this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
-                }
-              }
-            );
-        } else {
-          this.missionPointageService.creerMissionPointage(this.formulairePointage.value)
-            .subscribe(
-              (response) => {
-                this.listePointage.unshift(response['data']);
-                this.formulairePointage.reset();
-                this.modalService.dismissAll();
-                this.chargerIdMission(this.id$);
-                this.successmsg('Pointage personnel mission réussi', 'Le personnel a été pointé avec succès à cette mission');
-              },
-              (error) => {
-                const errors = error.error.errors;
-                for (let i = 0; i < errors.length; i++) {
-                  const currentError = errors[i];
-                  this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
-                }
-              }
-            );
-        }
-      } else {
-        // La date de pointage est invalide, affichez un message d'erreur
-        this.toastService.error('La date de pointage est en dehors de la période de la mission', 'Erreur!');
-      }
-    }
-  }
+  //     if (datePointage >= dateDebutMission && datePointage <= dateFinMission) {
+  //       // La date de pointage est valide, vous pouvez enregistrer le pointage
+  //       if (this.formulairePointage.get('id')?.value) {
+  //         this.missionPointageService.modifierMissionPointage(this.formulairePointage.get('id')?.value, this.formulairePointage.value)
+  //           .subscribe(
+  //             (response:any) => {
+  //               this.listePointage.map((e) => {
+  //                 if (e.id == response['data'].id) {
+  //                   e.date = response['data'].date;
+  //                   e.personnel = response['data'].personnel;
+  //                   e.facteur = response['data'].facteur;
+  //                 }
+  //                 return e;
+  //               });
+  //               this.modalService.dismissAll();
+  //               this.chargerIdMission(this.id$);
+  //               this.successmsg('Pointage modifié', 'Le Pointage a été modifié avec succès');
+  //               this.formulairePointage.reset();
+  //             },
+  //             (error) => {
+  //               const errors = error.error.errors;
+  //               for (let i = 0; i < errors.length; i++) {
+  //                 const currentError = errors[i];
+  //                 this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
+  //               }
+  //             }
+  //           );
+  //       } else {
+  //         this.missionPointageService.creerMissionPointage(this.formulairePointage.value)
+  //           .subscribe(
+  //             (response:any) => {
+  //               this.listePointage.unshift(response['data']);
+  //               this.formulairePointage.reset();
+  //               this.modalService.dismissAll();
+  //               this.chargerIdMission(this.id$);
+  //               this.successmsg('Pointage personnel mission réussi', 'Le personnel a été pointé avec succès à cette mission');
+  //             },
+  //             (error) => {
+  //               const errors = error.error.errors;
+  //               for (let i = 0; i < errors.length; i++) {
+  //                 const currentError = errors[i];
+  //                 this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
+  //               }
+  //             }
+  //           );
+  //       }
+  //     } else {
+  //       // La date de pointage est invalide, affichez un message d'erreur
+  //       this.toastService.error('La date de pointage est en dehors de la période de la mission', 'Erreur!');
+  //     }
+  //   }
+  // }
 
 
   supprimerPiontage(id: number) {
@@ -584,7 +634,7 @@ export class DetailmissionComponent implements OnInit {
 
   onDownloadEtat(): void {
     this.dossierService.genererEtatDePaiement(this.id$).subscribe(
-      (data) => {
+      (data:any) => {
         const currentDate = new Date();
         const fileName = `etat_de_paiement_de_la_mission_${this.reference}_${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}_${currentDate.getHours()}-${currentDate.getMinutes()}-${currentDate.getSeconds()}.pdf`;
         const blob = new Blob([data], { type: 'application/pdf' });
@@ -605,12 +655,11 @@ export class DetailmissionComponent implements OnInit {
     );
   }
 
-
   telechargerFrais(mission:Mission) {
     this.reference = mission.reference
     Swal.fire({
       title: 'Êtes-vous sûr ?',
-      text: 'Êtes-vous sûr de vouloir Télécharger la fiche des frais de la mission '+this.reference+' ? Il vous sera impossible de revenir en arrière !',
+      text: 'Êtes-vous sûr de vouloir Télécharger la fiche  de la mission '+this.mission?.motif+' ? Il vous sera impossible de revenir en arrière !',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#34c38f',
@@ -631,32 +680,62 @@ export class DetailmissionComponent implements OnInit {
   }
 
 
-  onDownloadFrais(): void {
-        this.loading = true; // Afficher l'indicateur de chargement
+onDownloadFrais(): void {
+    this.loading = true; // Afficher l'indicateur de chargement
 
     this.dossierService.telechargerFraisMission(this.id$).subscribe(
-      (data) => {
+      (data: any) => {
+        // Créer un blob à partir des données reçues
         const blob = new Blob([data], { type: 'application/pdf' });
-        this.loading = false; // Fermer l'indicateur de chargement une fois la requête terminée
-        this.hideLoadingModal(); // Cacher le modal de chargement
-        this.successmsg('Télécharger frais de mission réussie', 'Les frais de la mission '+this.reference+' ont été et télécharger avec succès, veillez svp vérifier dans votre dossiers téléchargement pour les retrouver');
+        
+        // Créer un URL pour le blob
+        const url = window.URL.createObjectURL(blob);
+        
+        // Créer un lien invisible
+        const link = document.createElement('a');
+        link.href = url;
+        
+        // Nommer le fichier avec la référence de la mission
+        link.download = `fiche-frais-mission-${this.reference}.pdf`;
+        
+        // Simuler un clic sur le lien
+        link.click();
+        
+        // Nettoyer l'URL
+        window.URL.revokeObjectURL(url);
+        
+        // Fermer l'indicateur de chargement
+        this.loading = false;
+        this.hideLoadingModal();
+        
+        // Message de succès
+        this.successmsg(
+          'Téléchargement réussi', 
+          'La fiche de frais de mission ' + this.reference + ' a été téléchargée avec succès. Veuillez vérifier dans votre dossier de téléchargements.'
+        );
       },
       (error) => {
-        const errors = error.error.errors;
-        for (let i = 0; i < errors.length; i++) {
-          const currentError = errors[i];
-          this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
+        this.loading = false;
+        this.hideLoadingModal();
+        
+        if (error.error?.errors) {
+          const errors = error.error.errors;
+          for (let i = 0; i < errors.length; i++) {
+            const currentError = errors[i];
+            this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
+          }
+        } else {
+          this.toastService.error('Erreur lors du téléchargement', 'Erreur!');
         }
       }
-    )
-  }
-
+    );
+}
 
   telechargerOrdre(mission:Mission) {
     this.reference = mission.reference
     Swal.fire({
       title: 'Êtes-vous sûr ?',
-      text: 'Êtes-vous sûr de vouloir Télécharger les ordres de la mission '+this.reference+' ? Il vous sera impossible de revenir en arrière !',
+      text: 'Êtes-vous sûr de vouloir Télécharger l attestation e la mission '+this.reference+' ? Il vous sera impossible de revenir en arrière !',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#34c38f',
@@ -676,12 +755,11 @@ export class DetailmissionComponent implements OnInit {
     });
   }
 
-
   onDownloadOrdre(): void {
         this.loading = true; // Afficher l'indicateur de chargement
 
     this.dossierService.telechargerOrdreMission(this.id$).subscribe(
-      (data) => {
+      (data:any) => {
         const blob = new Blob([data], { type: 'application/pdf' });
         this.loading = false; // Fermer l'indicateur de chargement une fois la requête terminée
         this.hideLoadingModal(); // Cacher le modal de chargement
@@ -708,7 +786,6 @@ export class DetailmissionComponent implements OnInit {
     });
   }
 
-
   showLoadingModalOrdre() {
     Swal.fire({
       title: 'Génération et Téléchargement en cours',
@@ -724,6 +801,5 @@ export class DetailmissionComponent implements OnInit {
   hideLoadingModal() {
     Swal.close();
   }
-
 
 }

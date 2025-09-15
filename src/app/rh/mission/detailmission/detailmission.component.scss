@@ -12,3 +12,83 @@
 .btn-darkblue:hover {
   background-color: #08306b; /* Encore plus foncé au survol */
 }
+
+.mission-details {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.action-sidebar .btn {
+  border-radius: 6px;
+  text-align: left;
+  padding: 0.75rem 1rem;
+  transition: all 0.2s ease;
+}
+
+.action-sidebar .btn:hover {
+  transform: translateX(5px);
+}
+
+.mission-card {
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+.info-item {
+  padding: 0.5rem 0;
+}
+
+.section-title {
+  position: relative;
+  padding-bottom: 0.5rem;
+  margin-bottom: 1.5rem;
+  color: #3b5de7;
+}
+
+.section-title::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 50px;
+  height: 3px;
+  background-color: #3b5de7;
+  border-radius: 3px;
+}
+
+.personnel-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.personnel-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+.objet-content {
+  border-left: 4px solid #3b5de7;
+}
+
+.avatar-lg {
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatar-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-weight: 600;
+}
+
+.badge {
+  font-size: 0.8rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 20px;
+}

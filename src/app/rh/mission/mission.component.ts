@@ -258,15 +258,15 @@ export class MissionComponent implements OnInit {
     return pages;
   }
 
-  // encodeId(id: number) {
-  //   return this.hashids.encode(id);
-  // }
-  encodeId(id: number | undefined): string {
-    if (id === undefined || id === null) {
-      return this.hashids.encode(0); // ou une valeur par défaut
-    }
+  encodeId(id: number) {
     return this.hashids.encode(id);
   }
+  // encodeId(id: number | undefined): string {
+  //   if (id === undefined || id === null) {
+  //     return this.hashids.encode(0); // ou une valeur par défaut
+  //   }
+  //   return this.hashids.encode(id);
+  // }
 
 
   openModal(content: any, dossier: Mission | undefined = undefined) {
@@ -304,16 +304,20 @@ export class MissionComponent implements OnInit {
 
       if (missionId) {
         // Modification
-        this.dossierService.modifierMission(missionId, formData).subscribe(
-          (response: any) => {
-            this.listeDossierPage = this.listeDossierPage.map(e => {
-              if (e.id == response.data.id) {
-                return { ...e, ...response.data };
-              }
-              return e;
+        this.dossierService.modifierMission(this.formulaireDossier.get("id")?.value, formData).subscribe(
+           (response:any)=>{
+              this.listeDossierPage.map(e =>{
+                if (e.id == response["data"]?.id){
+                  e.dateDebut = response["data"].dateDebut
+                  e.nbreJour = response["data"].nbreJour
+                  e.objet = response["data"].objet
+                  e.personnel = response["data"].personnelId
+                  e.moyenDeplacement = response["data"].moyenDeplacement
+                }
+                return e;
             });
             this.modalService.dismissAll();
-            this.router.navigate(['/rh/missions/details/', this.encodeId(response.data.id)]);
+            this.router.navigate(['/rh/missions/details/', this.encodeId(response?.id)]);
             this.successmsg("Mission modifiée", "La mission a été modifiée avec succès");
             this.formulaireDossier.reset();
           },

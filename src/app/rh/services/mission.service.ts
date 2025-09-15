@@ -34,11 +34,11 @@ export class MissionService {
   //   return this.httpClient.get<Mission>(url, { observe: 'response' });
   // }
   //
-  // public listerPointageParMissionPage(id:number, page: number, size: number, sort: string): Observable<MissionPointage> {
-  //   const url = `${this.contextPath}/${id}/missionpointages?page=${page}&size=${size}&sort=${sort}`;
-  //   // @ts-ignore
-  //   return this.httpClient.get<MissionPointage>(url, { observe: 'response' });
-  // }
+  public listerPointageParMissionPage(id:number, page: number, size: number, sort: string): Observable<MissionPointage> {
+    const url = `${this.contextPath}/${id}/missionpointages?page=${page}&size=${size}&sort=${sort}`;
+    // @ts-ignore
+    return this.httpClient.get<MissionPointage>(url, { observe: 'response' });
+  }
   //
   // public creerMission(data: any): Observable<Mission> {
   //   return this.httpClient.post<Mission>(
@@ -62,23 +62,29 @@ export class MissionService {
   //   return this.httpClient.delete<any>(this.contextPath + "/" + id);
   // }
   //
-  // genererEtatDePaiement(id:number): Observable<any> {
-  //   const url = `${this.contextPath+'/'+id+'/generation-etat-paiement'}`;
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/pdf' });
-  //   return this.httpClient.get(url, { responseType: 'arraybuffer', headers: headers });
-  // }
+  genererEtatDePaiement(id:number): Observable<any> {
+    const url = `${this.contextPath+'/'+id+'/generation-etat-paiement'}`;
+    const headers = new HttpHeaders({ 'Content-Type': 'application/pdf' });
+    return this.httpClient.get(url, { responseType: 'arraybuffer', headers: headers });
+  }
+  
+  telechargerFraisMission(id:number): Observable<any> {
+    const url = `${this.contextPath+'/'+id+'/telecharger'}`;
+    const headers = new HttpHeaders({ 'Content-Type': 'application/pdf' });
+    return this.httpClient.get(url, { responseType: 'arraybuffer', headers: headers });
+  }
+
+   telechargerappports(id:number): Observable<any> {
+    const url = `${this.contextPath+'/'+id+'/telecharger'}`;
+    const headers = new HttpHeaders({ 'Content-Type': 'application/pdf' });
+    return this.httpClient.get(url, { responseType: 'arraybuffer', headers: headers });
+  }
   //
-  // telechargerFraisMission(id:number): Observable<any> {
-  //   const url = `${this.contextPath+'/'+id+'/telechargerfrais'}`;
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/pdf' });
-  //   return this.httpClient.get(url, { responseType: 'arraybuffer', headers: headers });
-  // }
-  //
-  // telechargerOrdreMission(id:number): Observable<any> {
-  //   const url = `${this.contextPath+'/'+id+'/telechargerordre'}`;
-  //   const headers = new HttpHeaders({ 'Content-Type': 'application/pdf' });
-  //   return this.httpClient.get(url, { responseType: 'arraybuffer', headers: headers });
-  // }
+  telechargerOrdreMission(id:number): Observable<any> {
+    const url = `${this.contextPath+'/'+id+'/telechargerMission'}`;
+    const headers = new HttpHeaders({ 'Content-Type': 'application/pdf' });
+    return this.httpClient.get(url, { responseType: 'arraybuffer', headers: headers });
+  }
 
 
   public voirMission(id:number,){

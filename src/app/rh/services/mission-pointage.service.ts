@@ -41,5 +41,16 @@ export class MissionPointageService {
     return this.httpClient.delete<any>(this.contextPath + "/" + id);
   }
 
+  genererEtatDePaiement(id:number): Observable<any> {
+    const url = `${this.contextPath+'/'+id+'/generation-etat-paiement'}`;
+    const headers = new HttpHeaders({ 'Content-Type': 'application/pdf' });
+    return this.httpClient.get(url, { responseType: 'arraybuffer', headers: headers });
+  }
+
+  telechargerFraisMission(id:number): Observable<any> {
+    const url = `${this.contextPath+'/'+id+'/telechargerfrais'}`;
+    const headers = new HttpHeaders({ 'Content-Type': 'application/pdf' });
+    return this.httpClient.get(url, { responseType: 'arraybuffer', headers: headers });
+  }
 
 }

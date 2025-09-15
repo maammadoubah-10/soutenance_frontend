@@ -12,3 +12,54 @@
 .btn-darkblue:hover {
   background-color: #08306b; /* Encore plus foncé au survol */
 }
+
+ @import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');
+  
+  .search-icon {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    color: #6c757d;
+  }
+  
+  .mission-list .mission-item {
+    transition: all 0.3s ease;
+  }
+  
+  .mission-list .mission-item:hover {
+    background-color: #f8f9fa;
+    transform: translateX(5px);
+  }
+  
+  .mission-link:hover {
+    color: #0d6efd !important;
+    text-decoration: underline !important;
+  }
+  
+  .file-upload-container {
+    position: relative;
+  }
+  
+  .empty-state {
+    opacity: 0.7;
+    transition: opacity 0.3s;
+  }
+  
+  .empty-state:hover {
+    opacity: 1;
+  }
+  
+  .page-item.active .page-link {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+  }
+  
+  .btn-rounded {
+    border-radius: 50px;
+  }
+  
+  .form-control.ps-5 {
+    padding-left: 2.5rem !important;
+  }

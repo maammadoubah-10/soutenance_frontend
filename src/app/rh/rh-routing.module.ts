@@ -11,6 +11,7 @@ import { ContratComponent } from './contrat/contrat.component';
 import { IndiceComponent } from './indice/indice.component';
 import { DemandeComponent } from './demande/demande.component';
 import { MissionComponent } from './mission/mission.component';
+import { DetailmissionComponent } from './mission/detailmission/detailmission.component';
 
 const routes: Routes = [{ path: '', component: RhComponent },
    {
@@ -36,6 +37,9 @@ const routes: Routes = [{ path: '', component: RhComponent },
      { path: 'indices', component: IndiceComponent },
      { path: 'demandes', component: DemandeComponent },
      { path: 'missions', component: MissionComponent },
+     { path:'missions/details/:id',component: DetailmissionComponent},
+      
+        
 
     ]
   }

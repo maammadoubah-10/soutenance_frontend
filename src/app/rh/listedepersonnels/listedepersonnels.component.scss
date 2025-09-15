@@ -12,3 +12,177 @@
 .btn-darkblue:hover {
   background-color: #08306b; /* Encore plus foncé au survol */
 }
+
+
+
+/* Styles pour les cartes de personnel */
+.personnel-card {
+  transition: all 0.3s ease;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1.5rem;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.personnel-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.personnel-card .card-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.personnel-card .avatar-md {
+  width: 70px;
+  height: 70px;
+  margin: 0 auto 1rem;
+}
+
+.personnel-card .avatar-title {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 1.25rem;
+  background-color: rgba(2, 13, 68, 0.1);
+  // color: #04045f !important;
+}
+
+.personnel-card h5 {
+  font-weight: 600;
+  color: #343a40;
+  margin-bottom: 0.5rem;
+}
+
+.personnel-card h4 {
+  color: #6c757d;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+/* Badges d'état */
+.badge-soft-success {
+  background-color: rgba(52, 195, 143, 0.15);
+  color: #34c38f;
+}
+
+.badge-soft-warning {
+  background-color: rgba(241, 180, 76, 0.15);
+  color: #f1b44c;
+}
+
+.badge-soft-danger {
+  background-color: rgba(244, 106, 106, 0.15);
+  color: #f46a6a;
+}
+
+.badge-soft-secondary {
+  background-color: rgba(116, 120, 141, 0.15);
+  color: #74788d;
+}
+
+/* Actions en bas de carte */
+.personnel-card-actions {
+  margin-top: auto;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid #f6f6f6;
+}
+
+.view-profile-btn {
+  flex: 2;
+  background-color: #556ee6;
+  border-color: #556ee6;
+  color: white;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.view-profile-btn:hover {
+  background-color: #485ec4;
+  border-color: #485ec4;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.delete-btn {
+  flex: 1;
+  border-radius: 6px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.delete-btn:hover {
+  background-color: #f46a6a;
+  color: white;
+  transform: translateY(-2px);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1199.98px) {
+  .personnel-card-actions {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .personnel-card {
+    margin-bottom: 1rem;
+  }
+  
+  .personnel-card-actions {
+    flex-direction: row;
+  }
+}
+
+/* Pagination améliorée */
+.btn-primary {
+  background-color: #556ee6;
+  border-color: #556ee6;
+}
+
+.btn-primary:disabled {
+  background-color: #a0a9d4;
+  border-color: #a0a9d4;
+}
+
+.btn-primary:not(:disabled):hover {
+  background-color: #485ec4;
+  border-color: #485ec4;
+}
+
+/* Styles pour les états de chargement et d'erreur */
+.alert {
+  border-radius: 8px;
+  border: none;
+}
+
+.alert-info {
+  background-color: rgba(85, 110, 230, 0.1);
+  color: #556ee6;
+}
+
+.alert-danger {
+  background-color: rgba(244, 106, 106, 0.1);
+  color: #f46a6a;
+}
+
+/* Barre de recherche */
+.form-control {
+  border-radius: 6px;
+  border: 1px solid #e9ecef;
+  padding: 0.75rem 1rem;
+}
+
+.form-control:focus {
+  border-color: #556ee6;
+  box-shadow: 0 0 0 0.15rem rgba(85, 110, 230, 0.25);
+}
