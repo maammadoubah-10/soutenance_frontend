@@ -1,320 +1,243 @@
 <div id="layout-wrapper">
-  <app-entetedepage (settingsButtonClicked)="onSettingsButtonClicked()"
+  <app-entetedepage
+    (settingsButtonClicked)="onSettingsButtonClicked()"
     (mobileMenuButtonClicked)="onToggleMobileMenu()">
   </app-entetedepage>
 
   <div class="main">
     <div class="page-content">
-      <!-- content -->
       <div class="container-fluid">
 
-        <div class="background-image">
-          <p style="font-family: 'Times New Roman'; font-size: 50px">Espace de travail</p>
-        </div>
+        <!-- HERO PARALLAX -->
+        <section class="hero-landing">
+<div class="hero-bg" [style.background-image]="'url(/assets/home/hero.jpg)'"></div>
+          <div class="hero-overlay"></div>
+          <div class="hero-content container">
+            <div class="row align-items-center g-4">
+              <div class="col-12 col-lg-7">
+                <div class="glass p-4 p-lg-5">
+                  <p class="text-uppercase fw-bold text-primary-300 mb-2">{{ greeting }}</p>
+                  <h1 class="display-6 display-lg-5 text-white mb-2">
+                    Bienvenue, {{ utilisateurAuthentifie?.personnel?.etatCivil?.prenom }} !
+                  </h1>
+                  <p class="lead text-white-75 mb-4">
+                    Votre espace de travail – RH, Paie, Formation, Utilisateurs – tout en un.
+                  </p>
 
-        <div class="img">
-        <div class="card" style="margin-top: 10px" >
-          <div class="card-body" style="background-color: #04163d">
-            <div class="row">
-              <div class="col-lg-4">
-                <div class="media">
-                  <div class="me-3">
-                    <img *ngIf="profilSrc"  [src]="profilSrc" alt="" class="avatar-md rounded-circle img-thumbnail">
-
-                    <span *ngIf="!profilSrc"  class="avatar-user-profil-title rounded-circle bg-danger text-white font-size-24 avatar-user-profil avatar-md">
-                      {{utilisateurAuthentifie?.personnel?.etatCivil?.prenom[0] + utilisateurAuthentifie?.personnel?.etatCivil?.prenom[1]}}
-                     </span>
-
+                  <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
+                    <span class="badge bg-white text-primary fw-semibold" *ngIf="utilisateurAuthentifie?.personnel?.posteGeneral?.poste?.designation">
+                      <i class="bx bx-briefcase me-1"></i>
+                      {{ utilisateurAuthentifie?.personnel?.posteGeneral?.poste?.designation }}
+                    </span>
+                    <span class="badge bg-white text-primary fw-semibold" *ngFor="let role of utilisateurAuthentifie?.role">
+                      <i class="bx bx-shield-quarter me-1"></i>{{ role?.nom }}
+                    </span>
                   </div>
-                  <div  class="media-body align-self-center">
-                    <div class="text-muted">
-                      <p class="mb-2 text-white">Bienvenu sur votre espace de travail!</p>
-                      <h5 class="mb-1 text-white">{{utilisateurAuthentifie?.personnel?.etatCivil?.prenom }} {{utilisateurAuthentifie?.personnel?.nom }} </h5>
-                      <div *ngIf="utilisateurAuthentifie">
-                        <p *ngFor="let role of utilisateurAuthentifie.role" class="mb-0 text-white">{{role.nom}}</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div  class="line"></div>
-                </div>
-              </div>
 
-              <div class="col-lg-4 align-self-center">
-                <div class="text-lg-center mt-4 mt-lg-0">
-                  <div class="row">
-                    <div class="col-6">
-                      <div *ngIf="utilisateurAuthentifie?.personnel?.poste!=null">
-                        <p class="text-white mb-2 "><img style="height: 20px" class="mx-2" src="../../assets/Icon metro-profile.png">Poste occupé</p>
-                        <h5 class="mb-0 text-white">{{utilisateurAuthentifie?.personnel?.posteGeneral?.poste.designation}}</h5>
-                      </div>
-                    </div>
-                    <div class="col-6" >
-                      <div >
-                        <p class="text-white mb-2">Dernière connexion</p>
-                        <h5 class="mb-0 text-white">{{utilisateurAuthentifie?.dernierConnexion | date:'dd MMMM yyyy à HH:mm:ss' :'':'fr-FR'}}</h5>
-                      </div>
-                    </div>
+                  <div class="d-flex flex-wrap gap-2">
+                    <a class="btn btn-primary btn-lg shadow" routerLink="/rh">
+                      <i class="bx bx-id-card me-1"></i> Ressources Humaines
+                    </a>
+                    <a class="btn btn-outline-light btn-lg" routerLink="/marchepublic">
+                      <i class="bx bx-wallet me-1"></i> Paie
+                    </a>
                   </div>
                 </div>
               </div>
 
-              <div class="col-lg-4 parame d-none d-lg-block">
-                <div class="clearfix  mt-4 mt-lg-0">
-                  <div class="dropdownr float-end" ngbDropdown>
-                    <button class="btn text-black btn-light dropdown-toggle" type="button" data-toggle="dropdown"
-                      aria-haspopup="true" aria-expanded="false" ngbDropdownToggle>
-                      <i class="bx bxs-cog align-middle mr-1"></i>
-                    </button>
-                    <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
-                      <a class="dropdown-item" routerLink="/moncompte/profil"><i
-                        class="bx bx-user font-size-16 align-middle me-1"></i>
-                        Profil </a>
-                      <a class="dropdown-item" ><i
-                        class="bx bx-key font-size-16 align-middle me-1"></i>
-                        Changer le Mot de Passe </a>
-                      <a class="dropdown-item d-block" routerLink="/moncompte/parametre">
-                        <i
-                        class="bx bx-wrench font-size-16 align-middle me-1"></i>
-                        Paramètres </a>
-                      <a class="dropdown-item" routerLink="/moncompte/historique"><i
-                        class="bx bx-lock-open font-size-16 align-middle me-1"></i>
-                        Historique </a>
-                      <div class="dropdown-divider"></div>
-                      <a class="dropdown-item text-danger" (click)="deconnexion()"><i
-                        class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i>
-                        Déconnexion</a>
+              <div class="col-12 col-lg-5">
+                <div class="hero-card grid-tiles">
+                  <div class="tile" *ngFor="let s of heroStats">
+                    <div class="tile-icon"><i [class]="s.icon"></i></div>
+                    <div class="tile-body">
+                      <span class="tile-label">{{ s.label }}</span>
+                      <div class="tile-value">{{ s.value }}</div>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- carrousel d’annonces -->
+            <div class="row mt-4">
+              <div class="col-12">
+                <div class="announcements glass">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bx bx-bell-ring fs-4 text-white-75"></i>
+                    <h3 class="h6 text-white mb-0">Annonces</h3>
+                  </div>
+
+                  <ngb-carousel *ngIf="annonces?.length" [interval]="6000" [pauseOnHover]="true" [wrap]="true">
+                    <ng-template ngbSlide *ngFor="let a of annonces; let i = index" id="{{'slide-'+i}}">
+                      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
+                        <div class="text-white-75">
+                          <strong class="text-white me-2">{{ a.title }}</strong> — {{ a.text }}
+                        </div>
+                      <a *ngIf="a.cta" class="btn btn-sm btn-outline-light" [routerLink]="a.cta!.route">
+  {{ a.cta!.label }} <i class="bx bx-right-arrow-alt ms-1"></i>
+</a>
+
+                      </div>
+                    </ng-template>
+                  </ngb-carousel>
                 </div>
               </div>
             </div>
 
           </div>
-        </div>
+        </section>
 
+        <!-- ACCÈS RAPIDES -->
+        <section class="container mt-4">
+          <h2 class="section-title text-primary mb-3">Accès rapides</h2>
+          <div class="row g-3">
+            <div class="col-6 col-sm-4 col-lg-3 col-xxl-2" *ngFor="let link of quickLinks">
+              <a [routerLink]="link.route" class="quick-link card border-0 h-100">
+                <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
+                  <div class="quick-link-icon">
+                    <i [class]="link.icon"></i>
+                  </div>
+                  <div class="quick-link-label text-center">
+                    {{ link.label }}
+                  </div>
+                </div>
+              </a>
+            </div>
+          </div>
+        </section>
 
-          <div class="card" style="margin-top: 30px;">
-            <div class="card-body" style="background-color: #FFF; height: 50px; border-radius: 10px;">
-              <div class="row" *ngIf="isHolidayToday">
-                <marquee behavior="scroll" direction="left">
-                <p class="justify-content-center">🎉 Aujourd'hui est un jour férié ! 🎉 ... Bonne fête ! 🎈</p>
-                </marquee>
-              </div>
-              <div class="row" *ngIf="isHolidayTomorrow">
-                <marquee behavior="scroll" direction="left">
-                <p class="justify-content-center">Demain est un jour férié ! ... Bonne fête anticipée ! 🎉 ... {{ holidayNameTomorrow }}</p>
-                </marquee>
-              </div>
-              <div class="row" *ngIf="isNextDayHoliday">
-                <marquee behavior="scroll" direction="left">
-                <p class="justify-content-center">Le jour suivant est un jour férié ! ... Profitez de votre journée de repos ! 🎉 ... {{ holidayNameNextDay }}</p>
-                </marquee>
-              </div>
-              <div class="row" *ngIf="isRegularDay">
-                <marquee behavior="scroll" direction="left">
-                <p class="justify-content-center">Il n'y a pas de jour férié prévu. ... {{ motivationMessage }}</p>
-                </marquee>
+        <!-- BANDE KPI -->
+        <section class="kpi-band mt-4">
+          <div class="container">
+            <div class="row g-3">
+              <div class="col-6 col-md-3" *ngFor="let k of kpis">
+                <div class="kpi-item">
+                  <div class="kpi-value">{{ k.value }}</div>
+                  <div class="kpi-label">{{ k.label }}</div>
+                </div>
               </div>
             </div>
           </div>
+        </section>
 
-
-
-
-
-
-          <div class="row">
-            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
-                <div class="card text-center">
-                  <div class="ombre card-body">
-                    <a routerLink="/utilisateur"> <img  src="assets/images/logiciels/1.png"
-                                                        class="rounded-circle img-thumbnail avatar-md" alt="Gestion des utilisateurs" title="Gestion des utilisateurs">
-                    </a>
-                    <p class=" mt-3"><span class="noir" >Gestion  des  utilisateurs</span></p>
-                  </div>
-                </div>
-              </div>
-            <!-- <div class="  col-xl-2 col-lg-3 col-sm-3 " >
-                <div class="card text-center">
-                  <div class="ombre card-body"> -->
-                    <!-- target="_blank" http://192.168.1.188/dist/index.html#/login?user={{utilisateurAuthentifie?.email}} -->
-                    <!-- <a href="/courrier"> <img src="assets/images/logiciels/2.png"
-                                                    class="rounded-circle img-thumbnail avatar-md" alt="Gestion des courriers" title="Gestion des courriers">
-                    </a>
-                    <p class=" mt-3"><span class="noir" >Gestion des courriers</span></p>
-                  </div>
-                </div>
-              </div> -->
-            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
-                <div class="card text-center">
-                  <div class="ombre card-body">
-                    <a routerLink="/marchepublic"> <img src="assets/images/logiciels/3.png"
-                                                        class="rounded-circle img-thumbnail avatar-md" alt="Gestion des marchés publics" title="Gestion des marchés publics">
-                    </a>
-                    <p class=" mt-3"><span class="noir">Gestion De la Paie</span></p>
-                  </div>
-                </div>
-              </div>
-            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
-                <div class="card text-center">
-                  <div class="ombre card-body">
-                    <a routerLink="/rh"> <img src="assets/images/logiciels/4.png"
-                                                     class="rounded-circle img-thumbnail avatar-md" alt="Ressources Humaines" title="Ressources Humaines">
-                    </a>
-                    <p class=" mt-3"><span class="noir">Ressources Humaines</span></p>
-                  </div>
-                </div>
-              </div>
-
-
-            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
-                <div class="card text-center">
-                  <div class="ombre card-body">
-                    <a routerLink="/personnel"> <img src="assets/images/logiciels/4.png"
-                                                     class="rounded-circle img-thumbnail avatar-md" alt="Gestion du personnel" title="Gestion du personnel">
-                    </a>
-                    <p class=" mt-3"><span class="noir">Gestion de la Formation Interne</span></p>
-                  </div>
-                </div>
-              </div>
-
-            <!-- <div class="col-xl-2 col-lg-3 col-sm-3" >
-                <div class="card text-center">
-                  <div class="ombre card-body">
-                    <a routerLink="/budgetaire"> <img src="assets/images/logiciels/5.png"
-                                                      class="rounded-circle img-thumbnail avatar-md" alt="Gestion budgétaire et contrôle interne " title="Gestion budgétaire et contrôle interne">
-                    </a>
-                    <p class=" mt-3"><span class="noir">Budger et contrôle int</span></p>
-                  </div>
-                </div>
-              </div> -->
-            <!-- <div class="col-xl-2 col-lg-3 col-sm-3" >
-                <div class="card text-center">
-                  <div class="ombre card-body">
-                    <a routerLink="/commercial"> <img src="assets/images/logiciels/6.1.png"
-                                                      class="rounded-circle img-thumbnail avatar-md" alt="Gestion commerciale " title="Gestion commerciale">
-                    </a>
-                    <p class=" mt-3"><span class="noir">Gestion commerciale</span></p>
-                  </div>
-                </div>
-              </div> -->
-            <!-- <div class="col-xl-2 col-lg-3 col-sm-3 " >
-              <div class="card text-center">
-                <div class="ombre card-body">
-                  <a routerLink="/comptabilite-matiere"> <img src="assets/images/logiciels/7.png"
-                                                              class="rounded-circle img-thumbnail avatar-md" alt="Gestion de la comptabilité matière" title="Gestion de la comptabilité matière">
+        <!-- FEATURES CARDS -->
+        <section class="container mt-4">
+          <div class="row g-3">
+            <div class="col-12 col-lg-4" *ngFor="let f of features">
+              <div class="feature-card card border-0 h-100">
+                <div class="feature-img" [style.background-image]="'url(' + f.image + ')'"></div>
+                <div class="card-body">
+                  <h3 class="h6 mb-1">{{ f.title }}</h3>
+                  <p class="text-muted small mb-3">{{ f.text }}</p>
+                  <a [routerLink]="f.route" class="btn btn-primary btn-sm">
+                    Ouvrir <i class="bx bx-right-arrow-alt ms-1"></i>
                   </a>
-                  <p class=" mt-3"><span class="noir">Comptabilité matière</span></p>
-                </div>
-              </div>
-            </div> -->
-            <!-- <div class="col-xl-2 col-lg-3 col-sm-3" >
-              <div class="card text-center">
-                <div class="ombre card-body">
-                  <a routerLink="/comptabilitefinanciere"> <img src="assets/images/logiciels/8.png"
-                                                                class="rounded-circle img-thumbnail avatar-md" alt="Gestion financière et comptable" title="Gestion financière et comptable">
-                  </a>
-                  <p class=" mt-3"><span class="noir">Finance et comptable</span></p>
                 </div>
               </div>
             </div>
-            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
-              <div class="card text-center">
-                <div class="ombre card-body">
-                  <a routerLink="/immobilisation"> <img src="assets/images/logiciels/9.1.png"
-                                                                       class="rounded-circle img-thumbnail avatar-md" alt="Gestion des immobilisations" title="Gestion des immobilisations">
-                  </a>
-                  <p class=" mt-3"><span class="noir">Immobilisations</span></p>
-                </div>
-              </div>
-            </div>
-            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
-              <div class="card text-center">
-                <div class="ombre card-body">
-                  <a routerLink="/publication"> <img src="assets/images/logiciels/10.png"
-                                                     class="rounded-circle img-thumbnail avatar-md" alt="Gestion de la publication " title="Gestion de la publication ">
-                  </a>
-                  <p class=" mt-3"><span class="noir">Publication</span></p>
-                </div>
-              </div>
-            </div>
-            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
-              <div class="card text-center">
-                <div class="ombre card-body">
-                  <a routerLink="/production-publication"> <img src="assets/images/logiciels/11.png"
-                                                                class="rounded-circle img-thumbnail avatar-md"
-                                                                alt="Gestion de la production "
-                                                                title="Gestion de la production">
-                  </a>
-                  <p class=" mt-3"><span class="noir">Gestion de la production</span></p>
-                </div>
-              </div>
-            </div>
-            <div class="  col-xl-2 col-lg-3 col-sm-3 " >
-              <div class="card text-center">
-                <div class="ombre card-body">
-                  <a routerLink="/tache"> <img src="assets/images/logiciels/12.png"
-                                               class="rounded-circle img-thumbnail avatar-md" alt="Gestion de tâche" title="Gestion de tâche">
-                  </a>
-                  <p class=" mt-3"><span class="noir">Gestion de tâche</span></p>
-                </div>
-              </div>
-            </div> -->
-           <!-- <div class="  col-xl-2 col-lg-3 col-sm-3 " >
-              <div class="card text-center">
-                <div class="ombre card-body">
-                  <a routerLink="/paie"> <img src="assets/images/logiciels/13.png" class="rounded-circle img-thumbnail avatar-md" alt="Gestion de la paie"
-                                              title="Gestion de la paie">
-
-                  </a>
-                  <p class=" mt-3"><span class="noir">Gestion de la paie</span></p>
-                </div>
-              </div>
-            </div> -->
           </div>
+        </section>
 
-        </div>
+        <!-- GALERIE (masonry responsive) -->
+        <section class="container mt-4">
+          <h2 class="section-title text-primary mb-3">Galerie</h2>
+          <div class="masonry">
+            <div class="masonry-item" *ngFor="let g of gallery">
+              <div class="masonry-img" [style.background-image]="'url(' + g + ')'"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- TÉMOIGNAGES -->
+        <section class="container mt-5">
+          <div class="row g-3 align-items-stretch">
+            <div class="col-12 col-lg-4">
+              <h2 class="section-title text-primary mb-2">Ils en parlent</h2>
+              <p class="text-muted">
+                Les équipes apprécient la simplicité, la rapidité et la cohérence de l’espace de travail.
+              </p>
+            </div>
+            <div class="col-12 col-lg-8">
+              <div class="row g-3">
+                <div class="col-12 col-md-6" *ngFor="let t of testimonials">
+                  <div class="testimonial card border-0 h-100">
+                    <div class="card-body">
+                      <div class="d-flex align-items-center gap-2 mb-2">
+                        <img [src]="t.avatar" class="rounded-circle" width="40" height="40" alt="avatar">
+                        <div>
+                          <div class="fw-semibold">{{ t.name }}</div>
+                          <div class="text-muted small">{{ t.role }}</div>
+                        </div>
+                      </div>
+                      <p class="mb-0 text-muted">“{{ t.text }}”</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ACTUALITÉS / BLOG -->
+        <section class="container mt-4">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <h2 class="section-title text-primary mb-0">Actualités</h2>
+            <a routerLink="/publication" class="btn btn-link p-0">Tout voir</a>
+          </div>
+          <div class="row g-3">
+            <div class="col-12 col-md-6 col-xl-3" *ngFor="let n of news">
+              <div class="news-card card border-0 h-100">
+                <div class="news-img" [style.background-image]="'url(' + n.image + ')'"></div>
+                <div class="card-body">
+                  <h3 class="h6 mb-1">{{ n.title }}</h3>
+                  <p class="text-muted small mb-2">{{ n.excerpt }}</p>
+                  <div class="d-flex align-items-center justify-content-between">
+                    <span class="text-muted tiny">{{ n.date | date:'d MMM yyyy':'':'fr-FR' }}</span>
+                    <a [routerLink]="n.route" class="btn btn-outline-primary btn-sm">
+                      Lire <i class="bx bx-right-arrow-alt ms-1"></i>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- CTA FINAL -->
+        <section class="cta container mt-5">
+          <div class="cta-card">
+            <div class="cta-bg" [style.background-image]="'url(/assets/home/cta.jpg)'"></div>
+            <div class="cta-overlay"></div>
+            <div class="cta-body">
+              <h3 class="h4 text-white mb-2">Besoin d’aide ou d’une formation rapide ?</h3>
+              <p class="text-white-75 mb-3">Consultez le centre d’aide et les guides pas-à-pas.</p>
+              <a routerLink="/moncompte/parametre" class="btn btn-light btn-lg">
+                Centre d’aide
+              </a>
+            </div>
+          </div>
+        </section>
+
       </div>
     </div>
-    <!-- footer -->
 
-    <footer class="footer-dashboard" style="background-color: #210b63; color: white;">
-      <div class="container-fluid ">
-          <div class="row">
-              <div class="col-sm-6">
-                  {{year}} © ISI
-              </div>
-              <div class="col-sm-6">
-                  <div class="text-sm-end d-none d-sm-block">
-                      Design & Develop by ISI Dev Teams
-                  </div>
-              </div>
+    <footer class="footer-dashboard">
+      <div class="container-fluid">
+        <div class="row align-items-center g-2">
+          <div class="col-sm-6 small">© {{year}} ISI</div>
+          <div class="col-sm-6 small text-sm-end text-muted">
+            Design & Develop by ISI Dev Teams
           </div>
+        </div>
       </div>
-  </footer>
-
+    </footer>
   </div>
 
-  <ng-container *ngIf="utilisateurAuthentifieState$|async as reponse" [ngSwitch]="reponse.dataState">
-
-    <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
-        <div class="alert alert-info" role="alert">
-            {{dataStateEnum.CHARGEMENT}}
-        </div>
-    </ng-container>
-
-    <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
-        <div class="alert alert-danger" role="alert">
-            Code d'erreur :  {{reponse.errorMessage}}
-        </div>
-    </ng-container>
-
-    <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
-    </ng-container>
-
+  <!-- loaders erreurs -->
+  <ng-container *ngIf="utilisateurAuthentifieState$ | async as reponse" [ngSwitch]="reponse.dataState">
+    <div *ngSwitchCase="dataStateEnum.CHARGEMENT" class="alert alert-info m-3">Chargement…</div>
+    <div *ngSwitchCase="dataStateEnum.ERREUR" class="alert alert-danger m-3">
+      Code d'erreur : {{ reponse.errorMessage }}
+    </div>
   </ng-container>
 </div>
-
-
-
-<!--app-rightsidebar></app-rightsidebar-->

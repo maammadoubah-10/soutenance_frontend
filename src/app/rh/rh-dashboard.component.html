@@ -1,0 +1,154 @@
+<div class="container-fluid">
+  <app-titredepage title="Ressources Humaines" [items]="[{label:'RH'}, {label:'Tableau de bord', active:true}]"></app-titredepage>
+
+  <!-- ====== KPI ====== -->
+  <div class="row flex-grow-1">
+    <div class="col-md-3 grid-margin stretch-card">
+      <div class="card kpi-card h-100">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div>
+            <h6 class="card-title mb-1">Total Personnel</h6>
+            <h3 class="mb-0">{{ kpi.totalPersonnel }}</h3>
+          </div>
+          <div class="avatar-sm">
+            <div class="avatar-title bg-light rounded-circle text-primary font-size-24">
+              <i class="bx bxs-user"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 grid-margin stretch-card">
+      <div class="card kpi-card h-100">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div>
+            <h6 class="card-title mb-1">Postes ouverts</h6>
+            <h3 class="mb-0">{{ kpi.postesOuverts }}</h3>
+          </div>
+          <div class="avatar-sm">
+            <div class="avatar-title bg-light rounded-circle text-warning font-size-24">
+              <i class="bx bx-briefcase"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 grid-margin stretch-card">
+      <div class="card kpi-card h-100">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div>
+            <h6 class="card-title mb-1">En absence</h6>
+            <h3 class="mb-0">{{ kpi.enAbsence }}</h3>
+          </div>
+          <div class="avatar-sm">
+            <div class="avatar-title bg-light rounded-circle text-info font-size-24">
+              <i class="bx bx-time"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 grid-margin stretch-card">
+      <div class="card kpi-card h-100">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div>
+            <h6 class="card-title mb-1">Taux de turnover</h6>
+            <h3 class="mb-0">{{ kpi.tauxTurnover }}%</h3>
+          </div>
+          <div class="avatar-sm">
+            <div class="avatar-title bg-light rounded-circle text-danger font-size-24">
+              <i class="bx bx-refresh"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== ROW 1 : Effectif + Absence ====== -->
+  <div class="row">
+    <div class="col-lg-8 grid-margin stretch-card">
+      <div class="card chart-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="card-title mb-0">Effectif total (6 derniers mois)</h6>
+          </div>
+          <apx-chart
+            [series]="headcountArea.series"
+            [chart]="headcountArea.chart"
+            [xaxis]="headcountArea.xaxis"
+            [dataLabels]="headcountArea.dataLabels"
+            [stroke]="headcountArea.stroke"
+            [fill]="headcountArea.fill"
+            [grid]="headcountArea.grid"
+            [legend]="headcountArea.legend"
+            [tooltip]="headcountArea.tooltip">
+          </apx-chart>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4 grid-margin stretch-card">
+      <div class="card chart-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="card-title mb-0">Taux d’absence</h6>
+          </div>
+          <apx-chart
+            [series]="absenceRadial.series"
+            [chart]="absenceRadial.chart"
+            [labels]="absenceRadial.labels"
+            [plotOptions]="absenceRadial.plotOptions"
+            [fill]="absenceRadial.fill"
+            [tooltip]="absenceRadial.tooltip">
+          </apx-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== ROW 2 : Entrées/Sorties + Départements ====== -->
+  <div class="row">
+    <div class="col-lg-6 grid-margin stretch-card">
+      <div class="card chart-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="card-title mb-0">Entrées vs Sorties</h6>
+          </div>
+          <apx-chart
+            [series]="hiresDeparturesBar.series"
+            [chart]="hiresDeparturesBar.chart"
+            [xaxis]="hiresDeparturesBar.xaxis"
+            [yaxis]="hiresDeparturesBar.yaxis"
+            [plotOptions]="hiresDeparturesBar.plotOptions"
+            [dataLabels]="hiresDeparturesBar.dataLabels"
+            [grid]="hiresDeparturesBar.grid"
+            [tooltip]="hiresDeparturesBar.tooltip"
+            [legend]="hiresDeparturesBar.legend">
+          </apx-chart>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6 grid-margin stretch-card">
+      <div class="card chart-card">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <h6 class="card-title mb-0">Répartition par service</h6>
+          </div>
+          <apx-chart
+            [series]="departmentsDonut.series"
+            [chart]="departmentsDonut.chart"
+            [labels]="departmentsDonut.labels"
+            [legend]="departmentsDonut.legend"
+            [responsive]="departmentsDonut.responsive"
+            [tooltip]="departmentsDonut.tooltip">
+          </apx-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

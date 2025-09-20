@@ -1,0 +1,160 @@
+<!-- src/app/rh/presence/presence.component.html -->
+<div class="container-fluid px-3 main">
+  <app-titredepage title="Présences" [items]="items"></app-titredepage>
+
+  <div class="card">
+    <div class="card-body">
+
+      <!-- barre d’actions / filtres -->
+      <div class="toolbar d-flex flex-wrap align-items-end gap-2 mb-3">
+        <div>
+          <label class="form-label">Mois</label>
+          <select class="form-select form-select-sm" [formControl]="moisCtrl" (change)="onChangerFiltres()">
+            <option [ngValue]="null">— Tous —</option>
+            <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [ngValue]="m">{{ m }}</option>
+          </select>
+        </div>
+        <div>
+          <label class="form-label">Année</label>
+          <input type="number" class="form-control form-control-sm" [formControl]="anneeCtrl" (change)="onChangerFiltres()"
+                 [min]="2000" [max]="2100" placeholder="ex: 2025">
+        </div>
+        <div>
+          <label class="form-label">Service</label>
+          <select class="form-select form-select-sm" [formControl]="serviceIdCtrl" (change)="onChangerFiltres()">
+            <option [ngValue]="null">— Tous —</option>
+            <option *ngFor="let s of listeServices" [ngValue]="s.id">{{ s?.designation }}</option>
+          </select>
+        </div>
+        <div class="form-check ms-2">
+          <input class="form-check-input" type="checkbox" id="chkValide" [formControl]="csrhValideSeulement" (change)="onChangerFiltres()">
+          <label class="form-check-label" for="chkValide">CSRH validé seulement</label>
+        </div>
+
+        <div class="ms-auto d-flex gap-2">
+          <button class="btn btn-outline-primary btn-sm" (click)="validerSelection()" [disabled]="!selectedIds.size">Valider sélection</button>
+          <button class="btn btn-outline-secondary btn-sm" (click)="invaliderSelection()" [disabled]="!selectedIds.size">Invalider sélection</button>
+          <button class="btn btn-primary btn-sm" (click)="openModal(formTpl)">Ajouter une présence</button>
+        </div>
+      </div>
+
+      <ng-container *ngIf="presences$ | async as resp" [ngSwitch]="resp.dataState">
+        <div *ngSwitchCase="dataStateEnum.CHARGEMENT" class="alert alert-info">Chargement…</div>
+        <div *ngSwitchCase="dataStateEnum.ERREUR" class="alert alert-danger">Erreur de chargement</div>
+
+        <div *ngSwitchCase="dataStateEnum.CHARGE" class="table-responsive">
+          <table class="table table-striped align-middle">
+            <thead>
+            <tr>
+              <th><input type="checkbox" (change)="toutCocher($event)"></th>
+              <th>#</th>
+              <th>Personnel</th>
+              <th>Mois</th>
+              <th>Année</th>
+              <th>Jours absents</th>
+              <th>User validé</th>
+              <th>CSRH validé</th>
+              <th>Date validation</th>
+              <th style="width: 200px;">Action</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr *ngFor="let p of listePage; index as i">
+              <td>
+                <input type="checkbox" [checked]="selectedIds.has(p.id)" (change)="toggleSelect(p, $event)">
+              </td>
+              <td>{{ i + 1 + (currentPage * pageSize) }}</td>
+              <td>{{ afficherNomPersonnel(p?.personnel) }}</td>
+              <td>{{ p?.mois }}</td>
+              <td>{{ p?.annee }}</td>
+              <td>{{ p?.nbreJourAbsent }}</td>
+              <td>
+                <span class="badge" [class.bg-success]="p?.userValidation" [class.bg-secondary]="!p?.userValidation">
+                  {{ p?.userValidation ? 'Oui' : 'Non' }}
+                </span>
+              </td>
+              <td>
+                <span class="badge" [class.bg-success]="p?.csrhValidation" [class.bg-danger]="!p?.csrhValidation">
+                  {{ p?.csrhValidation ? 'Oui' : 'Non' }}
+                </span>
+              </td>
+              <td>{{ p?.dateValidation | date:'dd/MM/yyyy' }}</td>
+              <td>
+                <button class="btn btn-sm btn-info me-2" (click)="openModal(formTpl, p)">Modifier/Valider</button>
+                <button class="btn btn-sm btn-outline-success me-2" (click)="valider(p)">Valider</button>
+                <button class="btn btn-sm btn-outline-danger" (click)="invalider(p)">Invalider</button>
+              </td>
+            </tr>
+            <tr *ngIf="!listePage.length">
+              <td colspan="10" class="text-center">Aucune présence</td>
+            </tr>
+            </tbody>
+          </table>
+
+          <div class="d-flex justify-content-end align-items-center" *ngIf="totalPages > 1">
+            <button class="btn btn-outline-primary btn-sm me-2" [disabled]="currentPage===0"
+                    (click)="currentPage=currentPage-1; chargerPage()">Précédent</button>
+            <ng-container *ngFor="let p of pages">
+              <button class="btn btn-sm mx-1"
+                      [class.btn-primary]="p===currentPage"
+                      [class.btn-outline-primary]="p!==currentPage"
+                      (click)="currentPage=p; chargerPage()">{{ p+1 }}</button>
+            </ng-container>
+            <button class="btn btn-outline-primary btn-sm ms-2" [disabled]="currentPage+1===totalPages"
+                    (click)="currentPage=currentPage+1; chargerPage()">Suivant</button>
+          </div>
+        </div>
+      </ng-container>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal formulaire -->
+<ng-template #formTpl let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ form.get('id')?.value ? 'Modifier / Valider' : 'Ajouter' }} une présence</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="row">
+        <div class="col-md-6 mb-3" *ngIf="!form.get('id')?.value">
+          <label>Personnel</label>
+          <select class="form-select" formControlName="personnelId"
+                  [ngClass]="{'is-invalid': form.get('personnelId')?.invalid && form.get('personnelId')?.touched}">
+            <option [ngValue]="null">-- Sélectionner --</option>
+            <option *ngFor="let p of listePersonnel" [ngValue]="p.id">{{ afficherNomPersonnel(p) }}</option>
+          </select>
+          <div class="text-danger" *ngIf="form.get('personnelId')?.invalid && form.get('personnelId')?.touched">
+            Le personnel est obligatoire
+          </div>
+        </div>
+
+        <div class="col-md-3 mb-3" *ngIf="!form.get('id')?.value">
+          <label>Mois</label>
+          <select class="form-select" formControlName="mois"
+                  [ngClass]="{'is-invalid': form.get('mois')?.invalid && form.get('mois')?.touched}">
+            <option [ngValue]="null">-- Mois --</option>
+            <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [ngValue]="m">{{ m }}</option>
+          </select>
+          <div class="text-danger" *ngIf="form.get('mois')?.invalid && form.get('mois')?.touched">
+            Le mois est obligatoire
+          </div>
+        </div>
+
+        <div class="col-md-3 mb-3">
+          <label>Jours absents</label>
+          <input type="number" min="0" class="form-control" formControlName="nbreJourAbsent">
+        </div>
+      </div>
+
+      <div class="text-end">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.dismiss()">Fermer</button>
+        <button class="btn btn-primary" type="submit" [disabled]="form.invalid">
+          {{ form.get('id')?.value ? 'Valider' : 'Créer' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>

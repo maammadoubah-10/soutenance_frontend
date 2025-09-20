@@ -17,7 +17,6 @@ import localeFr from '@angular/common/locales/fr';
 import { FilterPipe } from './filter.pipe';
 import { SimplebarAngularModule } from 'simplebar-angular';
 // export function createTranslateLoader(http: HttpClient) { ... }
-
 @NgModule({
   declarations: [AppComponent,
   ],
@@ -34,6 +33,7 @@ import { SimplebarAngularModule } from 'simplebar-angular';
     //   maxAge: 25,
     //   logOnly: environment.production,
     // }),
+   // NgApexchartsModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: TokenInterceptor, multi: true },

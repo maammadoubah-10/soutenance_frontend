@@ -1,0 +1,23 @@
+{
+  "/personnel": {
+    "target": "http://localhost:9002",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "ws": true
+  },
+  "/personnel/websocket": {
+    "target": "http://localhost:9002",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "ws": true
+  },
+  "/utilisateur": {
+    "target": "http://localhost:9001",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "debug",
+    "ws": false
+  }
+}

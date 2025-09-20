@@ -99,6 +99,13 @@ export class EspacedetravailComponent implements OnInit , AfterViewInit{
     this.items = [{ label: 'Espace de travail ' }, { label: 'Logiciels', active: true }];
     this.obtenirUnUtilisateurParEmail();
     this.sidebartype = SIDEBAR_TYPE;
+    const h = new Date().getHours();
+    this.greeting = h < 12 ? 'Bonjour' : (h < 18 ? 'Bon après-midi' : 'Bonsoir');
+    this.heroStats = this.heroStats.map(s =>
+  s.label === 'Statut'
+    ? { ...s, value: this.isHolidayToday ? 'Jour férié 🎉' : (this.isHolidayTomorrow ? 'Férié demain' : 'Journée ouvrée') }
+    : s
+);
     // listen to event and change the layout, theme, etc
     /*
     this.eventService.subscribe('changeSidebartype', (layout) => {
@@ -139,8 +146,80 @@ export class EspacedetravailComponent implements OnInit , AfterViewInit{
   });
   }
 
-  
+  greeting = '';
+today = new Date();
 
+quickLinks = [
+  { label: 'Utilisateurs', route: '/utilisateur', icon: 'bx bx-user-circle' },
+  { label: 'Ressources Humaines', route: '/rh', icon: 'bx bx-id-card' },
+  { label: 'Gestion de la Paie', route: '/marchepublic', icon: 'bx bx-wallet' },
+  { label: 'Formation Interne', route: '/personnel', icon: 'bx bx-book-open' },
+  { label: 'Publication', route: '/publication', icon: 'bx bx-news' },
+  { label: 'Tâches', route: '/tache', icon: 'bx bx-task' },
+];
+
+kpis = [
+  { label: 'Présences (mois)', value: '—' },
+  { label: 'Congés actifs', value: '—' },
+  { label: 'Variables Paie', value: '—' },
+  { label: 'Demandes ouvertes', value: '—' },
+];
+
+features = [
+  {
+    title: 'Ressources Humaines',
+    text: 'Suivi des présences, validations, congés et dossiers.',
+    image: '/assets/home/feature-rh.jpg',
+    route: '/rh',
+  },
+  {
+    title: 'Gestion de la Paie',
+    text: 'Variables, bulletins et contrôles qualité.',
+    image: '/assets/home/feature-paie.jpg',
+    route: '/marchepublic',
+  },
+  {
+    title: 'Formation Interne',
+    text: 'Plan, sessions, présence & évaluations.',
+    image: '/assets/home/feature-formation.jpg',
+    route: '/personnel',
+  },
+];
+gallery = [
+  '/assets/home/g1.jpg',
+  '/assets/home/g2.jpg',
+  '/assets/home/g3.jpg',
+  '/assets/home/g4.jpg',
+  '/assets/home/g5.jpg',
+  '/assets/home/g6.jpg',
+];
+
+testimonials = [
+  { name: 'A. Kouassi', role: 'RH', text: 'Une page d’accueil claire et rapide au quotidien.', avatar: '/assets/home/av1.jpg' },
+  { name: 'S. Hountondji', role: 'Compta', text: 'Les accès rapides me font gagner du temps.', avatar: '/assets/home/av2.jpg' },
+  { name: 'M. Sagna', role: 'DSI', text: 'Design propre, navigation fluide, top.', avatar: '/assets/home/av3.jpg' },
+  { name: 'I. Dossa', role: 'Paie', text: 'Enfin une vue d’ensemble utile !', avatar: '/assets/home/av4.jpg' },
+];
+
+news = [
+  { title: 'Mise à jour RH', excerpt: 'Nouvelles règles de validation…', image: '/assets/home/n1.jpg', date: new Date(), route: '/publication' },
+  { title: 'Paie — clôture', excerpt: 'La clôture du mois aura lieu…', image: '/assets/home/n2.jpg', date: new Date(), route: '/publication' },
+  { title: 'Sécurité', excerpt: 'Renforcez vos mots de passe…', image: '/assets/home/n3.jpg', date: new Date(), route: '/publication' },
+  { title: 'Formation Excel', excerpt: 'Nouvelle session le 15…', image: '/assets/home/n4.jpg', date: new Date(), route: '/publication' },
+];
+
+heroStats = [
+  { label: 'Dernière connexion', value: (new Date()).toLocaleDateString('fr-FR'), icon: 'bx bx-time-five' },
+  { label: 'Aujourd’hui', value: (new Date()).toLocaleDateString('fr-FR', { weekday: 'long' }), icon: 'bx bx-calendar-event' },
+  { label: 'Statut', value: '—', icon: 'bx bx-bell' },
+  { label: 'Profil', value: 'Complet', icon: 'bx bx-user-check' },
+];
+
+annonces = [
+  { title: 'Bienvenue', text: 'Découvrez la nouvelle page d’accueil.', cta: { label: 'En savoir +', route: '/publication' } },
+  { title: 'Support', text: 'Un souci ? Le centre d’aide est là.', cta: { label: 'Centre d’aide', route: '/moncompte/parametre' } },
+  { title: 'Paie', text: 'Clôture du mois courant dans 5 jours.' },
+];
 
 
   obtenirUnUtilisateurParEmail() {

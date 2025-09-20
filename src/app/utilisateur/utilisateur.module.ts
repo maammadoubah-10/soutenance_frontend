@@ -43,6 +43,7 @@ import { FilterPipe } from "../filter.pipe";
 import { SimplebarAngularModule } from 'simplebar-angular';
 import { UtilisateursComponent } from './utilisateurs/utilisateurs.component';
 import { NgSelectModule } from '@ng-select/ng-select'; // Vérifiez cet import
+import { NgApexchartsModule } from 'ng-apexcharts';
 
 
 @NgModule({
@@ -79,6 +80,7 @@ import { NgSelectModule } from '@ng-select/ng-select'; // Vérifiez cet import
     CommunModule,
     FilterPipe,
     NgSelectModule,
+    NgApexchartsModule,
 ]
 })
 export class UtilisateurModule { }

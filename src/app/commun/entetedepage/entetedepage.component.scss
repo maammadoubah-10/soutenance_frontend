@@ -39,6 +39,17 @@
   gap: 16px;
 }
 
+/* pousse légèrement le logo à droite */
+.navbar-brand-box {
+  margin-left: 26px;   /* augmente si tu veux plus d’espace */
+}
+
+.brand-logo {
+  height: 42px;
+  display: block;
+}
+
+
 /* LOGO totalement à gauche, sans marge ni padding parasite */
 .navbar-brand-box,
 .navbar-brand-box.parent {

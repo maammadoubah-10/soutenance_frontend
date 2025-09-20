@@ -1,46 +1,175 @@
-.line {
-  border-left: 1px solid white;
-  height: 100px;
-
-  @media (max-width: 768px) {
-    border-top: 1px solid white;
-    width: 100%;
-    height: 1px;
-    margin-top: 100px;
-    margin-left: -300px;
-  }
+:root{
+  --blue-900:#0b1a5c;
+  --blue-800:#10257e;
+  --blue-700:#1232a0;
+  --blue-600:#1a47d0;
+  --blue-300:#bcd1ff;
+  --blue-100:#eef3ff;
+  --white:#ffffff;
+  --glass: rgba(255,255,255,.14);
+  --glass-border: rgba(255,255,255,.25);
+  --radius: 16px;
 }
 
-.parame {
-margin-top: auto;
-  margin-bottom: auto;
+.main{ background:#f5f8ff; }
+
+/* HERO */
+.hero-landing{
+  position: relative;
+  min-height: 62vh;
+  display: grid;
+  align-items: end;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.hero-bg{
+  position:absolute; inset:0;
+  background-position:center; background-size:cover; background-repeat:no-repeat;
+  transform: scale(1.05);
+  filter: saturate(1.1) brightness(.9);
+}
+.hero-overlay{
+  position:absolute; inset:0;
+  background: linear-gradient(120deg, rgba(16,37,126,.85), rgba(11,26,92,.65) 60%, rgba(11,26,92,.25));
+}
+.hero-content{ position:relative; padding-top:3rem; padding-bottom:2rem; }
+
+/* Glass card */
+.glass{
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(6px);
+  color: var(--white);
+}
+.text-primary-300{ color: var(--blue-300) !important; }
+.text-white-75{ color: rgba(255,255,255,.85); }
+
+/* Tiles (stats) */
+.grid-tiles{
+  display:grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+}
+.tile{
+  display:flex; gap:12px; align-items:center;
+  padding:12px 14px; border-radius: 14px;
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.22);
+  color:#fff; transition: transform .18s ease, box-shadow .18s ease;
+}
+.tile:hover{ transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,.18); }
+.tile-icon{
+  width:42px; height:42px; display:grid; place-items:center; border-radius:12px;
+  background: rgba(255,255,255,.22); font-size:22px;
+}
+.tile-label{ font-size:.8rem; opacity:.9; display:block; }
+.tile-value{ font-weight:700; }
+
+/* Annonces carousel */
+.announcements{ border-radius: var(--radius); padding: 12px 14px; }
+
+/* Section title */
+.section-title{
+  font-size:1rem; font-weight:800; letter-spacing:.02em;
 }
 
-.background-image {
-  margin-top: -80px;
-  display: flex;
-  justify-content: center;
-  align-items: flex-end;
-  height: 150px; /* remplacer 500px par la hauteur souhaitée */
-  background-image: url('../../assets/Groupe de masques 2.png'); /* remplacer image.jpg par l'URL de votre image de fond */
-  background-size: cover;
-  background-position: center;
+/* Quick links */
+.quick-link{
+  background: var(--white);
+  border-radius: var(--radius);
+  box-shadow: 0 6px 18px rgba(16,37,126,.08);
+  transition: transform .18s ease, box-shadow .18s ease;
+  text-decoration: none;
+}
+.quick-link:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 12px 28px rgba(16,37,126,.16);
+}
+.quick-link-icon{
+  width:58px; height:58px; border-radius: 14px;
+  background: var(--blue-100); color: var(--blue-800);
+  display:grid; place-items:center; font-size:28px; margin-bottom:.5rem;
+}
+.quick-link-label{ color: var(--blue-900); font-weight:600; }
+
+/* KPI band */
+.kpi-band{
+  background: linear-gradient(90deg, var(--blue-800), var(--blue-900));
+  padding: 12px 0;
+}
+.kpi-item{
+  background: rgba(255,255,255,.12);
+  border: 1px solid rgba(255,255,255,.25);
+  color:#fff; text-align:center; border-radius: 12px; padding: 14px 10px;
+}
+.kpi-value{ font-size: clamp(1rem,.8rem + .8vw,1.4rem); font-weight:800; line-height:1; }
+.kpi-label{ font-size:.8rem; opacity:.9; }
+
+/* Feature cards */
+.feature-card{
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: 0 6px 18px rgba(16,37,126,.08);
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+.feature-card:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 12px 30px rgba(16,37,126,.18);
+}
+.feature-img{
+  width:100%; height:160px;
+  background-size:cover; background-position:center;
 }
 
-app-titredepage {
-  margin-bottom: 10px; /* remplacer 50px par l'espacement souhaité */
+/* Masonry gallery */
+.masonry{
+  column-count: 1;
+  column-gap: 12px;
+}
+@media (min-width: 576px){ .masonry{ column-count: 2; } }
+@media (min-width: 992px){ .masonry{ column-count: 3; } }
+.masonry-item{
+  break-inside: avoid;
+  margin-bottom:12px;
+}
+.masonry-img{
+  width:100%; height: 220px; border-radius: 14px;
+  background-size:cover; background-position:center;
+  box-shadow: 0 6px 18px rgba(16,37,126,.12);
+  transition: transform .2s ease;
+}
+.masonry-img:hover{ transform: scale(1.02); }
+
+/* Testimonials */
+.testimonial{
+  border-radius: var(--radius);
+  box-shadow: 0 6px 18px rgba(16,37,126,.08);
 }
 
-.main{
-  background-image: url('../../assets/Groupe 786.png'); /* remplacer image.jpg par l'URL de votre image de fond */
+/* News */
+.news-card{
+  border-radius: var(--radius);
+  box-shadow: 0 6px 18px rgba(16,37,126,.08);
+  transition: transform .18s ease, box-shadow .18s ease;
 }
+.news-card:hover{ transform: translateY(-3px); box-shadow: 0 12px 30px rgba(16,37,126,.18); }
+.news-img{ width:100%; height:140px; background-size:cover; background-position:center; }
 
+/* CTA */
+.cta-card{
+  position: relative;
+  border-radius: var(--radius);
+  overflow: hidden;
+  min-height: 200px;
+  display:grid; place-items:center;
+}
+.cta-bg{ position:absolute; inset:0; background-size:cover; background-position:center; filter: brightness(.7); }
+.cta-overlay{ position:absolute; inset:0; background: linear-gradient(120deg, rgba(16,37,126,.8), rgba(11,26,92,.6)); }
+.cta-body{ position:relative; text-align:center; padding: 36px 20px; }
 
-
-
-
-
-
-
-
-
+/* Footer */
+.footer-dashboard{
+  background: var(--blue-900);
+  color:#fff; padding: 12px 0; margin-top: 24px;
+}

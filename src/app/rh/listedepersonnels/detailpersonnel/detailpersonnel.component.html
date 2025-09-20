@@ -1034,40 +1034,35 @@
                 <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
                   <div class="table-responsive">
                     <table class="table table-bordered align-middle nowrap">
-                      <thead>
-                        <tr>
-                          <th scope="col">#</th>
-                          <th scope="col">Date de Debut</th>
-                          <th scope="col">Date de Fin</th>
-                          <th scope="col">Poste</th>
-                          <th scope="col">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr *ngFor="let affectation of listeAffectationPersonnel ?? []
-                 ; let i=index">
-                          <th scope="row">{{i+1}}</th>
-                          <th>{{affectation?.dateDebut| date:'dd MMMM yyyy':'':'fr-FR'}}</th>
-                          <th>{{ affectation?.dateFin ? (affectation?.dateFin | date:'dd MMMM yyyy':'':'fr-FR') :
-                            'Aucune date de Fin' }} </th>
-                          <th>{{affectation?.poste?.designation}}</th>
-                          <th>
-                            <button placement="top" ngbToolTip="Modifier" class="btn btn-info mx-1 mt-1 btn-sm"
-                              (click)="openModalAfectation(affectationContente, affectation)">
-                              <i class="bx bx-pencil"></i>
-                            </button>
-                            <button placement="top" ngbToolTip="Supprimer" class="btn btn-danger mx-1 mt-1 btn-sm"
-                              (click)="supprimerAffectation(affectation.id)">
-                              <i class="bx bx-trash-alt"></i>
-                            </button>
-                          </th>
-                        </tr>
+                     <thead>
+                              <tr>
+                                <th scope="col">#</th>
+                                <th scope="col">Date de début</th>
+                                <th scope="col">Poste</th>
+                                <th scope="col">Action</th>
+                              </tr>
+                            </thead>
+                       <tbody>
+        <tr *ngFor="let affectation of (listeAffectationPersonnel ?? []); let i = index">
+          <th scope="row">{{ i + 1 }}</th>
+          <td>{{ affectation?.dateDebut | date:'dd MMMM yyyy':'':'fr-FR' }}</td>
+          <td>{{ affectation?.poste?.designation }}</td>
+          <td>
+            <button placement="top" ngbToolTip="Modifier" class="btn btn-info mx-1 mt-1 btn-sm"
+                    (click)="openModalAfectation(affectationContente, affectation)">
+              <i class="bx bx-pencil"></i>
+            </button>
+            <button placement="top" ngbToolTip="Supprimer" class="btn btn-danger mx-1 mt-1 btn-sm"
+                    (click)="supprimerAffectation(affectation!.id!)">
+              <i class="bx bx-trash-alt"></i>
+            </button>
+          </td>
+        </tr>
 
-                        <tr *ngIf="response.data?.length == 0">
-                          <td colspan="5" class="text-center"><i style="color: #d9534f;font-size: xxx-large"
-                              class='bx bxs-data btn btn-lg'></i><br>Aucune affectation pour {{personnel?.nom}}</td>
-                        </tr>
-                      </tbody>
+        <tr *ngIf="!(listeAffectationPersonnel?.length)">
+          <td colspan="4" class="text-center">Aucune affectation</td>
+        </tr>
+      </tbody>
                     </table>
                     <div class="row justify-content-between align-items-center mb-3" *ngIf="totalAffectation > 5">
                       <div class="col-auto me-auto"></div>

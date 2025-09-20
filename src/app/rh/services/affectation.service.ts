@@ -1,56 +1,50 @@
 import { Injectable } from '@angular/core';
-import {environment} from "../../../environments/environment";
-import {HttpClient} from "@angular/common/http";
-import {Observable} from "rxjs";
-import {Affectation} from "../models/affectation";
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { Affectation } from '../models/affectation';
+import { AffectationDto } from '../models/affectation-dto';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class AffectationService {
+  // Base = http://localhost:9002/rh/affectations
+  public contextPath: string = environment.hostmicroservicepersonnel + 'affectations';
 
-  public contextPath: string = environment.hostmicroservicepersonnel + "affectations";
+  constructor(private http: HttpClient) {}
 
-  constructor(private httpClient: HttpClient) {}
-
-  public listerAffectationPage(page: number, size: number, sort: string): Observable<Affectation> {
-    const url = `${this.contextPath}?page=${page}&size=${size}&sort=${sort}`;
+  lister(page = 0, size = 10, sort = 'desc'): Observable<any> {
+    const params = new HttpParams().set('page', page).set('size', size).set('sort', sort);
     // @ts-ignore
-    return this.httpClient.get<Affectation>(url, { observe: 'response' });
+    return this.http.get<any>(this.contextPath, { observe: 'response', params });
   }
 
-  public listerAffectationParPersonnelPage(id : number, page: number, size: number, sort: string): Observable<Affectation> {
-    const url = `${this.contextPath +'/personnel/' + id}?page=${page}&size=${size}&sort=${sort}`;
+  listerParPersonnel(personnelId: number, page = 0, size = 10, sort = 'desc'): Observable<any> {
+    const params = new HttpParams().set('page', page).set('size', size).set('sort', sort);
     // @ts-ignore
-    return this.httpClient.get<Affectation>(url, { observe: 'response' });
+    return this.http.get<any>(`${this.contextPath}/personnel/${personnelId}`, { observe: 'response', params });
   }
 
-  public recherchePersonnel(nom: string): Observable<any> {
-    const url = `${this.contextPath}?nom=${nom}`;
-    // @ts-ignore
-    return this.httpClient.get<any>(url, { observe: 'response' });
+  voir(id: number): Observable<Affectation> {
+    return this.http.get<Affectation>(`${this.contextPath}/${id}`);
   }
 
+  creer(dto: AffectationDto): Observable<Affectation> {
+    return this.http.post<Affectation>(this.contextPath, dto);
+  }
 
-  public creerAffectation(data: any): Observable<Affectation> {
-    return this.httpClient.post<Affectation>(
-      this.contextPath,
-      data
+  modifier(id: number, dto: AffectationDto): Observable<Affectation> {
+    return this.http.patch<Affectation>(`${this.contextPath}/${id}`, dto);
+  }
+
+  supprimer(id: number): Observable<any> {
+    return this.http.delete(`${this.contextPath}/${id}`);
+  }
+
+  // Optionnel : route alternative existante côté backend
+  affecter(personnelId: number, posteId: number, dateDebut: string): Observable<Affectation> {
+    return this.http.post<Affectation>(
+      `${this.contextPath}/personnel/${personnelId}/poste/${posteId}`,
+      { dateDebut }
     );
   }
-
-  public modifierAffectation(id:any, data:any):Observable<Affectation>{
-    return this.httpClient.patch<Affectation>(
-      this.contextPath +"/"+id,data)
-  }
-
-  public supprimerAffectation(id: number) {
-    return this.httpClient.delete<any>(this.contextPath + "/" + id);
-  }
-
-  public voirAffectation(id:number,){
-    return this.httpClient.get<any>(
-      this.contextPath+ '/'+id
-    )}
-
 }

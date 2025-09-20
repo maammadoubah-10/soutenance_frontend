@@ -102,6 +102,14 @@ export class UtilisateursComponent implements OnInit {
 
   }
 
+  displayPersonnel(p: any): string {
+  if (!p) return '';
+  const prenom = p?.etatCivil?.prenom ?? p?.prenom ?? '';
+  const nom    = p?.etatCivil?.nom    ?? p?.nom    ?? '';
+  const full   = `${prenom} ${nom}`.trim();
+  return full || (p?.etatCivil?.email ?? p?.email ?? '');
+}
+
   handleClick() {
     if (!this.designation) {
       this.onAfficherLesUtilisateurs();

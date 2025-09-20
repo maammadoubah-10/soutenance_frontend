@@ -118,26 +118,31 @@ export class EntetedepageComponent implements OnInit{
   }
 
   validateToken(): void {
-    const token = this.obtenirLeToken();
-    const contextPath: string = environment.hostmicroservicepersonnel + "personnels";
-    if (token) {
-      const url = `${contextPath}/validateToken/${token}`;
-      this.httClient.get<any>(url).subscribe(
-        response => {
-          const isValid = response.valid;
-          if (!isValid) {
-            this.toastr.error("vous avez ete deconnecter car votre token a expirer:veuillez vous reconnectez")
-            this.deconnexion(); // Déconnecter l'utilisateur si le token est expiré
-          }
-        },
-        error => {
-          console.error('Erreur lors de la validation du token :', error);
-        }
-      );
-    } else {
-      this.deconnexion(); // Déconnecter l'utilisateur si le token n'est pas disponible
-    }
+  const token = this.obtenirLeToken();
+  if (!token) {
+    this.deconnexion();
+    return;
   }
+
+  // ✅ Appel relative (même domaine). NGINX proxyfie vers :9002
+  const url = `/personnel/personnels/validateToken/${token}`;
+
+  this.httClient.get<any>(url).subscribe({
+    next: (response) => {
+      const isValid = !!response?.valid;
+      if (!isValid) {
+        this.toastr.error("Vous avez été déconnecté : votre session a expiré. Veuillez vous reconnecter.");
+        this.deconnexion();
+      }
+    },
+    error: (err) => {
+      console.error('Erreur lors de la validation du token :', err);
+      // (optionnel) si tu veux déconnecter en cas d’erreur réseau :
+      // this.deconnexion();
+    },
+  });
+}
+
 
   // Méthode pour nettoyer les abonnements lorsque le composant est détruit
   ngOnDestroy(): void {

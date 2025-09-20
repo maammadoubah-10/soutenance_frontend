@@ -1,33 +1,44 @@
 import { Injectable } from '@angular/core';
-// @ts-ignore
-import {WebSocketSubject} from "rxjs/internal-compatibility";
-import {webSocket} from "rxjs/webSocket";
-import {GLOBAL_CONFIG} from "../models/global";
+import { WebSocketSubject } from 'rxjs/webSocket';
+import { webSocket } from 'rxjs/webSocket';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class WebsocketService {
-  private socket$: WebSocketSubject<any>;
+  private socket$?: WebSocketSubject<any>;
 
-  constructor() {
-    const token = sessionStorage.getItem('token');
-    // Ne pas initialiser la connexion WebSocket dans le constructeur
-  }
+  constructor() {}
 
   public connect(): WebSocketSubject<any> {
-    // Initialiser la connexion WebSocket ici
-    const token = sessionStorage.getItem('token');
-    this.socket$ = webSocket(`${GLOBAL_CONFIG.API_BASE_URL_WEBSOCKET}/websocket`);
-    // this.socket$ = webSocket('ws://localhost:9002/rh/websocket');
-    // this.socket$.next({ type: 'auth', token: token });
+    if (this.socket$ && !this.socket$.closed) return this.socket$;
+
+    // Utiliser le même schéma et le même host que l’appli (évite l’erreur TLS)
+    const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const host   = window.location.host;        // ex: jilms.eismv.org
+    const path   = '/personnel/websocket';      // chemin PROXY côté NGINX
+
+    this.socket = webSocket({
+      url: `${scheme}://${host}${path}`,
+      // Si tu as besoin d'envoyer des headers, pas possible ici -> envoie le token après l'ouverture (comme tu le fais déjà)
+    });
+
+    return this.socket;
+  }
+
+  private get socket(): WebSocketSubject<any> {
+    if (!this.socket$) throw new Error('WebSocket non initialisé');
     return this.socket$;
   }
 
+  private set socket(s: WebSocketSubject<any>) {
+    this.socket$ = s;
+  }
+
   public disconnect(): void {
-    if (this.socket$) {
-      this.socket$.complete(); // Ferme la connexion websocket
-      console.log('Websocket déconnecté.'); // Ajout d'un log pour vérifier la déconnexion
+    try {
+      this.socket$?.complete();
+    } finally {
+      this.socket$ = undefined;
+      // console.log('Websocket déconnecté.');
     }
   }
 }

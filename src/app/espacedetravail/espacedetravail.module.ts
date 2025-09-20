@@ -17,7 +17,7 @@ import { EspacedetravailComponent } from './espacedetravail.component';
 import { CommunModule } from '../commun/commun.module';
 import { MenuComponent } from './menu/menu.component';
 import { EntetedepageComponent } from '../commun/entetedepage/entetedepage.component';
-
+import { NgbCarouselModule } from '@ng-bootstrap/ng-bootstrap';
 
 
 @NgModule({
@@ -36,7 +36,7 @@ import { EntetedepageComponent } from '../commun/entetedepage/entetedepage.compo
 
     FormsModule,
     NgbModalModule,
-    
+      NgbCarouselModule, 
     NgApexchartsModule,
     ReactiveFormsModule,
     HttpClientModule,

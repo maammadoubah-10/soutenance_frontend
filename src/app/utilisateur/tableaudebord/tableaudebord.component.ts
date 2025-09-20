@@ -1,13 +1,73 @@
 import { Component, OnInit } from '@angular/core';
-import {DomSanitizer} from "@angular/platform-browser";
-import {catchError, map, startWith} from "rxjs/operators";
-import {DataStateEnum, ModelDataState} from "../../state/state";
-import {HttpErrorResponse} from "@angular/common/http";
-import {Observable} from "rxjs";
-import {UtilisateurAuthentifie} from "../../authentification/models/utilisateur-authentifie";
-import {UtilisateurService} from "../services/utilisateur.service";
-import {Statistique} from "../models/statistique";
+import { DomSanitizer } from "@angular/platform-browser";
+import { catchError, map, startWith } from "rxjs/operators";
+import { DataStateEnum, ModelDataState } from "../../state/state";
+import { HttpErrorResponse } from "@angular/common/http";
+import { Observable } from "rxjs";
+import { UtilisateurAuthentifie } from "../../authentification/models/utilisateur-authentifie";
+import { UtilisateurService } from "../services/utilisateur.service";
 import { AuthentificationService } from '../../authentification/services/authentication.service';
+
+import {
+  ApexAxisChartSeries,
+  ApexNonAxisChartSeries,
+  ApexChart,
+  ApexXAxis,
+  ApexYAxis,
+  ApexDataLabels,
+  ApexStroke,
+  ApexPlotOptions,
+  ApexFill,
+  ApexTooltip,
+  ApexLegend,
+  ApexGrid,
+  ApexResponsive
+} from 'ng-apexcharts';
+
+/** === Types (toutes les props liées dans le template sont REQUISES) === **/
+export type AreaChartOptions = {
+  series: ApexAxisChartSeries;
+  chart: ApexChart;
+  xaxis: ApexXAxis;
+  yaxis?: ApexYAxis | ApexYAxis[];
+  dataLabels: ApexDataLabels;
+  stroke: ApexStroke;
+  fill: ApexFill;
+  tooltip: ApexTooltip;
+  grid: ApexGrid;
+  legend: ApexLegend;
+  colors?: string[];
+};
+
+export type DonutChartOptions = {
+  series: ApexNonAxisChartSeries;
+  chart: ApexChart;
+  labels: string[];
+  legend: ApexLegend;
+  tooltip: ApexTooltip;
+  responsive: ApexResponsive[];   // ✅ plus “?” → toujours défini
+};
+
+export type RadialChartOptions = {
+  series: ApexNonAxisChartSeries;
+  chart: ApexChart;
+  labels: string[];
+  plotOptions: ApexPlotOptions;
+  fill: ApexFill;
+  tooltip: ApexTooltip;
+};
+
+export type BarChartOptions = {
+  series: ApexAxisChartSeries;
+  chart: ApexChart;
+  xaxis: ApexXAxis;
+  yaxis: ApexYAxis;
+  plotOptions: ApexPlotOptions;
+  dataLabels: ApexDataLabels;
+  tooltip: ApexTooltip;
+  grid: ApexGrid;
+  colors?: string[];
+};
 
 @Component({
   selector: 'app-tableaudebord',
@@ -18,66 +78,189 @@ export class TableaudebordComponent implements OnInit {
   items: any[] = [];
 
   dataStateEnum = DataStateEnum;
-  profilSrc :any;
+  profilSrc: any;
   utilisateurAuthentifie: any;
+
   statistiqueTb: any;
   utilisateurAuthentifieState$?: Observable<ModelDataState<UtilisateurAuthentifie>>;
-  constructor( private sanitizer: DomSanitizer,
-               private utilisateurService: UtilisateurService,
-               private authenficationSerice: AuthentificationService,) {}
+
+  // Charts
+  usersAreaChart!: AreaChartOptions;
+  activationRadialChart!: RadialChartOptions;
+  rolesDonutChart!: DonutChartOptions;
+  permissionsBarChart!: BarChartOptions;
+
+  constructor(
+    private sanitizer: DomSanitizer,
+    private utilisateurService: UtilisateurService,
+    private authenficationSerice: AuthentificationService,
+  ) {}
 
   ngOnInit(): void {
-  this.items = [
+    this.items = [
       { label: 'Utilisateurs' },
       { label: 'Tableau de bord', active: true }
-    ];    this.obtenirUnUtilisateurParEmail();
-    this.obtenunirStatistique()
+    ];
+
+    this.initCharts();                 // valeurs par défaut
+    this.obtenirUnUtilisateurParEmail();
+    this.obtenunirStatistique();       // puis on met à jour
   }
 
+  // -------- DATA --------
   creationImage(image: Blob) {
     if (image && image.size > 0) {
-      let objectURL = URL.createObjectURL(image);
+      const objectURL = URL.createObjectURL(image);
       this.profilSrc = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-    } else {
-      //alert("Pas de fichier");
-      //this.showSpinner = false;
     }
   }
 
-private afficherImageDeProfil(image_de_profil: string | null | undefined): void {
-  if (!image_de_profil) return;
+  private afficherImageDeProfil(image_de_profil: string | null | undefined): void {
+    if (!image_de_profil) return;
+    const obs = this.authenficationSerice.recuperationDeImageDeProfil(image_de_profil);
+    if (!obs) return;
 
-  const obs = this.authenficationSerice.recuperationDeImageDeProfil(image_de_profil);
-  if (!obs) return;
-
-  obs.subscribe({
-    next: (blob: Blob) => this.creationImage(blob),
-    error: () => {
-      // gestion erreur
-    },
-  });
-}
+    obs.subscribe({
+      next: (blob: Blob) => this.creationImage(blob),
+      error: () => {},
+    });
+  }
 
   obtenirUnUtilisateurParEmail() {
-    this.utilisateurAuthentifieState$ = this.authenficationSerice.obtenirUnUtilisateurParEmail('').pipe(
-      map(data => {
-        this.utilisateurAuthentifie = data;
-        this.afficherImageDeProfil(this.utilisateurAuthentifie.image_de_profil);
-       // console.log(data,'sdsfdg');
-        return { data: data, dataState: DataStateEnum.CHARGE };
-      }),
-      startWith({ dataState: DataStateEnum.CHARGEMENT }),
-      catchError((error: HttpErrorResponse) => {
-        return this.authenficationSerice.gestionnaireDerreur(error);
-      }),
-      //catchError(error => of({ dataState: DataStateEnum.ERREUR, errorMessage: error.error.message, errorStatus: error.status })),
-    );
+    this.utilisateurAuthentifieState$ = this.authenficationSerice
+      .obtenirUnUtilisateurParEmail('')
+      .pipe(
+        map(data => {
+          this.utilisateurAuthentifie = data;
+          this.afficherImageDeProfil(this.utilisateurAuthentifie?.image_de_profil);
+          return { data, dataState: DataStateEnum.CHARGE };
+        }),
+        startWith({ dataState: DataStateEnum.CHARGEMENT }),
+        catchError((error: HttpErrorResponse) => this.authenficationSerice.gestionnaireDerreur(error)),
+      );
   }
 
-  obtenunirStatistique(){
-   this.utilisateurService.afficherLesStatistiquesUtilisateurs().subscribe((response) => {
-     this.statistiqueTb = response;
-   });
+  obtenunirStatistique() {
+    this.utilisateurService.afficherLesStatistiquesUtilisateurs().subscribe((response) => {
+      this.statistiqueTb = response;
+      this.updateChartsFromStats();
+    });
   }
 
+  // -------- CHARTS --------
+  private initCharts() {
+    const total = 120;
+    const actifs = 95;
+    const taux = total ? Math.round((actifs / total) * 100) : 0;
+
+    // Area
+    this.usersAreaChart = {
+      series: [
+        { name: 'Actifs', data: [12, 14, 15, 16, 17, 18, 19] },
+        { name: 'Inactifs', data: [3, 4, 3, 5, 4, 5, 4] }
+      ],
+      chart: { type: 'area', height: 320, toolbar: { show: false } },
+      dataLabels: { enabled: false },
+      stroke: { curve: 'smooth', width: 2 },
+      fill: { type: 'gradient', gradient: { opacityFrom: 0.5, opacityTo: 0.2 } },
+      xaxis: { categories: ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'] },
+      grid: { strokeDashArray: 4 },
+      tooltip: { theme: 'light' },
+      legend: { position: 'top' }
+    };
+
+    // Radial
+    this.activationRadialChart = {
+      series: [taux],
+      chart: { type: 'radialBar', height: 320 },
+      labels: ['Taux activation'],
+      plotOptions: {
+        radialBar: {
+          hollow: { size: '60%' },
+          dataLabels: {
+            name: { fontSize: '14px' },
+            value: { fontSize: '24px', formatter: (v: any) => `${v}%` }
+          }
+        }
+      },
+      fill: { type: 'gradient', gradient: { shade: 'light', opacityFrom: 0.9, opacityTo: 0.6 } },
+      tooltip: { enabled: true }
+    };
+
+    // Donut (✅ responsive toujours présent)
+    this.rolesDonutChart = {
+      series: [50, 30, 20],
+      chart: { type: 'donut', height: 320 },
+      labels: ['Admin', 'Manager', 'Utilisateur'],
+      legend: { position: 'bottom' },
+      responsive: [
+        { breakpoint: 992, options: { legend: { position: 'bottom' } } }
+      ],
+      tooltip: { y: { formatter: (val: number) => `${val}` } }
+    };
+
+    // Bar
+    this.permissionsBarChart = {
+      series: [{ name: 'Permissions', data: [12, 9, 15, 6, 10] }],
+      chart: { type: 'bar', height: 320, toolbar: { show: false } },
+      plotOptions: { bar: { columnWidth: '40%', borderRadius: 6 } },
+      dataLabels: { enabled: false },
+      xaxis: { categories: ['RH', 'Paie', 'Utilisateurs', 'Formation', 'Publication'] },
+      yaxis: { labels: { show: true } },
+      grid: { strokeDashArray: 4 },
+      tooltip: { theme: 'light' }
+    };
+  }
+
+  private updateChartsFromStats() {
+    const total = Number(this.statistiqueTb?.nombreTotalUtilisateur ?? 0);
+    const actifs = Number(this.statistiqueTb?.nombreTotalUtilisateurActif ?? 0);
+    const inactifs = Number(this.statistiqueTb?.nombreTotalUtilisateurNonActif ?? 0);
+    const roles = Number(this.statistiqueTb?.nombreTotalRole ?? 0);
+    const perms = Number(this.statistiqueTb?.nombreTotalPermission ?? 0);
+
+    const admin = Math.max(1, Math.round(roles * 0.2));
+    const manager = Math.max(1, Math.round(roles * 0.3));
+    const user = Math.max(1, roles - admin - manager);
+
+    this.usersAreaChart = {
+      ...this.usersAreaChart,
+      series: [
+        { name: 'Actifs', data: this.buildSmoothSeries(actifs) },
+        { name: 'Inactifs', data: this.buildSmoothSeries(inactifs) }
+      ]
+    };
+
+    const taux = total ? Math.round((actifs / total) * 100) : 0;
+    this.activationRadialChart = { ...this.activationRadialChart, series: [taux] };
+
+    this.rolesDonutChart = {
+      ...this.rolesDonutChart,
+      series: [admin, manager, user],
+      labels: ['Admin', 'Manager', 'Utilisateur'],
+      responsive: this.rolesDonutChart.responsive ?? []   // ✅ garde un array
+    };
+
+    const repartitionPerm = this.distributeNumberAcross(5, perms);
+    this.permissionsBarChart = {
+      ...this.permissionsBarChart,
+      series: [{ name: 'Permissions', data: repartitionPerm }]
+    };
+  }
+
+  private buildSmoothSeries(value: number): number[] {
+    const base = Math.max(0, Math.floor(value * 0.8));
+    const delta = Math.max(0, value - base);
+    return [base - 2, base + 1, base + 2, base + 3, base + delta - 1, base + delta, value];
+  }
+
+  private distributeNumberAcross(n: number, total: number): number[] {
+    if (n <= 0) return [];
+    const base = Math.floor(total / n);
+    const arr = Array(n).fill(base);
+    let rest = total - base * n;
+    let i = 0;
+    while (rest > 0) { arr[i % n]++; rest--; i++; }
+    return arr;
+  }
 }

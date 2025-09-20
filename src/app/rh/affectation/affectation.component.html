@@ -1,0 +1,114 @@
+<div class="container-fluid px-3 main">
+  <app-titredepage title="Affectations" [items]="items"></app-titredepage>
+
+  <div class="card">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h4 class="card-title">Liste des affectations</h4>
+        <button class="btn btn-primary" (click)="openModal(formTpl)">Ajouter une affectation</button>
+      </div>
+
+      <ng-container *ngIf="affectations$ | async as resp" [ngSwitch]="resp.dataState">
+        <div *ngSwitchCase="dataStateEnum.CHARGEMENT" class="alert alert-info">Chargement…</div>
+        <div *ngSwitchCase="dataStateEnum.ERREUR" class="alert alert-danger">Erreur de chargement</div>
+
+        <div *ngSwitchCase="dataStateEnum.CHARGE" class="table-responsive">
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Personnel</th>
+                <th>Poste</th>
+                <th>Date de début</th>
+                <th style="width: 180px">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let a of listePage; index as i">
+                <td>{{ i + 1 + (currentPage * pageSize) }}</td>
+                <td>{{ a?.personnel?.etatCivil?.prenom || a?.personnel?.prenom }} {{ a?.personnel?.etatCivil?.nom || a?.personnel?.nom }}</td>
+                <td>{{ a?.poste?.designation }}</td>
+                <td>{{ a?.dateDebut | date:'dd MMMM yyyy':'?':'fr-FR' }}</td>
+                <td>
+                  <button class="btn btn-sm btn-info me-2" (click)="openModal(formTpl, a)">Modifier</button>
+                  <button class="btn btn-sm btn-danger" (click)="supprimer(a.id!)">Supprimer</button>
+                </td>
+              </tr>
+              <tr *ngIf="!listePage.length">
+                <td colspan="5" class="text-center">Aucune affectation</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <div class="d-flex justify-content-end align-items-center" *ngIf="totalPages > 1">
+            <button class="btn btn-outline-primary btn-sm me-2" [disabled]="currentPage===0"
+                    (click)="currentPage=currentPage-1; chargerPage()">Précédent</button>
+            <ng-container *ngFor="let p of pages">
+              <button class="btn btn-sm mx-1"
+                      [class.btn-primary]="p===currentPage"
+                      [class.btn-outline-primary]="p!==currentPage"
+                      (click)="currentPage=p; chargerPage()">{{ p+1 }}</button>
+            </ng-container>
+            <button class="btn btn-outline-primary btn-sm ms-2" [disabled]="currentPage+1===totalPages"
+                    (click)="currentPage=currentPage+1; chargerPage()">Suivant</button>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
+
+<!-- Modal formulaire -->
+<ng-template #formTpl let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">{{ form.get('id')?.value ? 'Modifier' : 'Ajouter' }} une affectation</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <form [formGroup]="form" (ngSubmit)="submit()">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label>Personnel</label>
+          <select class="form-select" formControlName="personnel"
+                  [ngClass]="{'is-invalid': form.get('personnel')?.invalid && form.get('personnel')?.touched}">
+            <option [ngValue]="null">-- Sélectionner --</option>
+            <option *ngFor="let p of listePersonnel" [ngValue]="p.id">
+              {{ (p?.etatCivil?.prenom || p?.prenom) + ' ' + (p?.etatCivil?.nom || p?.nom) }}
+            </option>
+          </select>
+          <div class="text-danger" *ngIf="form.get('personnel')?.invalid && form.get('personnel')?.touched">
+            Le personnel est obligatoire
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label>Poste</label>
+          <select class="form-select" formControlName="poste"
+                  [ngClass]="{'is-invalid': form.get('poste')?.invalid && form.get('poste')?.touched}">
+            <option [ngValue]="null">-- Sélectionner --</option>
+            <option *ngFor="let s of listePostes" [ngValue]="s.id">{{ s.designation }}</option>
+          </select>
+          <div class="text-danger" *ngIf="form.get('poste')?.invalid && form.get('poste')?.touched">
+            Le poste est obligatoire
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label>Date de début</label>
+          <input type="date" class="form-control" formControlName="dateDebut"
+                 [ngClass]="{'is-invalid': form.get('dateDebut')?.invalid && form.get('dateDebut')?.touched}">
+          <div class="text-danger" *ngIf="form.get('dateDebut')?.invalid && form.get('dateDebut')?.touched">
+            La date de début est obligatoire
+          </div>
+        </div>
+      </div>
+
+      <div class="text-end">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.dismiss()">Fermer</button>
+        <button class="btn btn-primary" type="submit" [disabled]="form.invalid">
+          {{ form.get('id')?.value ? 'Modifier' : 'Créer' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>

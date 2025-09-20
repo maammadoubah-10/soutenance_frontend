@@ -29,7 +29,11 @@ import { IndiceComponent } from './indice/indice.component';
 import { DemandeComponent } from './demande/demande.component';
 import { MissionComponent } from './mission/mission.component';
 import { DetailmissionComponent } from './mission/detailmission/detailmission.component';
-
+import { AffectationComponent } from './affectation/affectation.component';
+import { PresenceComponent } from './presence/presence.component';
+import { RhDashboardComponent } from './rh-dashboard.component';
+//import { RhDashboardComponent } from './rh-dashboard.component';
+//import { NgApexchartsModule } from 'ng-apexcharts';
 @NgModule({
   declarations: [
     RhComponent,
@@ -47,6 +51,10 @@ import { DetailmissionComponent } from './mission/detailmission/detailmission.co
     DemandeComponent,
     MissionComponent,
     DetailmissionComponent,
+    AffectationComponent,
+    PresenceComponent,
+    RhDashboardComponent
+    
   ],
   imports: [
     CommonModule,
@@ -65,7 +73,8 @@ import { DetailmissionComponent } from './mission/detailmission/detailmission.co
     ToastrModule.forRoot(),
     //NgxPaginationModule,
     NgbTooltipModule,
-    MatStepperModule 
+    MatStepperModule ,
+    NgApexchartsModule
 ]
 })
 export class RhModule { }

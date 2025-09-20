@@ -70,6 +70,20 @@ export const MENU: MenuItem[] = [
              icon: 'bx bx-wallet',
              link: 'frais',
            },
+            {
+              id: 4,
+              label: 'Affectations',
+              icon: 'bx bx-transfer',  
+              link: 'affectations',
+            },
+            {
+              id: 4,
+              label: 'Présences',
+              icon: 'bx bx-check-square',
+              link: 'presences', 
+            },
+
+
            {
              id: 4,
              label: 'Missions',

@@ -164,13 +164,14 @@ export class DetailpersonnelComponent implements OnInit {
     commentaire: new FormControl(''),
   })
 
-  formulaireAffectation = new FormGroup({
-    id: new FormControl(),
-    dateDebut: new FormControl(new Date(), [Validators.required]),
-    dateFin: new FormControl(new Date()),
-    personnel: new FormControl<string | null>(null),
-    poste: new FormControl<string | null>(null, [Validators.required]),
-  })
+formulaireAffectation = new FormGroup({
+  id: new FormControl(),
+  dateDebut: new FormControl(new Date(), [Validators.required]),
+  // ❌ plus de dateFin ici
+  personnel: new FormControl<string | null>(null),
+  poste: new FormControl<string | null>(null, [Validators.required]),
+});
+
 
   formulaireAvenantContrat = new FormGroup({
     id: new FormControl(),
@@ -1546,101 +1547,113 @@ export class DetailpersonnelComponent implements OnInit {
   }
 
 
-  openModalAfectation(content: any, affectation: Affectation | undefined = undefined) {
-    if (affectation) {
-      this.formulaireAffectation.patchValue(affectation as any);
-
-      // Conversion explicite pour éviter undefined
-      const personnelId = affectation?.personnel?.id;
-      const posteId = affectation?.poste?.id;
-
-      this.formulaireAffectation.get('personnel')?.setValue(personnelId ? String(personnelId) : null);
-      this.formulaireAffectation.get('poste')?.setValue(posteId ? String(posteId) : null);
-    } else {
-      this.formulaireAffectation.reset();
-      this.formulaireAffectation.get('poste')?.setValue(null);
-      this.formulaireAffectation.get('personnel')?.setValue(this.id$ ? String(this.id$) : null);
-    }
-    this.modalService.open(content);
-  }
-
-
-  creeModifierAffectation() {
-    if (this.formulaireAffectation.valid)
-      if (this.formulaireAffectation.get('id')?.value) {
-        this.affectationService.modifierAffectation(this.formulaireAffectation.get("id")?.value, this.formulaireAffectation.value)
-          .subscribe(
-            (response: any) => {
-              this.listeAffectationPersonnel.map(e => {
-                if (e.id == response.id) {
-                  e.poste = response.poste
-                  e.dateDebut = response.dateDebut
-                  e.dateFin = response.dateFin
-                }
-                return e;
-              })
-              this.modalService.dismissAll()
-              this.chargerIdPersonnel(this.id$)
-              this.successmsg("Affectation modifier", "L'affectation a été modifié avec succès")
-              this.formulaireAffectation.reset()
-            },
-            (error) => {
-              const errors = error.error.errors;
-              for (let i = 0; i < errors.length; i++) {
-                const currentError = errors[i];
-                this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
-              }
-            }
-          )
-      } else {
-        this.affectationService.creerAffectation(this.formulaireAffectation.value).subscribe(
-          (response: any) => {
-            this.listeAffectationPersonnel.unshift(response['data'])
-            this.formulaireAffectation.reset()
-            this.modalService.dismissAll()
-            this.chargerIdPersonnel(this.id$)
-            this.successmsg("Affectation créer", "L'affectation a été créé avec succès")
-          },
-          (error) => {
-            const errors = error.error.errors;
-            for (let i = 0; i < errors.length; i++) {
-              const currentError = errors[i];
-              this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
-            }
-          }
-        )
-      }
-  }
-
-
-  supprimerAffectation(id: number) {
-    Swal.fire({
-      title: 'Êtes vous sûr ?',
-      text: 'Êtes vous sûr de vouloir le supprimer. Il vous sera impossible de revenir en arrière !',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#34c38f',
-      cancelButtonColor: '#f46a6a',
-      confirmButtonText: 'Oui, Supprimez le!',
-      cancelButtonText: 'Non, Annuler',
-    }).then((result) => {
-      if (result.value) {
-        this.affectationService.supprimerAffectation(id).subscribe({
-          next: (value: any) => {
-            this.devisSbj.next(0);
-            this.listeInterimesPersonnel = this.listeInterimesPersonnel.filter(
-              (i) => i.id !== id
-            );
-            this.chargerIdPersonnel(this.id$)
-            this.successmsg('Suppression réussie', 'Affectation supprimer');
-          },
-          error: (err) => {
-            this.errormsg('Affectation non supprimer', err.error.message);
-          },
-        });
-      }
+ openModalAfectation(content: any, affectation: Affectation | undefined = undefined) {
+  if (affectation) {
+    this.formulaireAffectation.patchValue({
+      id: affectation.id ?? null,
+      dateDebut: affectation.dateDebut ? new Date(affectation.dateDebut) : new Date(),
+      personnel: affectation.personnel?.id ? String(affectation.personnel.id) : null,
+      poste: affectation.poste?.id ? String(affectation.poste.id) : null,
     });
+  } else {
+    this.formulaireAffectation.reset();
+    this.formulaireAffectation.get('poste')?.setValue(null);
+    this.formulaireAffectation.get('personnel')?.setValue(this.id$ ? String(this.id$) : null);
+    this.formulaireAffectation.get('dateDebut')?.setValue(new Date());
   }
+  this.modalService.open(content, { size: 'lg', backdrop: 'static', keyboard: false });
+}
+
+private formatDateYYYYMMDD(d: Date | string | null): string {
+  if (!d) return '';
+  const x = new Date(d);
+  const y = x.getFullYear();
+  const m = String(x.getMonth() + 1).padStart(2, '0');
+  const dd = String(x.getDate()).padStart(2, '0');
+  return `${y}-${m}-${dd}`;
+}
+
+creeModifierAffectation() {
+  if (!this.formulaireAffectation.valid) return;
+
+  const v = this.formulaireAffectation.value;
+  const dto = {
+    personnel: Number(v.personnel ?? this.id$),
+    poste: Number(v.poste),
+    dateDebut: this.formatDateYYYYMMDD(v.dateDebut as Date),
+  };
+
+  // UPDATE
+  if (this.formulaireAffectation.get('id')?.value) {
+    this.affectationService.modifier(Number(this.formulaireAffectation.get('id')?.value), dto)
+      .subscribe(
+        (response: any) => {
+          this.listeAffectationPersonnel = this.listeAffectationPersonnel.map(e => {
+            if (e.id === response.id) {
+              return { ...e, poste: response.poste, dateDebut: response.dateDebut }; // ❌ pas de dateFin
+            }
+            return e;
+          });
+          this.modalService.dismissAll();
+          this.chargerIdPersonnel(this.id$);
+          this.successmsg("Affectation modifiée", "L'affectation a été modifiée avec succès");
+          this.formulaireAffectation.reset();
+        },
+        (error: any) => { // ✅ typage
+          const errors = error?.error?.errors ?? [];
+          for (const currentError of errors) {
+            this.toastService.error(`${currentError.champs}: ${currentError.message}`, 'Erreur!');
+          }
+        }
+      );
+  } else {
+    // CREATE
+    this.affectationService.creer(dto).subscribe(
+      (response: any) => {
+        this.listeAffectationPersonnel.unshift(response['data'] ?? response);
+        this.formulaireAffectation.reset();
+        this.modalService.dismissAll();
+        this.chargerIdPersonnel(this.id$);
+        this.successmsg("Affectation créée", "L'affectation a été créée avec succès");
+      },
+      (error: any) => { // ✅ typage
+        const errors = error?.error?.errors ?? [];
+        for (const currentError of errors) {
+          this.toastService.error(`${currentError.champs}: ${currentError.message}`, 'Erreur!');
+        }
+      }
+    );
+  }
+}
+
+supprimerAffectation(id: number) {
+  Swal.fire({
+    title: 'Êtes vous sûr ?',
+    text: 'Êtes vous sûr de vouloir le supprimer. Il vous sera impossible de revenir en arrière !',
+    icon: 'warning',
+    showCancelButton: true,
+    confirmButtonColor: '#34c38f',
+    cancelButtonColor: '#f46a6a',
+    confirmButtonText: 'Oui, Supprimez le!',
+    cancelButtonText: 'Non, Annuler',
+  }).then((result) => {
+    if (result.value) {
+      this.affectationService.supprimer(id).subscribe({
+        next: () => {
+          this.devisSbj.next(0);
+          // ✅ bonne liste filtrée
+          this.listeAffectationPersonnel = this.listeAffectationPersonnel.filter(i => i.id !== id);
+          this.chargerIdPersonnel(this.id$);
+          this.successmsg('Suppression réussie', 'Affectation supprimée');
+        },
+        error: (err: any) => { // ✅ typage
+          this.errormsg('Affectation non supprimée', err?.error?.message ?? 'Erreur');
+        },
+      });
+    }
+  });
+}
+
 
 
   openModalContratDetail(contrat: Contrat, content: any) {
