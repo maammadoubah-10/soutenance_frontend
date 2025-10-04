@@ -64,7 +64,7 @@
                 <input type="checkbox" [checked]="selectedIds.has(p.id)" (change)="toggleSelect(p, $event)">
               </td>
               <td>{{ i + 1 + (currentPage * pageSize) }}</td>
-              <td>{{ afficherNomPersonnel(p?.personnel) }}</td>
+              <td>{{ afficherNomPersonnel(p) }}</td>
               <td>{{ p?.mois }}</td>
               <td>{{ p?.annee }}</td>
               <td>{{ p?.nbreJourAbsent }}</td>

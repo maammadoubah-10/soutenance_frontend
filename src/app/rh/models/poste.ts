@@ -1,13 +1,12 @@
 import {Service} from "./service";
 
 export interface Poste {
-  id: number,
-  designation: string,
-  description: string, //text area
-  ficheDePoste: string
-  chefService: boolean,
-  estChef: boolean,
+  id: number;
+  designation: string;
+  description: string;
+  ficheDePoste: string | null;
+  chefService: boolean;
 
-  service: Service
-  poste: Poste
+  service: Service;
+  poste: Poste | null;
 }

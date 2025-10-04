@@ -1,7 +1,7 @@
 <div class="container-fluid px-3 main">
   <app-titredepage title="Mission" [items]="items"></app-titredepage>
-  
-  <!-- Filtre de recherche avec animation -->
+
+  <!-- Filtre de recherche -->
   <div class="row animate__animated animate__fadeIn">
     <div class="col-lg-12">
       <div class="card job-filter shadow-sm border-0">
@@ -10,15 +10,23 @@
             <div class="col-xxl-4 col-lg-6">
               <div class="position-relative">
                 <i class="bx bx-search search-icon"></i>
-                <input type="search" id="searchInput" [(ngModel)]="reference"
+                <input
+                  type="search"
+                  id="searchInput"
+                  [(ngModel)]="reference"
                   (keyup)="onPageChangeReference(currentPage)"
                   placeholder="Taper les trois premières lettres de la référence..."
-                  class="form-control form-control-lg ps-5 ng-untouched ng-pristine ng-valid">
+                  class="form-control form-control-lg ps-5"
+                />
               </div>
             </div>
+
             <div class="col-xxl-2 col-lg-6">
               <div class="position-relative h-100 hstack gap-3">
-                <button (click)="openModal(content)" type="submit" class="btn-darkblue btn-lg h-100 w-100 d-flex align-items-center justify-content-center">
+                <button
+                  (click)="openModal(content)"
+                  type="button"
+                  class="btn-darkblue btn-lg h-100 w-100 d-flex align-items-center justify-content-center">
                   <i class="mdi mdi-plus align-middle me-2"></i> Ajouter une mission
                 </button>
               </div>
@@ -30,77 +38,145 @@
   </div>
 
   <!-- Liste des missions -->
-  <ng-container [ngSwitch]="response?.dataState" *ngIf="dossiers | async as response">
+  <ng-container *ngIf="dossiers | async as response" [ngSwitch]="response?.dataState">
+    <!-- CHARGEMENT -->
     <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
       <div class="alert alert-info d-flex align-items-center mt-4 animate__animated animate__fadeIn" role="alert">
         <i class="bx bx-loader-circle bx-spin me-2 fs-5"></i>
         {{ dataStateEnum.CHARGEMENT }}
       </div>
     </ng-container>
-    
+
+    <!-- ERREUR -->
     <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
       <div class="alert alert-danger d-flex align-items-center mt-4 animate__animated animate__shakeX" role="alert">
         <i class="bx bx-error-circle me-2 fs-5"></i>
         <span>Erreur lors du chargement des données</span>
       </div>
     </ng-container>
-    
+
+    <!-- CHARGE -->
     <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
       <div class="card border-0 shadow-sm mt-4 animate__animated animate__fadeInUp" *ngIf="listeDossierPage.length">
         <div class="card-body p-0">
           <div class="table-responsive">
             <ul class="list-group list-group-flush mission-list">
-              <li class="list-group-item border-0 py-3 px-4 mission-item animate__animated animate__fadeIn" 
-                  *ngFor="let dossier of listeDossierPage ?? []; let i = index" [style.animation-delay]="i * 0.05 + 's'">
+              <li
+                class="list-group-item border-0 py-3 px-4 mission-item animate__animated animate__fadeIn"
+                *ngFor="let dossier of listeDossierPage ?? []; let i = index"
+                [style.animation-delay]="i * 0.05 + 's'">
+
                 <div class="d-flex justify-content-between align-items-center">
                   <div class="d-flex align-items-center">
+
+                    <!-- Actions -->
                     <div class="mission-actions me-3">
-                      <button type="button" title="Ajouter le rapport" placement="top" ngbToolTip="Ajouter le rapport"
-                        *ngIf="!dossier?.rapport" (click)="openModalRapport(rapport, dossier)"
-                        class="btn btn-outline-secondary btn-sm rounded-circle me-2" data-bs-toggle="button">
+                      <!-- Ajouter rapport -->
+                      <button
+                        type="button"
+                        title="Ajouter le rapport"
+                        [placement]="'top'"
+                        ngbTooltip="Ajouter le rapport"
+                        *ngIf="!dossier?.rapport"
+                        (click)="openModalRapport(rapport, dossier)"
+                        class="btn btn-outline-secondary btn-sm rounded-circle me-2">
                         <i class="bx bx-upload"></i>
                       </button>
-                      <a type="button" title="Télécharger le rapport" placement="top" target="_blank"
-                        (click)="showPopOnDownloadRapportMission()" href="{{telechargerRapportMission(dossier)}}"
-                        *ngIf="dossier?.dateDebut" ngbTooltip="Télécharger le rapport"
-                        class="btn btn-outline-dark btn-sm rounded-circle me-2" data-bs-toggle="button">
-                        <i class="bx bx-download"></i>
-                      </a>
 
-                      <button type="button" title="Modifier" placement="top" ngbToolTip="Modifier"
-                        (click)="openModal(content, dossier)" class="btn btn-outline-primary btn-sm rounded-circle me-2"
-                        data-bs-toggle="button">
+                      <!-- Télécharger pièce jointe -->
+                      <button
+                        type="button"
+                        title="Télécharger la pièce jointe"
+                        [placement]="'top'"
+                        ngbTooltip="Télécharger la pièce jointe"
+                        *ngIf="dossier?.pieces"
+                        (click)="onTelechargerRapport(dossier)"
+                        class="btn btn-outline-dark btn-sm rounded-circle me-2">
+                        <i class="bx bx-download"></i>
+                      </button>
+
+                      <!-- Modifier -->
+                      <button
+                        type="button"
+                        title="Modifier"
+                        [placement]="'top'"
+                        ngbTooltip="Modifier"
+                        (click)="openModal(content, dossier)"
+                        class="btn btn-outline-primary btn-sm rounded-circle me-2">
                         <i class="bx bx-pencil"></i>
                       </button>
-                      <button type="button" title="supprimer" placement="top" ngbToolTip="supprimer"
-                        (click)="supprimerMission(dossier.id)" class="btn btn-outline-danger btn-sm rounded-circle"
-                        data-bs-toggle="button">
+
+                      <!-- Supprimer -->
+                      <button
+                        type="button"
+                        title="Supprimer"
+                        [placement]="'top'"
+                        ngbTooltip="Supprimer"
+                        (click)="supprimerMission(dossier.id)"
+                        class="btn btn-outline-danger btn-sm rounded-circle">
                         <i class="bx bx-trash-alt"></i>
                       </button>
                     </div>
-                    
+
+                    <!-- Statut -->
                     <div class="mission-status me-4">
-                      <span *ngIf="dossier?.dateDebut" class="badge bg-success-subtle text-success fs-6 py-2 px-3 rounded-pill">
-                        <i class="bx bx-time-five me-1"></i> En Cours
+                      <span
+                        *ngIf="dossier?.isTodayBetweenDates"
+                        class="badge bg-success-subtle text-success fs-6 py-2 px-3 rounded-pill">
+                        <i class="bx bx-time-five me-1"></i> En cours
                       </span>
-                      <span *ngIf="!dossier?.dateFin" class="badge bg-danger-subtle text-danger fs-6 py-2 px-3 rounded-pill">
+                      <span
+                        *ngIf="!dossier?.isTodayBetweenDates && dossier?.dateFin"
+                        class="badge bg-danger-subtle text-danger fs-6 py-2 px-3 rounded-pill">
                         <i class="bx bx-check-circle me-1"></i> Terminée
                       </span>
                     </div>
-                    
-                    <a class="mission-link text-decoration-none fw-semibold text-primary fs-5" 
-                      [routerLink]="['details/' +  encodeId(dossier.id)]">
-                      {{dossier?.dateDebut | date:'dd MMMM yyyy':'':'fr-FR'}}
+
+                    <!-- Date (lien) -->
+                    <a
+                      class="mission-link text-decoration-none fw-semibold text-primary fs-5 me-3"
+                      [routerLink]="['details/' + encodeId(dossier.id)]">
+                      {{ dossier?.dateDebut | date:'dd MMMM yyyy':'':'fr-FR' }}
                     </a>
+
+                    <!-- Référence / jours -->
+                    <span class="badge bg-primary-subtle text-primary rounded-pill me-3" *ngIf="dossier?.reference">
+                      Ref: {{ dossier.reference }}
+                    </span>
+                    <span class="text-muted me-3" *ngIf="dossier?.nbreJour">
+                      Jours: {{ dossier.nbreJour }}
+                    </span>
+
+                    <!-- NOM + PRÉNOM -->
+                    <span class="text-dark fw-medium me-3" *ngIf="dossier?.personnel">
+                      {{ dossier?.personnel?.prenom }} {{ dossier?.personnel?.nom }}
+                    </span>
+
+                    <!-- Transport -->
+                    <span class="text-muted me-3" *ngIf="dossier?.moyenDeplacement">
+                      Transport: {{ dossier.moyenDeplacement }}
+                    </span>
+
+                    <!-- Badge Pièce jointe -->
+                    <span class="badge bg-info-subtle text-info rounded-pill" *ngIf="dossier?.pieces">
+                      Pièce jointe
+                    </span>
                   </div>
-                  
+
+                  <!-- Motif + période -->
                   <div class="d-flex align-items-center">
                     <div class="mission-info text-end me-4">
-                      <a [routerLink]="['details/' +  encodeId(dossier.id)]"
+                      <a
+                        [routerLink]="['details/' + encodeId(dossier.id)]"
                         class="subject text-dark text-decoration-none fw-medium d-block">
-                        {{dossier?.motif}}
+                        {{ dossier?.motif }}
                       </a>
-                      <div class="date text-muted small">{{dossier?.dateDebut| date:'dd MMMM yyyy':'':'fr-FR'}}</div>
+                      <div class="date text-muted small">
+                        {{ dossier?.dateDebut | date:'dd MMMM yyyy':'':'fr-FR' }}
+                        <span *ngIf="dossier?.dateFin">
+                          → {{ dossier?.dateFin | date:'dd MMMM yyyy':'':'fr-FR' }}
+                        </span>
+                      </div>
                     </div>
                     <i class="bx bx-chevron-right text-muted fs-4"></i>
                   </div>
@@ -111,10 +187,11 @@
         </div>
       </div>
 
+      <!-- Empty state -->
       <div class="row mt-5 animate__animated animate__fadeIn" *ngIf="!listeDossierPage.length">
         <div class="col-12 text-center py-5">
           <div class="empty-state">
-            <i class='bx bxs-data text-muted' style="font-size: 5rem;"></i>
+            <i class="bx bxs-data text-muted" style="font-size: 5rem;"></i>
             <h4 class="mt-3 text-muted">Aucune Mission</h4>
             <p class="text-muted">Commencez par ajouter votre première mission</p>
             <button (click)="openModal(content)" class="btn btn-primary mt-3">
@@ -134,9 +211,9 @@
                   <i class="bx bx-chevron-left"></i> Précédent
                 </button>
               </li>
-              
+
               <ng-container *ngIf="pages.length > 1">
-                <ng-container *ngIf="pages.length <= 11">
+                <ng-container *ngIf="pages.length <= 11; else longPager">
                   <ng-container *ngFor="let page of pages">
                     <li class="page-item" [class.active]="currentPage === page">
                       <button class="page-link" (click)="currentPage = page; handleClick()">
@@ -145,9 +222,9 @@
                     </li>
                   </ng-container>
                 </ng-container>
-                
-                <ng-container *ngIf="pages.length > 11">
-                  <ng-container *ngIf="currentPage <= 6">
+
+                <ng-template #longPager>
+                  <ng-container *ngIf="currentPage <= 6; else middlePager">
                     <ng-container *ngFor="let page of pages.slice(0, 5)">
                       <li class="page-item" [class.active]="currentPage === page">
                         <button class="page-link" (click)="currentPage = page; handleClick()">
@@ -155,9 +232,7 @@
                         </button>
                       </li>
                     </ng-container>
-                    <li class="page-item disabled">
-                      <span class="page-link">...</span>
-                    </li>
+                    <li class="page-item disabled"><span class="page-link">...</span></li>
                     <ng-container *ngFor="let page of pages.slice(-5)">
                       <li class="page-item" [class.active]="currentPage === page">
                         <button class="page-link" (click)="currentPage = page; handleClick()">
@@ -166,60 +241,56 @@
                       </li>
                     </ng-container>
                   </ng-container>
-                  
-                  <ng-container *ngIf="currentPage > 6 && currentPage < pages.length - 5">
-                    <ng-container *ngFor="let page of pages.slice(0, 2)">
-                      <li class="page-item" [class.active]="currentPage === page">
-                        <button class="page-link" (click)="currentPage = page; handleClick()">
-                          {{ page + 1 }}
-                        </button>
-                      </li>
+
+                  <ng-template #middlePager>
+                    <ng-container *ngIf="currentPage < pages.length - 5; else tailPager">
+                      <ng-container *ngFor="let page of pages.slice(0, 2)">
+                        <li class="page-item" [class.active]="currentPage === page">
+                          <button class="page-link" (click)="currentPage = page; handleClick()">
+                            {{ page + 1 }}
+                          </button>
+                        </li>
+                      </ng-container>
+                      <li class="page-item disabled"><span class="page-link">...</span></li>
+                      <ng-container *ngFor="let page of pages.slice(currentPage - 1, currentPage + 2)">
+                        <li class="page-item" [class.active]="currentPage === page">
+                          <button class="page-link" (click)="currentPage = page; handleClick()">
+                            {{ page + 1 }}
+                          </button>
+                        </li>
+                      </ng-container>
+                      <li class="page-item disabled"><span class="page-link">...</span></li>
+                      <ng-container *ngFor="let page of pages.slice(-2)">
+                        <li class="page-item" [class.active]="currentPage === page">
+                          <button class="page-link" (click)="currentPage = page; handleClick()">
+                            {{ page + 1 }}
+                          </button>
+                        </li>
+                      </ng-container>
                     </ng-container>
-                    <li class="page-item disabled">
-                      <span class="page-link">...</span>
-                    </li>
-                    <ng-container *ngFor="let page of pages.slice(currentPage - 1, currentPage + 2)">
-                      <li class="page-item" [class.active]="currentPage === page">
-                        <button class="page-link" (click)="currentPage = page; handleClick()">
-                          {{ page + 1 }}
-                        </button>
-                      </li>
-                    </ng-container>
-                    <li class="page-item disabled">
-                      <span class="page-link">...</span>
-                    </li>
-                    <ng-container *ngFor="let page of pages.slice(-2)">
-                      <li class="page-item" [class.active]="currentPage === page">
-                        <button class="page-link" (click)="currentPage = page; handleClick()">
-                          {{ page + 1 }}
-                        </button>
-                      </li>
-                    </ng-container>
-                  </ng-container>
-                  
-                  <ng-container *ngIf="currentPage >= pages.length - 5">
-                    <ng-container *ngFor="let page of pages.slice(0, 2)">
-                      <li class="page-item" [class.active]="currentPage === page">
-                        <button class="page-link" (click)="currentPage = page; handleClick()">
-                          {{ page + 1 }}
-                        </button>
-                      </li>
-                    </ng-container>
-                    <li class="page-item disabled">
-                      <span class="page-link">...</span>
-                    </li>
-                    <ng-container *ngFor="let page of pages.slice(-5)">
-                      <li class="page-item" [class.active]="currentPage === page">
-                        <button class="page-link" (click)="currentPage = page; handleClick()">
-                          {{ page + 1 }}
-                        </button>
-                      </li>
-                    </ng-container>
-                  </ng-container>
-                </ng-container>
+
+                    <ng-template #tailPager>
+                      <ng-container *ngFor="let page of pages.slice(0, 2)">
+                        <li class="page-item" [class.active]="currentPage === page">
+                          <button class="page-link" (click)="currentPage = page; handleClick()">
+                            {{ page + 1 }}
+                          </button>
+                        </li>
+                      </ng-container>
+                      <li class="page-item disabled"><span class="page-link">...</span></li>
+                      <ng-container *ngFor="let page of pages.slice(-5)">
+                        <li class="page-item" [class.active]="currentPage === page">
+                          <button class="page-link" (click)="currentPage = page; handleClick()">
+                            {{ page + 1 }}
+                          </button>
+                        </li>
+                      </ng-container>
+                    </ng-template>
+                  </ng-template>
+                </ng-template>
               </ng-container>
-              
-              <li class="page-item" [class.disabled]="currentPage+1 === totalPages">
+
+              <li class="page-item" [class.disabled]="currentPage + 1 === totalPages">
                 <button class="page-link" (click)="currentPage = currentPage + 1; handleClick()">
                   Suivant <i class="bx bx-chevron-right"></i>
                 </button>
@@ -232,23 +303,33 @@
   </ng-container>
 </div>
 
-<!-- Modal pour créer/modifier une mission -->
+<!-- Modal créer/modifier -->
 <ng-template #content let-modal>
   <div class="modal-header bg-light">
-    <h4 class="modal-title fw-semibold">{{formulaireDossier.get('id')?.value ? 'Modifier': 'Créer'}} une mission</h4>
+    <h4 class="modal-title fw-semibold">
+      {{ formulaireDossier.get('id')?.value ? 'Modifier' : 'Créer' }} une mission
+    </h4>
     <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cliquer pour fermer')"></button>
   </div>
+
   <div class="modal-body">
     <form [formGroup]="formulaireDossier" (ngSubmit)="creerModifierMission()">
       <div class="row">
         <div class="col-md-6">
           <div class="mb-3">
             <label for="dateDebut" class="form-label fw-medium">Date de début</label>
-            <input type="date" class="form-control form-control-lg" placeholder="Sélectionner la date de début"
-              formControlName="dateDebut" id="dateDebut"
-              [ngClass]="{'is-invalid': formulaireDossier.get('dateDebut')?.invalid && formulaireDossier.get('dateDebut')?.dirty, 'is-valid': formulaireDossier.get('dateDebut')?.valid}">
-            <div *ngIf="formulaireDossier.get('dateDebut')?.invalid && formulaireDossier.get('dateDebut')?.dirty"
-              class="invalid-feedback">
+            <input
+              type="date"
+              class="form-control form-control-lg"
+              placeholder="Sélectionner la date de début"
+              formControlName="dateDebut"
+              id="dateDebut"
+              [ngClass]="{
+                'is-invalid': formulaireDossier.get('dateDebut')?.invalid && formulaireDossier.get('dateDebut')?.dirty,
+                'is-valid': formulaireDossier.get('dateDebut')?.valid
+              }"
+            />
+            <div *ngIf="formulaireDossier.get('dateDebut')?.invalid && formulaireDossier.get('dateDebut')?.dirty" class="invalid-feedback">
               La date de début est obligatoire
             </div>
           </div>
@@ -257,11 +338,19 @@
         <div class="col-md-6">
           <div class="mb-3">
             <label for="nbreJour" class="form-label fw-medium">Nombre de jours</label>
-            <input type="number" class="form-control form-control-lg" placeholder="Entrer le nombre de jours"
-              formControlName="nbreJour" id="nbreJour"
-              [ngClass]="{'is-invalid': formulaireDossier.get('nbreJour')?.invalid && formulaireDossier.get('nbreJour')?.dirty, 'is-valid': formulaireDossier.get('nbreJour')?.valid}">
-            <div *ngIf="formulaireDossier.get('nbreJour')?.invalid && formulaireDossier.get('nbreJour')?.dirty"
-              class="invalid-feedback">
+            <input
+              type="number"
+              min="1"
+              class="form-control form-control-lg"
+              placeholder="Entrer le nombre de jours"
+              formControlName="nbreJour"
+              id="nbreJour"
+              [ngClass]="{
+                'is-invalid': formulaireDossier.get('nbreJour')?.invalid && formulaireDossier.get('nbreJour')?.dirty,
+                'is-valid': formulaireDossier.get('nbreJour')?.valid
+              }"
+            />
+            <div *ngIf="formulaireDossier.get('nbreJour')?.invalid && formulaireDossier.get('nbreJour')?.dirty" class="invalid-feedback">
               Le nombre de jours est obligatoire
             </div>
           </div>
@@ -269,50 +358,83 @@
       </div>
 
       <div class="row">
+        <!-- Personnel -->
         <div class="col-md-6">
           <div class="mb-3">
             <label for="personnelId" class="form-label fw-medium">Personnel</label>
-            <ng-select [searchable]=true autofocus="true" (search)="onSearchPersonnel($event.term)"
-              [loading]="loading" formControlName="personnelId" id="personnelId"
-              [ngClass]="{'is-invalid': formulaireDossier.get('personnelId')?.invalid && formulaireDossier.get('personnelId')?.dirty, 'is-valid': formulaireDossier.get('personnelId')?.valid}"
+            <ng-select
+              [searchable]="true"
+              (search)="onSearchPersonnel($event.term)"
+              [loading]="loading"
+              formControlName="personnelId"
+              id="personnelId"
+              [ngClass]="{
+                'is-invalid': formulaireDossier.get('personnelId')?.invalid && formulaireDossier.get('personnelId')?.dirty,
+                'is-valid': formulaireDossier.get('personnelId')?.valid
+              }"
               placeholder="Rechercher un personnel...">
               <ng-option *ngFor="let personnels of listePersonnel" [value]="personnels.id">
-                {{personnels?.prenom + ' ' + personnels?.nom}}
+                {{ personnels?.prenom + ' ' + personnels?.nom }}
               </ng-option>
             </ng-select>
-            <div *ngIf="formulaireDossier.get('personnelId')?.invalid && formulaireDossier.get('personnelId')?.dirty"
-              class="invalid-feedback">
+            <div *ngIf="formulaireDossier.get('personnelId')?.invalid && formulaireDossier.get('personnelId')?.dirty" class="invalid-feedback">
               La sélection d'un personnel est obligatoire
+            </div>
+
+            <!-- Statut d’éligibilité -->
+            <div class="mt-2 small" *ngIf="formulaireDossier.get('personnelId')?.value">
+              <span *ngIf="eligibiliteLoading" class="text-muted">
+                Vérification d'éligibilité en cours...
+              </span>
+              <span *ngIf="!eligibiliteLoading && eligibiliteOk" class="text-success">
+                ✅ Le personnel est éligible à la création d'une mission.
+              </span>
+              <span *ngIf="!eligibiliteLoading && !eligibiliteOk && eligibiliteMessage" class="text-danger">
+                ❌ {{ eligibiliteMessage }}
+              </span>
             </div>
           </div>
         </div>
 
+        <!-- Moyen de transport -->
         <div class="col-md-6">
           <div class="mb-3">
             <label for="moyenDeplacement" class="form-label fw-medium">Moyen de transport</label>
-            <input type="text" class="form-control form-control-lg" placeholder="Entrer le moyen de transport"
-              formControlName="moyenDeplacement" id="moyenDeplacement"
-              [ngClass]="{'is-invalid': formulaireDossier.get('moyenDeplacement')?.invalid && formulaireDossier.get('moyenDeplacement')?.dirty, 'is-valid': formulaireDossier.get('moyenDeplacement')?.valid}">
-            <div
-              *ngIf="formulaireDossier.get('moyenDeplacement')?.invalid && formulaireDossier.get('moyenDeplacement')?.dirty"
-              class="invalid-feedback">
+            <input
+              type="text"
+              class="form-control form-control-lg"
+              placeholder="Entrer le moyen de transport"
+              formControlName="moyenDeplacement"
+              id="moyenDeplacement"
+              [ngClass]="{
+                'is-invalid': formulaireDossier.get('moyenDeplacement')?.invalid && formulaireDossier.get('moyenDeplacement')?.dirty,
+                'is-valid': formulaireDossier.get('moyenDeplacement')?.valid
+              }"
+            />
+            <div *ngIf="formulaireDossier.get('moyenDeplacement')?.invalid && formulaireDossier.get('moyenDeplacement')?.dirty" class="invalid-feedback">
               Le moyen de transport est obligatoire
             </div>
           </div>
         </div>
       </div>
 
+      <!-- Motif & Pièce jointe -->
       <div class="row">
         <div class="col-md-6">
           <div class="mb-3">
-            <label for="objet" class="form-label fw-medium">Objet</label>
-            <textarea type="text" class="form-control" formControlName="objet" rows="4" id="objet"
-              placeholder="Décrire l'objet de la mission..."
-              [ngClass]="{'is-invalid': formulaireDossier.get('objet')?.invalid && formulaireDossier.get('objet')?.dirty, 'is-valid': formulaireDossier.get('objet')?.valid}">
-            </textarea>
-            <div *ngIf="formulaireDossier.get('objet')?.invalid && formulaireDossier.get('objet')?.dirty"
-              class="invalid-feedback">
-              L'objet est obligatoire
+            <label for="motif" class="form-label fw-medium">Motif</label>
+            <textarea
+              class="form-control"
+              rows="4"
+              id="motif"
+              formControlName="motif"
+              placeholder="Décrire le motif de la mission..."
+              [ngClass]="{
+                'is-invalid': formulaireDossier.get('motif')?.invalid && formulaireDossier.get('motif')?.dirty,
+                'is-valid': formulaireDossier.get('motif')?.valid
+              }"></textarea>
+            <div *ngIf="formulaireDossier.get('motif')?.invalid && formulaireDossier.get('motif')?.dirty" class="invalid-feedback">
+              Le motif est obligatoire
             </div>
           </div>
         </div>
@@ -321,8 +443,7 @@
           <div class="mb-3">
             <label for="pieces" class="form-label fw-medium">Pièces jointes</label>
             <div class="file-upload-container">
-              <input type="file" class="form-control form-control-lg" (change)="uploaderFicher($event)" id="pieces"
-                [ngClass]="!pieces ? 'is-invalid' : 'is-valid'">
+              <input type="file" class="form-control form-control-lg" (change)="uploaderFicher($event)" id="pieces" />
               <small class="form-text text-muted">Formats acceptés: PDF, Word, Images</small>
             </div>
           </div>
@@ -331,14 +452,18 @@
 
       <div class="modal-footer bg-light">
         <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">Annuler</button>
-        <button class="btn btn-primary px-4" [disabled]="formulaireDossier.invalid"
-          type="submit">{{formulaireDossier.get('id')?.value ? 'Modifier': 'Créer'}}</button>
+        <button
+          class="btn btn-primary px-4"
+          [disabled]="formulaireDossier.invalid || !eligibiliteOk || eligibiliteLoading"
+          type="submit">
+          {{ formulaireDossier.get('id')?.value ? 'Modifier' : 'Créer' }}
+        </button>
       </div>
     </form>
   </div>
 </ng-template>
 
-<!-- Modal pour ajouter un rapport -->
+<!-- Modal rapport -->
 <ng-template #rapport let-modal>
   <div class="modal-header bg-light">
     <h4 class="modal-title fw-semibold">Ajouter le rapport de mission</h4>
@@ -351,8 +476,7 @@
           <div class="form-group mb-4">
             <label for="rapport" class="form-label fw-medium">Rapport</label>
             <div class="file-upload-container">
-              <input type="file" class="form-control form-control-lg" (change)="uploaderFicher($event)" id="rapport"
-                [ngClass]="!pieces ? 'is-invalid' : 'is-valid'">
+              <input type="file" class="form-control form-control-lg" (change)="uploaderFicher($event)" id="rapport" />
               <small class="form-text text-muted">Sélectionnez le rapport à uploader</small>
             </div>
           </div>
@@ -365,3 +489,4 @@
       </div>
     </form>
   </div>
+</ng-template>

@@ -1,14 +1,71 @@
-.main{
-  background-image: url('../../../assets/Groupe 786.png'); /* remplacer image.jpg par l'URL de votre image de fond */
+.main {
+  background-image: url('../../../assets/Groupe 786.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
 }
 
+.permission-card {
+  border: 0;
+  border-radius: 1rem;
+  overflow: hidden;
 
+  .card-header {
+    background: #fff;
+    border-bottom: 1px solid #eef0f3;
+  }
+}
+
+.icon-badge {
+  font-size: 1.1rem;
+  padding: .6rem .7rem;
+  background: #e8f6ef;
+}
+
+.toolbar .search-box {
+  min-width: 260px;
+}
+
+.per-page {
+  min-width: 130px;
+}
+
+.table {
+  --bs-table-bg: #fff;
+  thead th {
+    position: sticky;
+    top: 0;
+    z-index: 5;
+  }
+}
+
+.sticky-top {
+  top: 0;
+}
+
+.skeleton-row {
+  height: 44px;
+  border-radius: .5rem;
+  background: linear-gradient(90deg, #f2f4f7 25%, #e9edf2 37%, #f2f4f7 63%);
+  background-size: 400% 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0%   { background-position: 100% 0; }
+  100% { background-position: 0 0; }
+}
+
+/* Dark-blue btn (tu l’utilises déjà) */
 .btn-darkblue {
-  background-color: #0d47a1; /* Bleu foncé */
-  color: white;
+  background-color: #0d47a1;
+  color: #fff;
   border: none;
 }
+.btn-darkblue:hover { background-color: #08306b; }
 
-.btn-darkblue:hover {
-  background-color: #08306b; /* Encore plus foncé au survol */
+/* Petits raffinements responsives */
+@media (max-width: 575.98px) {
+  .toolbar { width: 100%; }
+  .toolbar .search-box { flex: 1 1 auto; min-width: 0; }
 }
