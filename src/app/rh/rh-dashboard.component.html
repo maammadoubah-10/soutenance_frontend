@@ -1,8 +1,12 @@
 <div class="container-fluid">
   <app-titredepage title="Ressources Humaines" [items]="[{label:'RH'}, {label:'Tableau de bord', active:true}]"></app-titredepage>
 
+  <!-- States -->
+  <div *ngIf="loading" class="alert alert-info mb-3">Chargement…</div>
+  <div *ngIf="!loading && errorMsg" class="alert alert-danger mb-3">{{ errorMsg }}</div>
+
   <!-- ====== KPI ====== -->
-  <div class="row flex-grow-1">
+  <div class="row flex-grow-1" *ngIf="!loading && !errorMsg">
     <div class="col-md-3 grid-margin stretch-card">
       <div class="card kpi-card h-100">
         <div class="card-body d-flex align-items-center justify-content-between">
@@ -69,7 +73,7 @@
   </div>
 
   <!-- ====== ROW 1 : Effectif + Absence ====== -->
-  <div class="row">
+  <div class="row" *ngIf="!loading && !errorMsg">
     <div class="col-lg-8 grid-margin stretch-card">
       <div class="card chart-card">
         <div class="card-body">
@@ -111,7 +115,7 @@
   </div>
 
   <!-- ====== ROW 2 : Entrées/Sorties + Départements ====== -->
-  <div class="row">
+  <div class="row" *ngIf="!loading && !errorMsg">
     <div class="col-lg-6 grid-margin stretch-card">
       <div class="card chart-card">
         <div class="card-body">

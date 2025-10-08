@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-
-// Types ng-apexcharts (v1.x)
+//import { RhDashboardService, RhDashboardDto } from './services/rh-dashboard.service';
 import {
   ApexAxisChartSeries,
   ApexNonAxisChartSeries,
@@ -17,8 +16,10 @@ import {
   ApexGrid,
   ApexResponsive
 } from 'ng-apexcharts';
+import { RhDashboardDto, RhDashboardService } from './services/rh-dashboard.service';
+//import { RhDashboardService, RhDashboardDto } from './rh-dashboard.service';
 
-/** ===== Types où tout ce qui est lié dans le template est défini (pas d'undefined) ===== **/
+/** ===== Types pour ng-apexcharts ===== **/
 export type AreaChartOptions = {
   series: ApexAxisChartSeries;
   chart: ApexChart;
@@ -39,7 +40,7 @@ export type DonutChartOptions = {
   labels: string[];
   legend: ApexLegend;
   tooltip: ApexTooltip;
-  responsive: ApexResponsive[]; // toujours défini
+  responsive: ApexResponsive[];
 };
 
 export type RadialChartOptions = {
@@ -60,80 +61,72 @@ export type BarChartOptions = {
   dataLabels: ApexDataLabels;
   tooltip: ApexTooltip;
   grid: ApexGrid;
-  legend: ApexLegend;   // ✅ obligatoire
+  legend: ApexLegend;
   colors?: string[];
 };
 
-
 @Component({
   selector: 'app-rh-dashboard',
-  templateUrl: './rh-dashboard.component.html',
-  //styleUrls: ['./rh-dashboard.component.scss']
+  templateUrl: './rh-dashboard.component.html'
 })
 export class RhDashboardComponent implements OnInit {
 
-  /** ===== KPI (mock par défaut, remplacables par API) ===== */
+  /** ===== KPI ===== */
   kpi = {
     totalPersonnel: 0,
     postesOuverts: 0,
     enAbsence: 0,
-    tauxTurnover: 0   // en %
+    tauxTurnover: 0
   };
 
-  /** ===== CHART OPTIONS ===== */
-  headcountArea!: AreaChartOptions;        // Effectif global (tendance)
-  hiresDeparturesBar!: BarChartOptions;    // Entrées vs Sorties (mois)
-  absenceRadial!: RadialChartOptions;      // Taux d’absence
-  departmentsDonut!: DonutChartOptions;    // Répartition par service
+  /** ===== Charts ===== */
+  headcountArea!: AreaChartOptions;
+  hiresDeparturesBar!: BarChartOptions;
+  absenceRadial!: RadialChartOptions;
+  departmentsDonut!: DonutChartOptions;
 
-  constructor() {}
+  /** ===== UI state ===== */
+  loading = false;
+  errorMsg = '';
+
+  constructor(private api: RhDashboardService) {}
 
   ngOnInit(): void {
-    // initialise des graphes pour éviter toute erreur d'inputs non définis
     this.initChartsWithDefaults();
-
-    // charge stats (ici mock; remplacer par appel API ensuite)
-    this.loadStats();
+    this.fetchData();
   }
 
-  /** =========================
-   *  1) INIT CHARTS (défauts)
-   *  ========================= */
+  /** 1) INIT défauts (sécurise les inputs) */
   private initChartsWithDefaults(): void {
-    // ---- EFFECTIF (area) : tendance sur 6 mois ----
     this.headcountArea = {
-      series: [
-        { name: 'Effectif', data: [120, 125, 128, 132, 136, 140] }
-      ],
+      series: [{ name: 'Effectif', data: [] }],
       chart: { type: 'area', height: 320, toolbar: { show: false } },
       dataLabels: { enabled: false },
       stroke: { curve: 'smooth', width: 2 },
       fill: { type: 'gradient', gradient: { opacityFrom: 0.45, opacityTo: 0.15 } },
-      xaxis: { categories: ['Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sept'] },
+      xaxis: { categories: [] },
       grid: { strokeDashArray: 4 },
       tooltip: { theme: 'light' },
       legend: { position: 'top' }
     };
 
-    // ---- ENTREE vs SORTIE (bar) ----
     this.hiresDeparturesBar = {
       series: [
-        { name: 'Entrées', data: [4, 6, 5, 7, 8, 6] },
-        { name: 'Sorties', data: [2, 3, 4, 2, 5, 3] }
+        { name: 'Entrées', data: [] },
+        { name: 'Sorties', data: [] }
       ],
       chart: { type: 'bar', height: 320, stacked: false, toolbar: { show: false } },
       plotOptions: { bar: { columnWidth: '45%', borderRadius: 6 } },
       dataLabels: { enabled: false },
-      xaxis: { categories: ['Avr', 'Mai', 'Juin', 'Juil', 'Août', 'Sept'] },
+      xaxis: { categories: [] },
       yaxis: { labels: { show: true } },
       grid: { strokeDashArray: 4 },
       tooltip: { theme: 'light' },
       legend: { position: 'top' }
     };
 
-    // ---- ABSENCE (radial) ----
     this.absenceRadial = {
-      series: [12], // %
+      series: [0],
       chart: { type: 'radialBar', height: 320 },
       labels: ['Taux d’absence'],
       plotOptions: {
@@ -152,79 +145,67 @@ export class RhDashboardComponent implements OnInit {
       tooltip: { enabled: true }
     };
 
-    // ---- RÉPARTITION PAR SERVICE (donut) ----
     this.departmentsDonut = {
-      series: [40, 25, 20, 15], // RH, Finance, IT, Opérations (exemple)
+      series: [],
       chart: { type: 'donut', height: 320 },
-      labels: ['RH', 'Finance', 'IT', 'Opérations'],
+      labels: [],
       legend: { position: 'bottom' },
-      responsive: [
-        { breakpoint: 992, options: { legend: { position: 'bottom' } } }
-      ],
+      responsive: [{ breakpoint: 992, options: { legend: { position: 'bottom' } } }],
       tooltip: { y: { formatter: (val: number) => `${val}` } }
     };
   }
 
-  /** =========================
-   *  2) CHARGER LES STATS
-   *  =========================
-   *  👉 Remplace ce mock par ton appel HttpClient vers l’API RH
-   */
-  private loadStats(): void {
-    // ---- MOCK: simule des valeurs venues du backend ----
-    const backend = {
-      totalPersonnel: 142,
-      postesOuverts: 7,
-      enAbsence: 9,
-      tauxTurnover: 6.3, // %
-      // séries mensuelles pour 6 derniers mois (même catégories que plus haut)
-      headcountSeries: [120, 125, 128, 132, 138, 142],
-      hires: [5, 7, 4, 9, 11, 8],
-      departures: [3, 2, 4, 3, 5, 2],
-      absenceRate: 11.5,
-      departments: {
-        labels: ['RH', 'Finance', 'IT', 'Opérations', 'Commercial'],
-        values: [38, 28, 32, 22, 22] // somme arbitraire; c'est juste une répartition
+  /** 2) Chargement réel depuis le backend */
+  private fetchData(): void {
+    this.loading = true;
+    this.errorMsg = '';
+
+    this.api.getDashboard().subscribe({
+      next: (res: RhDashboardDto) => {
+        // KPI
+        this.kpi = {
+          totalPersonnel: res?.kpi?.totalPersonnel ?? 0,
+          postesOuverts:  res?.kpi?.postesOuverts  ?? 0,
+          enAbsence:      res?.kpi?.enAbsence      ?? 0,
+          tauxTurnover:   Math.round((res?.kpi?.tauxTurnover ?? 0) * 10) / 10
+        };
+
+        // Effectif (area)
+        this.headcountArea = {
+          ...this.headcountArea,
+          xaxis: { categories: res?.headcount?.labels ?? [] },
+          series: [{ name: 'Effectif', data: res?.headcount?.data ?? [] }]
+        };
+
+        // Entrées / Sorties (bar)
+        this.hiresDeparturesBar = {
+          ...this.hiresDeparturesBar,
+          xaxis: { categories: res?.hiresDepartures?.labels ?? [] },
+          series: [
+            { name: 'Entrées',   data: res?.hiresDepartures?.hires ?? [] },
+            { name: 'Sorties',   data: res?.hiresDepartures?.departures ?? [] }
+          ]
+        };
+
+        // Absence (radial)
+        this.absenceRadial = {
+          ...this.absenceRadial,
+          series: [Math.round((res?.absence?.rate ?? 0) * 10) / 10]
+        };
+
+        // Répartition par service (donut)
+        this.departmentsDonut = {
+          ...this.departmentsDonut,
+          labels: res?.departments?.labels ?? [],
+          series: res?.departments?.values ?? []
+        };
+      },
+      error: (err: HttpErrorResponse) => {
+        this.errorMsg = err?.error?.message || 'Erreur lors du chargement du tableau de bord.';
+      },
+      complete: () => {
+        this.loading = false;
       }
-    };
-
-    // ---- Alimente KPI ----
-    this.kpi = {
-      totalPersonnel: backend.totalPersonnel ?? 0,
-      postesOuverts: backend.postesOuverts ?? 0,
-      enAbsence: backend.enAbsence ?? 0,
-      tauxTurnover: Math.round((backend.tauxTurnover ?? 0) * 10) / 10
-    };
-
-    // ---- Mettre à jour graphiques avec ces données ----
-
-    // Area: Effectif
-    this.headcountArea = {
-      ...this.headcountArea,
-      series: [{ name: 'Effectif', data: backend.headcountSeries ?? [] }]
-    };
-
-    // Bar: Entrées / Sorties
-    this.hiresDeparturesBar = {
-      ...this.hiresDeparturesBar,
-      series: [
-        { name: 'Entrées', data: backend.hires ?? [] },
-        { name: 'Sorties', data: backend.departures ?? [] }
-      ]
-    };
-
-    // Radial: Absence
-    this.absenceRadial = {
-      ...this.absenceRadial,
-      series: [Math.round((backend.absenceRate ?? 0) * 10) / 10]
-    };
-
-    // Donut: Départements
-    this.departmentsDonut = {
-      ...this.departmentsDonut,
-      labels: backend.departments?.labels ?? ['RH', 'Finance', 'IT', 'Opérations'],
-      series: backend.departments?.values ?? [40, 25, 20, 15],
-      responsive: this.departmentsDonut.responsive ?? []
-    };
+    });
   }
 }
