@@ -7,44 +7,49 @@ import { Presence } from "../models/presence";
 
 @Injectable({ providedIn: 'root' })
 export class PresenceService {
-  public contextPath: string = environment.hostmicroservicepersonnel + "presences";
+  // 👉 environment.hostmicroservicepersonnel DOIT être "http://localhost:9002/rh"
+  public readonly contextPath = `${environment.hostmicroservicepersonnel.replace(/\/$/, '')}/presences`;
 
   constructor(private httpClient: HttpClient) {}
 
-  // Liste paginée (toutes)
   listerPresenceALLPage(
     page: number,
     size: number,
-    _sortField: string,   // inutilisé pour l’instant
-    _sortDir: 'asc' | 'desc',
+    sortField: string,
+    sortDir: 'asc' | 'desc',
     mois?: number,
     annee?: number,
     serviceId?: number
   ) {
-    const url =
-      `${this.contextPath}/rechercher?page=${page}&size=${size}` +
-      (mois !== undefined ? `&mois=${mois}` : '') +
-      (annee !== undefined ? `&annee=${annee}` : '') +
-      (serviceId !== undefined ? `&serviceId=${serviceId}` : '');
-    return this.httpClient.get<any>(url, { observe: 'response' });
+    let params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sort', `${sortField},${sortDir}`);
+    if (mois != null) params = params.set('mois', mois);
+    if (annee != null) params = params.set('annee', annee);
+    if (serviceId != null) params = params.set('serviceId', serviceId);
+
+    return this.httpClient.get<any>(`${this.contextPath}/rechercher`, { observe: 'response', params });
   }
 
-  // Liste paginée (validées CSRH)
   listerPresenceMarqueALLPage(
     page: number,
     size: number,
-    _sortField: string,
-    _sortDir: 'asc' | 'desc',
+    sortField: string,
+    sortDir: 'asc' | 'desc',
     mois?: number,
     annee?: number,
     serviceId?: number
   ) {
-    const url =
-      `${this.contextPath}/rechercher/valider?page=${page}&size=${size}` +
-      (mois !== undefined ? `&mois=${mois}` : '') +
-      (annee !== undefined ? `&annee=${annee}` : '') +
-      (serviceId !== undefined ? `&serviceId=${serviceId}` : '');
-    return this.httpClient.get<any>(url, { observe: 'response' });
+    let params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sort', `${sortField},${sortDir}`);
+    if (mois != null) params = params.set('mois', mois);
+    if (annee != null) params = params.set('annee', annee);
+    if (serviceId != null) params = params.set('serviceId', serviceId);
+
+    return this.httpClient.get<any>(`${this.contextPath}/rechercher/valider`, { observe: 'response', params });
   }
 
   async getPresenceIdIfExists(personnelId: number, mois: number): Promise<number | null> {
@@ -53,7 +58,6 @@ export class PresenceService {
       const resp = await firstValueFrom(this.httpClient.get<any>(url, { observe: 'response' }));
       const list = resp.body as any[];
       if (!Array.isArray(list) || list.length === 0) return null;
-
       const ext = list[0];
       const maybeId = ext?.id ?? ext?.presenceId ?? ext?.presenceID ?? ext?._id;
       return (typeof maybeId === 'number') ? maybeId : Number.isFinite(Number(maybeId)) ? Number(maybeId) : null;
@@ -62,40 +66,34 @@ export class PresenceService {
     }
   }
 
-  // Création
   creerPresence(personnelId: number, nbreJourAbsent: number, mois: number): Observable<Presence> {
-    const url = `${this.contextPath}?nbreJourAbsent=${nbreJourAbsent}&personnelId=${personnelId}&mois=${mois}`;
-    return this.httpClient.post<Presence>(url, null);
+    const params = new HttpParams()
+      .set('personnelId', personnelId)
+      .set('mois', mois)
+      .set('nbreJourAbsent', nbreJourAbsent ?? 0);
+    return this.httpClient.post<Presence>(`${this.contextPath}`, null, { params });
   }
 
-  // Validation/MàJ (CSRH)
   modifierPresence(id: number, nbreJourAbsent: number): Observable<Presence> {
-    const url = `${this.contextPath}/${id}?nbreJourAbsent=${nbreJourAbsent}`;
-    return this.httpClient.patch<Presence>(url, null);
+    const params = new HttpParams().set('nbreJourAbsent', nbreJourAbsent ?? 0);
+    return this.httpClient.patch<Presence>(`${this.contextPath}/${id}`, null, { params });
   }
 
-  // Invalidation
-  annulerValidationPresence(id: number, data: any): Observable<Presence> {
-    return this.httpClient.patch<Presence>(`${this.contextPath}/${id}/invalide`, data);
+  annulerValidationPresence(id: number, _data: any): Observable<Presence> {
+    return this.httpClient.patch<Presence>(`${this.contextPath}/${id}/invalide`, null);
   }
 
-  // Validation en masse
-  validerALLPresence(presenceIds: number[], data: any): Observable<Presence> {
+  validerALLPresence(presenceIds: number[], _data: any): Observable<Presence> {
     const params = new HttpParams().set('presenceIds', presenceIds.join(','));
-    return this.httpClient.patch<Presence>(`${this.contextPath}/confirmeAll`, data, { params });
+    return this.httpClient.patch<Presence>(`${this.contextPath}/confirmeAll`, null, { params });
   }
 
-  // Invalidation en masse
-  annulervalidationALLPresence(presenceIds: number[], data: any): Observable<Presence> {
+  annulervalidationALLPresence(presenceIds: number[], _data: any): Observable<Presence> {
     const params = new HttpParams().set('presenceIds', presenceIds.join(','));
-    return this.httpClient.patch<Presence>(`${this.contextPath}/invalideAll`, data, { params });
+    return this.httpClient.patch<Presence>(`${this.contextPath}/invalideAll`, null, { params });
   }
 
   supprimerPresence(id: number) {
     return this.httpClient.delete<any>(`${this.contextPath}/${id}`);
-  }
-
-  voirPresence(id: number) {
-    return this.httpClient.get<any>(`${this.contextPath}/${id}`);
   }
 }

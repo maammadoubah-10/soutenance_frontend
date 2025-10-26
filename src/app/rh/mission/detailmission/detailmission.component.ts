@@ -35,20 +35,20 @@ import { UtilisateurService } from '../../../utilisateur/services/utilisateur.se
 export class DetailmissionComponent implements OnInit {
 
   items: any[] = [];
-  dataStateEnum = DataStateEnum
-  state?: DataStateEnum
+  dataStateEnum = DataStateEnum;
+  state?: DataStateEnum;
   mission$?: Observable<ModelDataState<Mission | undefined>>;
   pointages?: Observable<ModelDataState<MissionPointage[] >>;
   mission?: Mission;
-  listePointage: MissionPointage[] = []
-  listeDossierPage: Mission[] = [] //listePersonnelPage
-  listeImputation: Imputation[] = []
-  listeMissionnaireExterne: MissionnaireExterne[] = []
-  listeMissionnaireExterneMission: MissionnaireExterne[] = []
-  listePersonnel: Personnel[] = []
-  listePersonnelMission: Personnel[] = []
-  listeFacteur: Facteur[] = []
-  listeTypeMission: TypeMission[] = []
+  listePointage: MissionPointage[] = [];
+  listeDossierPage: Mission[] = [];
+  listeImputation: Imputation[] = [];
+  listeMissionnaireExterne: MissionnaireExterne[] = [];
+  listeMissionnaireExterneMission: MissionnaireExterne[] = [];
+  listePersonnel: Personnel[] = [];
+  listePersonnelMission: Personnel[] = [];
+  listeFacteur: Facteur[] = [];
+  listeTypeMission: TypeMission[] = [];
   public nom:string = '';
   public matricule:string = '';
   public prenom: string = '';
@@ -58,15 +58,15 @@ export class DetailmissionComponent implements OnInit {
   public designation:string = '';
   public reference:string = '';
   public sigle:string = '';
-  pieces:File|undefined
+  pieces:File|undefined;
 
- formulaireDossier = new FormGroup({
+  formulaireDossier = new FormGroup({
     id: new FormControl(),
     dateDebut: new FormControl(new Date(), [Validators.required]),
-    nbreJour: new FormControl<number | null>(null, [Validators.required]), // Changer à number
+    nbreJour: new FormControl<number | null>(null, [Validators.required]),
     objet: new FormControl(''),
     personnelId: new FormControl<number | null>(null, [Validators.required]),
-    moyenDeplacement: new FormControl('', [Validators.required]), // Changer à string
+    moyenDeplacement: new FormControl('', [Validators.required]),
   });
 
   formulairePointage = new FormGroup({
@@ -75,7 +75,7 @@ export class DetailmissionComponent implements OnInit {
     facteur: new FormControl<string | null>(null, [Validators.required]),
     personnel: new FormControl<string | null>(null,[Validators.required]),
     mission: new FormControl(),
-  })
+  });
 
   totalDossier : number = 0;
   currentPage: number = 0;
@@ -83,33 +83,38 @@ export class DetailmissionComponent implements OnInit {
   sort: string = "desc";
   public pages: number[] = [];
   totalPages: number = 0;
-  hashids : any
+  hashids : any;
   private id$: any;
-  devisSbj = new BehaviorSubject(0); // remove tab
-  constructor(private dossierService: MissionService,
-              private typemissionService:TypeMissionService,
-              private missionPointageService:MissionPointageService,
-              private facteurService:FacteurService,
-              private activatedRoute:ActivatedRoute,
-              private missionnaireExterneService:MissionnaireExterneService,
-              private imputationService:ImputationService,
-              private personnelService:PersonnelService,
-              private utilisateurService:UtilisateurService,
-              private router:Router,
-              private toastService:ToastrService,
-              private modalService:NgbModal) { }
+  devisSbj = new BehaviorSubject(0);
+
+  constructor(
+    private dossierService: MissionService,
+    private typemissionService:TypeMissionService,
+    private missionPointageService:MissionPointageService,
+    private facteurService:FacteurService,
+    private activatedRoute:ActivatedRoute,
+    private missionnaireExterneService:MissionnaireExterneService,
+    private imputationService:ImputationService,
+    private personnelService:PersonnelService,
+    private utilisateurService:UtilisateurService,
+    private router:Router,
+    private toastService:ToastrService,
+    private modalService:NgbModal
+  ) { }
+
   ngOnInit(): void {
     registerLocaleData(localeFr, 'fr');
     this.hashids = new Hashids('mysecretkey');
+
     this.activatedRoute.paramMap.subscribe((params) => {
       const encodedId = params.get('id');
       if (encodedId) {
         this.id$ = this.decodeId(encodedId);
       } else {
-        // Handle the null case appropriately
-        this.id$ = null; // or some default value
+        this.id$ = null;
       }
     });
+
     this.items = [
       { label: 'Ressources Humaines' },
       { label: 'Mission' },
@@ -117,7 +122,7 @@ export class DetailmissionComponent implements OnInit {
     ];
     this.chargerIdMission(this.id$);
 
-        this.utilisateurService.personnelNonUtilisateur().subscribe(x => {
+    this.utilisateurService.personnelNonUtilisateur().subscribe(x => {
       this.listePersonnel = x;
     });
   }
@@ -134,10 +139,8 @@ export class DetailmissionComponent implements OnInit {
   onSearchPersonnel(nom: string){
     if(nom.length >= 3){
       this.personnelService.recherchePersonnel(nom).subscribe(
-        (response : any) => {
-          this.listePersonnel = response.body.content
-        },(error)=>{
-        }
+        (response : any) => { this.listePersonnel = response.body.content },
+        (_error: any)=>{}
       );
     }
   }
@@ -145,10 +148,8 @@ export class DetailmissionComponent implements OnInit {
   onSearchImputation(nom: string){
     if(nom.length >= 3){
       this.imputationService.rechercheImputation(nom).subscribe(
-        (response : any) => {
-          this.listeImputation = response.body.content
-        },(error)=>{
-        }
+        (response : any) => { this.listeImputation = response.body.content },
+        (_error: any)=>{}
       );
     }
   }
@@ -156,10 +157,8 @@ export class DetailmissionComponent implements OnInit {
   onSearchTypeMission(nom: string){
     if(nom.length >= 3){
       this.typemissionService.rechercheTypeMission(nom).subscribe(
-        (response : any) => {
-          this.listeTypeMission = response.body.content
-        },(error)=>{
-        }
+        (response : any) => { this.listeTypeMission = response.body.content },
+        (_error: any)=>{}
       );
     }
   }
@@ -167,10 +166,8 @@ export class DetailmissionComponent implements OnInit {
   onSearchMissionnaireExterne(nom: string){
     if(nom.length >= 3){
       this.missionnaireExterneService.rechercheMissionnaireExterneNom(nom).subscribe(
-        (response : any) => {
-          this.listeMissionnaireExterne = response.body.content
-        },(error)=>{
-        }
+        (response : any) => { this.listeMissionnaireExterne = response.body.content },
+        (_error: any)=>{}
       );
     }
   }
@@ -178,10 +175,8 @@ export class DetailmissionComponent implements OnInit {
   onSearchFacteur(nom: string){
     if(nom.length >= 3){
       this.facteurService.rechercheFacteur(nom).subscribe(
-        (response : any) => {
-          this.listeFacteur = response.body.content
-        },(error)=>{
-        }
+        (response : any) => { this.listeFacteur = response.body.content },
+        (_error: any)=>{}
       );
     }
   }
@@ -192,19 +187,19 @@ export class DetailmissionComponent implements OnInit {
   }
 
   chargerIdMission(id:number) {
-    this.activatedRoute.params.subscribe((params) => {
+    this.activatedRoute.params.subscribe((_params) => {
       this.chargeInformationMission(id);
-      this.chargerListePointageMission()
+      this.chargerListePointageMission();
     });
   }
-  
+
   chargeInformationMission(id: number) {
     this.mission$ = this.dossierService.voirMission(id)
       .pipe(
         map((response:any) => {
           this.mission = response;
-          this.listePersonnelMission = response.personnels
-          this.listeMissionnaireExterneMission = response.missionnaireExternes
+          this.listePersonnelMission = response.personnels;
+          this.listeMissionnaireExterneMission = response.missionnaireExternes;
           if (this.mission && this.mission.dateDebut && this.mission.dateFin) {
             const startDate = new Date(this.mission.dateDebut);
             const endDate = new Date(this.mission.dateFin);
@@ -213,12 +208,8 @@ export class DetailmissionComponent implements OnInit {
           }
           return { dataState: DataStateEnum.CHARGE, data: { ...response } };
         }),
-        startWith({ dataState: DataStateEnum.CHARGEMENT })
-      )
-      .pipe(
-        catchError((err) => {
-          return of({ dataState: this.dataStateEnum.CHARGE, data: undefined });
-        })
+        startWith({ dataState: DataStateEnum.CHARGEMENT }),
+        catchError((_err: any) => of({ dataState: this.dataStateEnum.CHARGE, data: undefined }))
       );
   }
 
@@ -229,35 +220,21 @@ export class DetailmissionComponent implements OnInit {
     const years = Math.floor(months / 12);
 
     let duration = '';
-    if (years > 0) {
-      duration += years + ' an' + (years > 1 ? 's' : '') + ' ';
-    }
-    if (months > 0) {
-      duration += months + ' mois ';
-    }
-    if (days > 0) {
-      duration += days + ' jour' + (days > 1 ? 's' : '');
-    }
-
+    if (years > 0) duration += years + ' an' + (years > 1 ? 's' : '') + ' ';
+    if (months > 0) duration += months + ' mois ';
+    if (days > 0) duration += days + ' jour' + (days > 1 ? 's' : '');
     return duration.trim();
   }
 
+  goBack(): void { this.router.navigate(['rh/missions']); }
 
-  goBack(): void {
-    this.router.navigate(['rh/missions']);
-  }
-
-  closeModal() {
-    this.modalService.dismissAll()
-  }
+  closeModal() { this.modalService.dismissAll(); }
 
   successmsg(title = 'Mission ajouté !', message = 'Vous venez d\'ajoutez avec succès une nouvelle mission !') {
     Swal.fire(title, message, 'success');
   }
 
-  errormsg(title = 'Erreur !', message:string) {
-    Swal.fire(title, message, 'error');
-  }
+  errormsg(title = 'Erreur !', message:string) { Swal.fire(title, message, 'error'); }
 
   openModal(content: any, dossier: Mission | undefined = undefined) {
     if (dossier) {
@@ -269,68 +246,58 @@ export class DetailmissionComponent implements OnInit {
   }
 
   creerModifierMission() {
-    if (this.formulaireDossier.valid) {
-      const formData = new FormData();
-
-      // Ajouter tous les champs du formulaire
-      this.appendFormControlToFormData(formData, 'dateDebut', 'dateDebut');
-      this.appendFormControlToFormData(formData, 'nbreJour', 'nbreJour');
-      this.appendFormControlToFormData(formData, 'objet', 'objet');
-      this.appendFormControlToFormData(formData, 'personnelId', 'personnelId');
-      this.appendFormControlToFormData(formData, 'moyenDeplacement', 'moyenDeplacement');
-
-      // Ajouter le fichier si présent
-      if (this.pieces) {
-        formData.append('pieces', this.pieces);
-      }
-
-      // Vérifier si c'est une modification ou une création
-      const missionId = this.formulaireDossier.get('id')?.value;
-
-      if (missionId) {
-        // Modification
-        this.dossierService.modifierMission(this.formulaireDossier.get("id")?.value, formData).subscribe(
-           (response:any)=>{
-              this.listeDossierPage.map(e =>{
-                if (e.id == response["data"].id){
-                  e.dateDebut = response["data"].dateDebut
-                  e.nbreJour = response["data"].nbreJour
-                  e.objet = response["data"].objet
-                  e.personnel = response["data"].personnelId
-                  e.moyenDeplacement = response["data"].moyenDeplacement
-                }
-                return e;
-            });
-            this.modalService.dismissAll();
-            this.router.navigate(['/rh/missions/details/', this.encodeId(response.data?.id)]);
-            this.successmsg("Mission modifiée", "La mission a été modifiée avec succès");
-            this.formulaireDossier.reset();
-          },
-          (error) => {
-            this.handleError(error);
-          }
-        );
-      } else {
-        // Création
-        this.dossierService.creerMission(formData).subscribe(
-          (response: any) => {
-            this.listeDossierPage.unshift(response.data);
-            this.formulaireDossier.reset();
-            this.modalService.dismissAll();
-            this.chargerIdMission(this.id$);
-            this.successmsg("Mission créée", "La mission a été créée avec succès");
-          },
-          (error) => {
-            this.handleError(error);
-          }
-        );
-      }
-    } else {
+    if (!this.formulaireDossier.valid) {
       this.toastService.error('Veuillez remplir tous les champs obligatoires', 'Erreur!');
+      return;
+    }
+
+    const formData = new FormData();
+    this.appendFormControlToFormData(formData, 'dateDebut', 'dateDebut');
+    this.appendFormControlToFormData(formData, 'nbreJour', 'nbreJour');
+    this.appendFormControlToFormData(formData, 'objet', 'objet');
+    this.appendFormControlToFormData(formData, 'personnelId', 'personnelId');
+    this.appendFormControlToFormData(formData, 'moyenDeplacement', 'moyenDeplacement');
+
+    if (this.pieces) formData.append('pieces', this.pieces);
+
+    const missionId = this.formulaireDossier.get('id')?.value;
+
+    if (missionId) {
+      this.dossierService.modifierMission(this.formulaireDossier.get("id")?.value, formData).subscribe(
+        (response:any)=>{
+          this.listeDossierPage.map(e =>{
+            if (e.id == response["data"].id){
+              e.dateDebut = response["data"].dateDebut;
+              e.nbreJour = response["data"].nbreJour;
+              e.objet = response["data"].objet;
+              // @ts-ignore
+              e.personnel = response["data"].personnelId;
+              e.moyenDeplacement = response["data"].moyenDeplacement;
+            }
+            return e;
+          });
+          this.modalService.dismissAll();
+          this.router.navigate(['/rh/missions/details/', this.encodeId(response.data?.id)]);
+          this.successmsg("Mission modifiée", "La mission a été modifiée avec succès");
+          this.formulaireDossier.reset();
+        },
+        (error: any) => this.handleError(error)
+      );
+    } else {
+      this.dossierService.creerMission(formData).subscribe(
+        (response: any) => {
+          this.listeDossierPage.unshift(response.data);
+          this.formulaireDossier.reset();
+          this.modalService.dismissAll();
+          this.chargerIdMission(this.id$);
+          this.successmsg("Mission créée", "La mission a été créée avec succès");
+        },
+        (error: any) => this.handleError(error)
+      );
     }
   }
 
-    private handleError(error: any): void {
+  private handleError(error: any): void {
     if (error.error?.errors) {
       const errors = error.error.errors;
       for (let i = 0; i < errors.length; i++) {
@@ -338,18 +305,13 @@ export class DetailmissionComponent implements OnInit {
         this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
       }
     } else {
-      this.toastService.error(
-        error.error?.message || 'Erreur lors de l\'opération',
-        'Erreur!'
-      );
+      this.toastService.error(error.error?.message || 'Erreur lors de l\'opération','Erreur!');
     }
   }
 
-  // Méthode utilitaire pour ajouter les champs au FormData
   private appendFormControlToFormData(formData: FormData, fieldName: string, controlName: string): void {
     const value = this.formulaireDossier.get(controlName)?.value;
     if (value !== null && value !== undefined && value !== '') {
-      // Formater les dates correctement
       if (value instanceof Date) {
         formData.append(fieldName, value.toISOString().split('T')[0]);
       } else {
@@ -371,15 +333,13 @@ export class DetailmissionComponent implements OnInit {
     }).then((result) => {
       if (result.value) {
         this.dossierService.supprimerMission(this.id$).subscribe({
-          next: (value) => {
+          next: (_value: any) => {
             this.devisSbj.next(0);
-            this.listeDossierPage = this.listeDossierPage.filter(
-              (i) => i.id !== this.id$
-            );
-            this.goBack()
+            this.listeDossierPage = this.listeDossierPage.filter((i) => i.id !== this.id$);
+            this.goBack();
             this.successmsg('Suppression réussie', 'Mission supprimer');
           },
-          error: (err) => {
+          error: (err: any) => {
             this.errormsg('Mission non supprimer', err.error.message);
           },
         });
@@ -388,28 +348,41 @@ export class DetailmissionComponent implements OnInit {
   }
 
   openModalRapport(content:any, mission:Mission) {
-    this.id = mission.id
-    this.modalService.open(content)
+    this.id = mission.id;
+    this.modalService.open(content);
   }
 
+  // ✅ Corrige TS2345 (this.id peut être undefined)
   ajouterRapport(){
-    const formData = new FormData(); //objet formdata
-    formData.append('pieces', this.pieces as File); //mettre le ifhcier dans le formulaire
-    this.dossierService.ajouterLeRapport(this.id, formData)
+    if (!this.id) {
+      this.toastService.error('Mission inconnue', 'Rapport');
+      return;
+    }
+    if (!this.pieces) {
+      this.toastService.error('Veuillez sélectionner un fichier', 'Rapport');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('pieces', this.pieces as File);
+    this.dossierService.ajouterLeRapport(this.id!, formData) // <-- non-null assertion
       .subscribe(
-        (response)=>{
-          this.modalService.dismissAll()
-          this.chargerIdMission(this.id$)
-          this.successmsg("Rapport ajouté", "Le rapport a été ajouté avec succès")
+        (_response: any)=>{
+          this.modalService.dismissAll();
+          this.chargerIdMission(this.id$);
+          this.successmsg("Rapport ajouté", "Le rapport a été ajouté avec succès");
         },
-        (error)=> {
-          const errors = error.error.errors;
-          for (let i = 0; i < errors.length; i++) {
-            const currentError = errors[i];
-            this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
+        (error: any)=> {
+          const errors = error?.error?.errors;
+          if (errors?.length) {
+            for (let i = 0; i < errors.length; i++) {
+              const currentError = errors[i];
+              this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
+            }
+          } else {
+            this.toastService.error(error?.error?.message || 'Erreur inconnue', 'Rapport');
           }
         }
-      )
+      );
   }
 
   uploaderFicher($event: any) {
@@ -418,42 +391,9 @@ export class DetailmissionComponent implements OnInit {
     }
   }
 
-
-  // telechargerRapportMission(mission: Mission) {
-  //   this.dossierService.telechargerappports(mission.id)
-  // }
-
-  //  telechargerRapport(mission:Mission) {
-  //   this.reference = mission.reference
-  //   Swal.fire({
-  //     title: 'Êtes-vous sûr ?',
-  //     text: 'Êtes-vous sûr de vouloir Télécharger la fiche  de la mission '+this.mission?.motif+' ? Il vous sera impossible de revenir en arrière !',
-  //     icon: 'warning',
-  //     showCancelButton: true,
-  //     confirmButtonColor: '#34c38f',
-  //     cancelButtonColor: '#f46a6a',
-  //     confirmButtonText: 'Oui, Télécharger les !',
-  //     cancelButtonText:  'Non, Annuler',
-  //   }).then((result) => {
-  //     if (result.isConfirmed) {
-  //       // this.showLoadingModalFrais(); // Afficher le modal de chargement
-  //       this.onDownloadFrais();
-  //     } else if (result.dismiss === Swal.DismissReason.cancel) {
-  //       // handle cancel action if necessary
-  //     }
-  //   }).catch((errors) => {
-  //     this.toastService.error(errors.message, 'Fiche Frais de mission non Télécharger');
-  //     this.errormsg('Fiche Frais de mission non Télécharger', errors.message);
-  //   });
-  // }
-
   showPopOnDownloadRapportMission() {
-    this.successmsg(
-      'Rapport de Mission telecharger',
-      "Le Rapport de la Mission a été bien téléchargé avec succès"
-    );
+    this.successmsg('Rapport de Mission telecharger',"Le Rapport de la Mission a été bien téléchargé avec succès");
   }
-
 
   chargerListePointageMission() {
     this.pointages = this.dossierService.listerPointageParMissionPage(this.id$, this.currentPage, this.dossierPerPage, this.sort)
@@ -463,39 +403,17 @@ export class DetailmissionComponent implements OnInit {
           this.totalDossier = response.body.totalElements;
           this.totalPages = response.body.totalPages;
           this.pages = this.getPages();
-          return {
-            dataState: this.dataStateEnum.CHARGE,
-            data: this.listePointage,
-          };
+          return { dataState: this.dataStateEnum.CHARGE, data: this.listePointage };
         }),
-        startWith({ dataState: this.dataStateEnum.CHARGEMENT })
-      )
-      .pipe(
-        catchError((err) => {
-          return of({ dataState: this.dataStateEnum.ERREUR, data: [] });
-        })
+        startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
+        catchError((_err: any) => of({ dataState: this.dataStateEnum.ERREUR, data: [] }))
       );
   }
 
   getPages(): number[] {
     const pages: number[] = [];
-    for (let i = 0; i < this.totalPages; i++) {
-      pages.push(i);
-    }
+    for (let i = 0; i < this.totalPages; i++) pages.push(i);
     return pages;
-  }
-
-  openModalPiontage(content:any, missionPointage:MissionPointage | undefined = undefined){
-    if (missionPointage){
-      this.formulairePointage.patchValue(missionPointage as any)
-      this.formulairePointage.get('personnel')?.setValue(missionPointage?.personnel?.id.toString())
-      this.formulairePointage.get('facteur')?.setValue(missionPointage?.facteur?.nom?.toString())
-    }else{
-      this.formulairePointage.reset()
-      this.formulairePointage.get('mission')?.setValue(this.id$)
-    }
-    this.modalService.open(content)
-
   }
 
   pointerPersonnelMission() {
@@ -508,75 +426,8 @@ export class DetailmissionComponent implements OnInit {
       cancelButtonColor: '#f46a6a',
       confirmButtonText: 'Oui, Pointer !',
       cancelButtonText:  'Non, Annuler',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        //this.creeModifierPointage();
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        // handle cancel action if necessary
-      }
-    }).catch((error) => {
-    });
+    }).then((_result) => {}).catch((_error: any) => {});
   }
-
-  // creeModifierPointage() {
-  //   if (this.formulairePointage.valid) {
-  //     const datePointage = new Date(this.formulairePointage.get('date')?.value);
-  //     const dateDebutMission = new Date(this.mission.dateDebut);
-  //     const dateFinMission = new Date(this.mission.dateFin);
-
-  //     if (datePointage >= dateDebutMission && datePointage <= dateFinMission) {
-  //       // La date de pointage est valide, vous pouvez enregistrer le pointage
-  //       if (this.formulairePointage.get('id')?.value) {
-  //         this.missionPointageService.modifierMissionPointage(this.formulairePointage.get('id')?.value, this.formulairePointage.value)
-  //           .subscribe(
-  //             (response:any) => {
-  //               this.listePointage.map((e) => {
-  //                 if (e.id == response['data'].id) {
-  //                   e.date = response['data'].date;
-  //                   e.personnel = response['data'].personnel;
-  //                   e.facteur = response['data'].facteur;
-  //                 }
-  //                 return e;
-  //               });
-  //               this.modalService.dismissAll();
-  //               this.chargerIdMission(this.id$);
-  //               this.successmsg('Pointage modifié', 'Le Pointage a été modifié avec succès');
-  //               this.formulairePointage.reset();
-  //             },
-  //             (error) => {
-  //               const errors = error.error.errors;
-  //               for (let i = 0; i < errors.length; i++) {
-  //                 const currentError = errors[i];
-  //                 this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
-  //               }
-  //             }
-  //           );
-  //       } else {
-  //         this.missionPointageService.creerMissionPointage(this.formulairePointage.value)
-  //           .subscribe(
-  //             (response:any) => {
-  //               this.listePointage.unshift(response['data']);
-  //               this.formulairePointage.reset();
-  //               this.modalService.dismissAll();
-  //               this.chargerIdMission(this.id$);
-  //               this.successmsg('Pointage personnel mission réussi', 'Le personnel a été pointé avec succès à cette mission');
-  //             },
-  //             (error) => {
-  //               const errors = error.error.errors;
-  //               for (let i = 0; i < errors.length; i++) {
-  //                 const currentError = errors[i];
-  //                 this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
-  //               }
-  //             }
-  //           );
-  //       }
-  //     } else {
-  //       // La date de pointage est invalide, affichez un message d'erreur
-  //       this.toastService.error('La date de pointage est en dehors de la période de la mission', 'Erreur!');
-  //     }
-  //   }
-  // }
-
 
   supprimerPiontage(id: number) {
     Swal.fire({
@@ -591,15 +442,13 @@ export class DetailmissionComponent implements OnInit {
     }).then((result) => {
       if (result.value) {
         this.missionPointageService.supprimerMissionPointage(id).subscribe({
-          next: (value) => {
+          next: (_value: any) => {
             this.devisSbj.next(0);
-            this.listePointage = this.listePointage.filter(
-              (i) => i.id !== id
-            );
-            this.chargerIdMission(this.id$)
+            this.listePointage = this.listePointage.filter((i) => i.id !== id);
+            this.chargerIdMission(this.id$);
             this.successmsg('Suppression réussie', 'Pointage supprimer');
           },
-          error: (err) => {
+          error: (err: any) => {
             this.errormsg('Pointage non supprimer', err.error.message);
           },
         });
@@ -607,9 +456,8 @@ export class DetailmissionComponent implements OnInit {
     });
   }
 
-
   genererLesEtats(mission:Mission) {
-    this.reference = mission.reference
+    this.reference = mission.reference;
     Swal.fire({
       title: 'Êtes-vous sûr ?',
       text: 'Êtes-vous sûr de vouloir générer les états de paiemants de la mission  '+this.reference+'  ? Il vous sera impossible de revenir en arrière !',
@@ -622,18 +470,15 @@ export class DetailmissionComponent implements OnInit {
     }).then((result) => {
       if (result.isConfirmed) {
         this.onDownloadEtat();
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        // handle cancel action if necessary
       }
-    }).catch((errors) => {
+    }).catch((errors: any) => {
       this.toastService.error(errors.message, 'Etat de paiemant non générer et télécharger');
       this.errormsg('Etat de paiemant non générer et télécharger', errors.message);
     });
   }
 
-
   onDownloadEtat(): void {
-    this.dossierService.genererEtatDePaiement(this.id$).subscribe(
+    this.dossierService.genererEtatDePaiement(Number(this.id$)).subscribe(
       (data:any) => {
         const currentDate = new Date();
         const fileName = `etat_de_paiement_de_la_mission_${this.reference}_${currentDate.getFullYear()}-${currentDate.getMonth() + 1}-${currentDate.getDate()}_${currentDate.getHours()}-${currentDate.getMinutes()}-${currentDate.getSeconds()}.pdf`;
@@ -645,18 +490,22 @@ export class DetailmissionComponent implements OnInit {
         link.click();
         this.successmsg('Générer etat de paiement réussie', 'Les états de paiements de cette mission a été générer et télécharger avec succès');
       },
-      (error) => {
-        const errors = error.error.errors;
-        for (let i = 0; i < errors.length; i++) {
-          const currentError = errors[i];
-          this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
+      (error: any) => {
+        const errors = error?.error?.errors;
+        if (errors?.length) {
+          for (let i = 0; i < errors.length; i++) {
+            const currentError = errors[i];
+            this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
+          }
+        } else {
+          this.toastService.error(error?.error?.message || 'Erreur lors de la génération', 'Erreur!');
         }
       }
     );
   }
 
   telechargerFrais(mission:Mission) {
-    this.reference = mission.reference
+    this.reference = mission.reference;
     Swal.fire({
       title: 'Êtes-vous sûr ?',
       text: 'Êtes-vous sûr de vouloir Télécharger la fiche  de la mission '+this.mission?.motif+' ? Il vous sera impossible de revenir en arrière !',
@@ -668,58 +517,35 @@ export class DetailmissionComponent implements OnInit {
       cancelButtonText:  'Non, Annuler',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.showLoadingModalFrais(); // Afficher le modal de chargement
+        this.showLoadingModalFrais();
         this.onDownloadFrais();
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        // handle cancel action if necessary
       }
-    }).catch((errors) => {
+    }).catch((errors: any) => {
       this.toastService.error(errors.message, 'Fiche Frais de mission non Télécharger');
       this.errormsg('Fiche Frais de mission non Télécharger', errors.message);
     });
   }
 
-
-onDownloadFrais(): void {
-    this.loading = true; // Afficher l'indicateur de chargement
-
-    this.dossierService.telechargerFraisMission(this.id$).subscribe(
+  onDownloadFrais(): void {
+    this.loading = true;
+    this.dossierService.telechargerFraisMission(Number(this.id$)).subscribe(
       (data: any) => {
-        // Créer un blob à partir des données reçues
         const blob = new Blob([data], { type: 'application/pdf' });
-        
-        // Créer un URL pour le blob
         const url = window.URL.createObjectURL(blob);
-        
-        // Créer un lien invisible
         const link = document.createElement('a');
         link.href = url;
-        
-        // Nommer le fichier avec la référence de la mission
         link.download = `fiche-frais-mission-${this.reference}.pdf`;
-        
-        // Simuler un clic sur le lien
         link.click();
-        
-        // Nettoyer l'URL
         window.URL.revokeObjectURL(url);
-        
-        // Fermer l'indicateur de chargement
         this.loading = false;
         this.hideLoadingModal();
-        
-        // Message de succès
-        this.successmsg(
-          'Téléchargement réussi', 
-          'La fiche de frais de mission ' + this.reference + ' a été téléchargée avec succès. Veuillez vérifier dans votre dossier de téléchargements.'
-        );
+        this.successmsg('Téléchargement réussi','La fiche de frais a été téléchargée avec succès.');
       },
-      (error) => {
+      (error: any) => {
         this.loading = false;
         this.hideLoadingModal();
-        
-        if (error.error?.errors) {
-          const errors = error.error.errors;
+        const errors = error?.error?.errors;
+        if (errors?.length) {
           for (let i = 0; i < errors.length; i++) {
             const currentError = errors[i];
             this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
@@ -729,10 +555,10 @@ onDownloadFrais(): void {
         }
       }
     );
-}
+  }
 
   telechargerOrdre(mission:Mission) {
-    this.reference = mission.reference
+    this.reference = mission.reference;
     Swal.fire({
       title: 'Êtes-vous sûr ?',
       text: 'Êtes-vous sûr de vouloir Télécharger l attestation e la mission '+this.reference+' ? Il vous sera impossible de revenir en arrière !',
@@ -744,34 +570,36 @@ onDownloadFrais(): void {
       cancelButtonText:  'Non, Annuler',
     }).then((result) => {
       if (result.isConfirmed) {
-        this.showLoadingModalOrdre(); // Afficher le modal de chargement
+        this.showLoadingModalOrdre();
         this.onDownloadOrdre();
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        // handle cancel action if necessary
       }
-    }).catch((errors) => {
+    }).catch((errors: any) => {
       this.toastService.error(errors.message, 'Ordre de la mission non Télécharger');
       this.errormsg('Ordre de la mission non Télécharger', errors.message);
     });
   }
 
   onDownloadOrdre(): void {
-        this.loading = true; // Afficher l'indicateur de chargement
-
-    this.dossierService.telechargerOrdreMission(this.id$).subscribe(
-      (data:any) => {
-        const blob = new Blob([data], { type: 'application/pdf' });
-        this.loading = false; // Fermer l'indicateur de chargement une fois la requête terminée
-        this.hideLoadingModal(); // Cacher le modal de chargement
-        this.successmsg('Téléchargement de l\'ordre de mission réussi', 'Les ordres de la mission ' + this.reference + ' ont été téléchargés avec succès, veillez svp vérifier dans votre dossiers téléchargement sur votre ordinateur pour les retrouver');
+    this.loading = true;
+    this.dossierService.telechargerOrdreMission(Number(this.id$)).subscribe(
+      (_data:any) => {
+        // tu peux créer le blob comme pour onDownloadFrais si besoin d’auto-télécharger
+        this.loading = false;
+        this.hideLoadingModal();
+        this.successmsg('Téléchargement de l\'ordre de mission réussi','Vérifiez vos téléchargements.');
       },
-      (error) => {
-        const errors = error.error.errors;
-        for (let i = 0; i < errors.length; i++) {
-          const currentError = errors[i];
-          this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
+      (error: any) => {
+        const errors = error?.error?.errors;
+        if (errors?.length) {
+          for (let i = 0; i < errors.length; i++) {
+            const currentError = errors[i];
+            this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
+          }
+        } else {
+          this.toastService.error(error?.error?.message || 'Erreur lors du téléchargement', 'Erreur!');
         }
-      })
+      }
+    );
   }
 
   showLoadingModalFrais() {
@@ -798,8 +626,6 @@ onDownloadFrais(): void {
     });
   }
 
-  hideLoadingModal() {
-    Swal.close();
-  }
+  hideLoadingModal() { Swal.close(); }
 
 }

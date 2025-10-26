@@ -28,9 +28,11 @@ export class PresenceComponent implements OnInit {
   total = 0;
   currentPage = 0;
   pageSize = 10;
-    // 🔧 au lieu de sort = 'desc'
-  sortField = 'dateValidation';   // id | dateValidation | mois | annee ...
+
+  // ✅ tri SAFE par défaut (évite 500 liés au champ inexistant)
+  sortField = 'id';
   sortDir: 'asc' | 'desc' = 'desc';
+
   pages: number[] = [];
   totalPages = 0;
 
@@ -81,7 +83,7 @@ export class PresenceComponent implements OnInit {
 
   chargerServices(): void {
     try {
-      // @ts-ignore
+      // @ts-ignore (si tu as un ServiceService séparé)
       import('../services/service.service').then(m => {
         const svc = new m.ServiceService(this.personnelService['httpClient']); // réutilise HttpClient
         svc.listerServicePage(0, 1000, 'asc').subscribe((resp: any) => {
@@ -115,7 +117,10 @@ export class PresenceComponent implements OnInit {
         return { dataState: this.dataStateEnum.CHARGE, data: this.listePage };
       }),
       startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
-      catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] }))
+      catchError((e) => {
+        this.toastr.error(e?.error?.message ?? 'Erreur lors du chargement des présences', 'Erreur');
+        return of({ dataState: this.dataStateEnum.ERREUR, data: [] });
+      })
     );
   }
 
@@ -139,54 +144,60 @@ export class PresenceComponent implements OnInit {
     this.modal.open(modalRef, { size: 'lg', backdrop: 'static', keyboard: false });
   }
 
-  // création ou validation unitaire (PATCH si id, sinon POST ou PATCH si déjà existante)
+  // création ou validation unitaire
   async submit(): Promise<void> {
-  if (this.form.invalid) return;
+    if (this.form.invalid) return;
 
-  const v = this.form.value;
+    const v = this.form.value;
 
-  // bloque mois futur côté UI
-  if (!v.id && typeof v.mois === 'number') {
-    const moisActuel = new Date().getMonth() + 1;
-    if (v.mois > moisActuel) {
-      this.toastr.error('Le mois choisi est dans le futur.', 'Erreur');
-      return;
+    // mois futur → block UI
+    if (!v.id && typeof v.mois === 'number') {
+      const moisActuel = new Date().getMonth() + 1;
+      if (v.mois > moisActuel) {
+        this.toastr.error('Le mois choisi est dans le futur.', 'Erreur');
+        return;
+      }
     }
-  }  const personnelId = Number(v.personnelId);
-  const mois = Number(v.mois);
-  const nbre = Number(v.nbreJourAbsent ?? 0);
 
-  // on cherche d'abord si une présence existe déjà pour (personnel, mois) (année courante)
-  const existId = await this.presenceService.getPresenceIdIfExists(personnelId, mois);
+    const personnelId = Number(v.personnelId);
+    const mois = Number(v.mois);
+    const nbre = Number(v.nbreJourAbsent ?? 0);
 
-  if (existId !== null && existId !== undefined && !Number.isNaN(Number(existId))) {
-    // PATCH (mise à jour) — on NE construit PAS d’URL avec undefined
-    this.presenceService.modifierPresence(Number(existId), nbre).subscribe({
-      next: () => { this.toastr.info('Présence existante mise à jour'); this.modal.dismissAll(); this.chargerPage(); },
-      error: (e) => this.toastr.error(e?.error?.message ?? 'Erreur serveur', 'Erreur')
-    });
-  } else {
-    // POST (création)
-    this.presenceService.creerPresence(personnelId, nbre, mois).subscribe({
-      next: () => { this.toastr.success('Présence créée'); this.modal.dismissAll(); this.chargerPage(); },
-      error: (err) => this.toastr.error(err?.error?.message ?? 'Erreur serveur', 'Erreur')
-    });
+    try {
+      const existId = await this.presenceService.getPresenceIdIfExists(personnelId, mois);
+
+      if (existId !== null && !Number.isNaN(Number(existId))) {
+        // PATCH
+        this.presenceService.modifierPresence(Number(existId), nbre).subscribe({
+          next: () => { this.toastr.info('Présence existante mise à jour'); this.modal.dismissAll(); this.chargerPage(); },
+          error: (e) => this.toastr.error(e?.error?.message ?? 'Erreur serveur', 'Erreur')
+        });
+      } else {
+        // POST
+        this.presenceService.creerPresence(personnelId, nbre, mois).subscribe({
+          next: () => { this.toastr.success('Présence créée'); this.modal.dismissAll(); this.chargerPage(); },
+          error: (err) => this.toastr.error(err?.error?.message ?? 'Erreur serveur', 'Erreur')
+        });
+      }
+    } catch (e: any) {
+      this.toastr.error(e?.message ?? 'Erreur interne', 'Erreur');
+    }
   }
-}
 
   // --- actions unitaires ---
- valider(p: Presence): void {
-  if (!p || p.id === null || p.id === undefined || Number.isNaN(Number(p.id))) {
-    this.toastr.error('Identifiant de présence invalide.', 'Erreur');
-    return;
+  valider(p: Presence): void {
+    if (!p || p.id == null || Number.isNaN(Number(p.id))) {
+      this.toastr.error('Identifiant de présence invalide.', 'Erreur');
+      return;
+    }
+    this.presenceService.modifierPresence(Number(p.id), p.nbreJourAbsent ?? 0).subscribe({
+      next: () => { this.toastr.success('Présence validée'); this.chargerPage(); },
+      error: (e) => this.toastr.error(e?.error?.message ?? 'Erreur serveur', 'Erreur')
+    });
   }
-  this.presenceService.modifierPresence(Number(p.id), p.nbreJourAbsent ?? 0).subscribe({
-    next: () => { this.toastr.success('Présence validée'); this.chargerPage(); },
-    error: (e) => this.toastr.error(e?.error?.message ?? 'Erreur serveur', 'Erreur')
-  });
-}
 
   invalider(p: Presence): void {
+    if (!p || p.id == null) return;
     this.presenceService.annulerValidationPresence(p.id, '').subscribe({
       next: () => { this.toastr.info('Présence invalidée'); this.chargerPage(); },
       error: (e) => this.toastr.error(e?.error?.message ?? 'Erreur serveur', 'Erreur')
@@ -223,12 +234,23 @@ export class PresenceComponent implements OnInit {
   }
 
   // --- util ---
-  afficherNomPersonnel(p: any): string {
-    if (!p) return '';
-    const prenom = p?.etatCivil?.prenom ?? p?.prenom ?? '';
-    const nom = p?.etatCivil?.nom ?? p?.nom ?? '';
-    return `${prenom} ${nom}`.trim();
-  }
+  // --- util ---
+afficherNomPersonnel(row: any): string {
+  if (!row) return '';
+  // priorité aux champs du DTO (plats)
+  const prenom =
+    row?.personnelPrenom ??
+    row?.personnel?.etatCivil?.prenom ??
+    row?.personnel?.prenom ??
+    '';
+  const nom =
+    row?.personnelNom ??
+    row?.personnel?.etatCivil?.nom ??
+    row?.personnel?.nom ??
+    '';
+  return `${prenom} ${nom}`.trim();
+}
+
 
   onChangerFiltres(): void {
     this.currentPage = 0;
