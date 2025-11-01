@@ -277,7 +277,7 @@
                    'is-valid': formulaireUtilisateur.get('personnelid')?.valid}">
               <option value="">Sélectionnez un personnel</option>
               <option *ngFor="let personnel of personnels" [value]="personnel.id">
-              {{ displayPersonnel(personnel) }}
+              {{ displayPersonnel(personnel) }}, {{personnel.nom}}
               </option>
 
             </select>

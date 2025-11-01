@@ -7,7 +7,7 @@ import {
   Input,
   OnChanges
 } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { EventService } from '../../commun/services/event.service';
 import { Router, NavigationEnd } from '@angular/router';
@@ -15,6 +15,10 @@ import { Router, NavigationEnd } from '@angular/router';
 import { MENU } from './menu';
 import { MenuItem } from './menu.model';
 import MetisMenu from 'metismenujs';
+import { catchError, map, Observable, startWith } from 'rxjs';
+import { DataStateEnum, ModelDataState } from '../../state/state';
+import { UtilisateurAuthentifie } from '../../authentification/models/utilisateur-authentifie';
+import { AuthentificationService } from '../../authentification/services/authentication.service';
 
 @Component({
   selector: 'app-menu',
@@ -31,11 +35,16 @@ export class MenuComponent implements OnInit, AfterViewInit, OnChanges {
   data: any;
   menuItems: MenuItem[] = [];
 
+  utilisateurAuthentifie: any;
+  utilisateurAuthentifieState$?: Observable<ModelDataState<UtilisateurAuthentifie>>;
+   email: string | null = null;
+
   constructor(
     private eventService: EventService,
     private router: Router,
     public translate: TranslateService,
-    private http: HttpClient
+    private http: HttpClient,
+    private authenficationSerice: AuthentificationService,
   ) {
     router.events.forEach((event) => {
       if (event instanceof NavigationEnd) {
@@ -48,6 +57,7 @@ export class MenuComponent implements OnInit, AfterViewInit, OnChanges {
   ngOnInit() {
     this.initialize();
     this._scrollElement();
+    this.obtenirUnUtilisateurParEmail();
   }
 
   ngAfterViewInit() {
@@ -56,6 +66,26 @@ export class MenuComponent implements OnInit, AfterViewInit, OnChanges {
       this._activateMenuDropdown();
     }
   }
+
+   obtenirUnUtilisateurParEmail() {
+  
+      const email = sessionStorage.getItem("email") ?? ""; 
+      console.log("utilisateur connecter ",email);
+    this.utilisateurAuthentifieState$ = this.authenficationSerice
+    .obtenirUnUtilisateurParEmail(email)
+    .pipe(
+      map(data => {
+        this.utilisateurAuthentifie = data;
+        this.email = data?.email ?? null;
+        //this.afficherImageDeProfil(data?.image_de_profil);
+        return { data, dataState: DataStateEnum.CHARGE };
+      }),
+      startWith({ dataState: DataStateEnum.CHARGEMENT }),
+      catchError((error: HttpErrorResponse) => this.authenficationSerice.gestionnaireDerreur(error))
+    );
+  
+      }
+  
 
   toggleMenu(event: any) {
     event.currentTarget.nextElementSibling.classList.toggle('mm-show');

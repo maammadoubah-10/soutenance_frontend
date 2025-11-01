@@ -709,7 +709,7 @@
                           <ng-template #templateA>
                             <th class="text-center">Aucun Fichier</th>
                           </ng-template>
-                          <th>{{ (piece?.commentaire ?? '').length <= 30 ? (piece?.commentaire ?? '') :(piece?.commentaire ?? '')?.substring(0, 27) + "..."
+                          <th>{{ (piece?.commentaire ?? '').length <= 30 ? (piece?.commentaire ?? '') :(piece?.commentaire ?? '').substring(0, 27) + "..."
                               }}</th>
                           <th>
                             <button (click)="openModalPieceDetail(piece, detailPiece)" placement="top"
@@ -880,7 +880,7 @@
                           <th>{{interim?.dateDebut| date:'dd MMMM yyyy':'':'fr-FR'}}</th>
                           <th>{{interim?.dateFin| date:'dd MMMM yyyy':'':'fr-FR'}}</th>
                           <th>{{interim?.poste?.designation}}</th>
-                          <th>{{ (interim?.commentaire ?? '').length <= 30 ? (interim?.commentaire ?? '') :(interim?.commentaire ?? '')?.substring(0, 27)
+                          <th>{{ (interim?.commentaire ?? '').length <= 30 ? (interim?.commentaire ?? '') :(interim?.commentaire ?? '').substring(0, 27)
                               + "..." }}</th>
                           <th>
                             <button (click)="openModalInterimeDetail(interim, detailInterim)" placement="top"
@@ -1224,19 +1224,19 @@
                         <th scope="row">
                           {{ (mission?.objet?? '').length <= 15 ? 
                             (mission?.objet ?? '') : 
-                            (mission?.objet ?? '')?.substring(0, 14) + "..." }}
+                            (mission?.objet ?? '').substring(0, 14) + "..." }}
                         </th>
                         <th scope="row">{{ (mission?.accompagne??'').length <= 15 ? (mission?.accompagne ?? '')
-                            : (mission?.accompagne ?? '')?.substring(0, 14) + "..." }}</th>
+                            : (mission?.accompagne ?? '').substring(0, 14) + "..." }}</th>
                         <th scope="row">
                           {{ (mission?.conducteur?.prenom ?? '').length <= 7 ? 
                             (mission?.conducteur?.prenom ?? ''): 
-                            (mission?.conducteur?.prenom ?? '')?.substring(0, 6) + "..." }}
+                            (mission?.conducteur?.prenom ?? '').substring(0, 6) + "..." }}
                         </th>
                         <th scope="row">
                           {{ (mission?.moyenTransport ?? '').length <= 15
                               ? (mission?.moyenTransport ?? '')
-                              : (mission?.moyenTransport ?? '')?.substring(0, 14) + '...' }}
+                              : (mission?.moyenTransport ?? '').substring(0, 14) + '...' }}
                         </th>
                         <th>{{mission?.dateDebut| date:'dd MMMM yyyy':'':'fr-FR'}}</th>
                         <th>{{mission?.dateFin| date:'dd MMMM yyyy':'':'fr-FR'}}</th>

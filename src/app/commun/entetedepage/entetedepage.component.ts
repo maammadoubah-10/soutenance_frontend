@@ -11,7 +11,6 @@ import { WebSocketSubject } from 'rxjs/webSocket';
 import { ToastrService } from 'ngx-toastr';
 import { WebsocketService } from '../services/websocket.service';
 import { NotificationService } from '../services/notification.service';
-import { PedagogieService } from '../../pedagogie/services/pedagogie.service';
 import { DataStateEnum, ModelDataState } from '../../state/state';
 import { UtilisateurAuthentifie } from '../../authentification/models/utilisateur-authentifie';
 import { AuthentificationService } from '../../authentification/services/authentication.service';
@@ -45,7 +44,6 @@ export class EntetedepageComponent implements OnInit{
   constructor(@Inject(DOCUMENT) private document: any, private router: Router,
               private titleService: Title,
               public translate: TranslateService,
-              private pedagogieService: PedagogieService,
               //public _cookiesService: CookieService,
               private authenficationSerice: AuthentificationService,
               private sanitizer: DomSanitizer,
@@ -386,7 +384,6 @@ export class EntetedepageComponent implements OnInit{
       }),
       //catchError(error => of({ dataState: DataStateEnum.ERREUR, errorMessage: error.error.message, errorStatus: error.status })),
     );
-
   }
 
   onSearchRequerantEmail() {
@@ -396,16 +393,6 @@ export class EntetedepageComponent implements OnInit{
       console.error('Email not found in session storage');
       return;
     }
-
-    this.pedagogieService.rechercheRequerantParEmail(email).subscribe(
-      (response: any) => {
-        this.requerant = response.body;
-      },
-      (error) => {
-        // Gérez les erreurs ici
-        console.error("Erreur pour la récupération du requérant", error);
-      }
-    );
   }
 
 

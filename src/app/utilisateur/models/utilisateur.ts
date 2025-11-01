@@ -1,4 +1,4 @@
-import { Role } from '../../roles/models/role.model';
+import { Role } from './role';
 import { EtatCivil } from './etat-civil';
 import { Personnel } from './personnel';
 

@@ -128,7 +128,7 @@
                     <td>{{conge?.dateFin| date:'dd MMMM yyyy':'?':'fr-FR'}}</td>
                     <td *ngIf="conge?.valide === true">{{'Valider'}}</td>
                     <td *ngIf="conge?.valide === false">{{'Rejéter'}}</td>
-                    <td style="text-align: justify">{{(conge?.typeConge ?? '').length <= 15 ? (conge?.typeConge ?? '') : (conge?.typeConge ?? '')?.slice(0, 14) + "..."}}</td>
+                    <td style="text-align: justify">{{(conge?.typeConge ?? '').length <= 15 ? (conge?.typeConge ?? '') : (conge?.typeConge ?? '').slice(0, 14) + "..."}}</td>
                   </tr>
                   <tr *ngIf="response.data?.length == 0">
                     <td colspan="7" class="text-center"><i style="color: #d9534f;font-size: xxx-large" class='bx bxs-data btn btn-lg'></i><br>Aucun congés</td>

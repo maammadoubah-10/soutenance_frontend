@@ -29,18 +29,21 @@ export const MENU: MenuItem[] = [
         label: 'Permissions',
         icon: 'bxs-lock-open',
         link: 'permissions',
+        permissions: 'gerer-les-permissions'
     },
     {
         id: 6,
         label: 'Rôles',
         icon: 'bxs-group',
         link: 'roles',
+        permissions: 'gerer-les-roles'
     },
     {
         id: 7,
         label: 'Utilisateurs',
         icon: 'bxs-user',
         link: 'utilisateurs',
+        permissions: 'gerer-les-utilisateur'
     },
             
     

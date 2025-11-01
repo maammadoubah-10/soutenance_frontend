@@ -109,7 +109,7 @@
                       <td>{{demande?.typeDemande}}</td>
                       <td>{{demande?.nbreJour}}</td>
                       <td style="text-align: justify">{{ (demande?.motif ?? '').length <= 15 ? (demande?.motif ?? '') :
-                          (demande?.motif?? '')?.slice(0, 14) + "..." }}</td>
+                          (demande?.motif?? '').slice(0, 14) + "..." }}</td>
                     </tr>
                     <tr *ngIf="response.data?.length == 0">
                       <td colspan="9" class="text-center"><i style="color: #d9534f;font-size: xxx-large"

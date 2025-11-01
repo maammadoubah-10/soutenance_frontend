@@ -4,10 +4,10 @@ import { map, Observable } from 'rxjs';
 import HttpResponse from "../../utilisateur/models/HttpResponse";
 
 import { environment } from '../../../environments/environment';
-import { Role } from '../../roles/models/role.model';
 import { Utilisateur, UtilisateurDto } from '../models/utilisateur';
 import { Statistique } from '../models/statistique';
 import { Permission } from '../models/permission';
+import { Role } from '../models/role';
 const host = environment.hostmicroserviceutilisateur;
 const hostpersonnel = environment.hostmicroservicepersonnel;
 const ROOT = environment.hostmicroserviceutilisateur.replace(/\/+$/, ''); // ex: http://localhost:9001/utilisateur

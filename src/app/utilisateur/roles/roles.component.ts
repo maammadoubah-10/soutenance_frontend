@@ -266,12 +266,12 @@ export class RolesComponent implements OnInit {
       });
   }
 
-  onSearchPermission(searchItemPermission: string) {
-    if (searchItemPermission.length >= 3) {
+   onSearchPermission(searchItemPermission : string){
+    if(searchItemPermission.length >= 3){
       this.utilisateurService.recherchePermission(searchItemPermission).subscribe(
-        (response: any) => {
+        (response : any) => {
           this.permissions = response
-        }, (error) => {
+        },(error)=>{
         }
       );
     }
