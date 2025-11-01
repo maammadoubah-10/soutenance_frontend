@@ -51,12 +51,12 @@ import { DossierService } from '../../services/dossier.service';
 import { DemandeService } from '../../services/demande.service';
 import { PresenceService } from '../../services/presence.service';
 import { MatStepper } from '@angular/material/stepper';
+
 @Component({
   selector: 'app-detailpersonnel',
   templateUrl: './detailpersonnel.component.html',
   styleUrls: ['./detailpersonnel.component.scss'],
   providers: [{ provide: LOCALE_ID, useValue: 'fr' }],
-
 })
 export class DetailpersonnelComponent implements OnInit {
 
@@ -77,7 +77,7 @@ export class DetailpersonnelComponent implements OnInit {
   mois: number = 0;
   nbrJourAbasent: number = 0
   contrat?: Contrat;
-  listeDossierPage: Personnel[] = [] //listePersonnelPage
+  listeDossierPage: Personnel[] = []
   listePoste: Poste[] = []
   listeService: Service[] = []
   listeBanque: Banques[] = []
@@ -100,10 +100,10 @@ export class DetailpersonnelComponent implements OnInit {
   listeAvenantContratPersonnel: Avenant[] = []
   piece?: Pieces;
   interime?: Interimes;
-  public typeCivilites = Object.values(civilite); //definir les enums // voir le swagger pour voir comment s'est écrit
-  public situationMatrimoniales = Object.values(situationMatrimoniale); //definir les enums // voir le swagger pour voir comment s'est écrit
-  // Définir une expression régulière pour les numéros de téléphone valides
-  PHONE_REGEX = /^[+]?[(]?[0-9]{1,6}[)]?[-\s.]?[0-9]{3,6}[-\s.]?[0-9]{3,6}$/; //pattern du téléphone
+  public typeCivilites = Object.values(civilite);
+  public situationMatrimoniales = Object.values(situationMatrimoniale);
+  PHONE_REGEX = /^[+]?[(]?[0-9]{1,6}[)]?[-\s.]?[0-9]{3,6}[-\s.]?[0-9]{3,6}$/;
+
   public nom: string = '';
   public matricule: string = '';
   public prenom: string = '';
@@ -116,6 +116,7 @@ export class DetailpersonnelComponent implements OnInit {
   public designation: string = '';
   public sigle: string = '';
   file: File | undefined
+
   formulaireDebaucher = new FormGroup({
     id: new FormControl(''),
     dateDebauchage: new FormControl(new Date, [Validators.required]),
@@ -164,14 +165,13 @@ export class DetailpersonnelComponent implements OnInit {
     commentaire: new FormControl(''),
   })
 
-formulaireAffectation = new FormGroup({
-  id: new FormControl(),
-  dateDebut: new FormControl(new Date(), [Validators.required]),
-  // ❌ plus de dateFin ici
-  personnel: new FormControl<string | null>(null),
-  poste: new FormControl<string | null>(null, [Validators.required]),
-});
-
+  // ✅ AFFECTATION sans dateFin
+  formulaireAffectation = new FormGroup({
+    id: new FormControl(),
+    dateDebut: new FormControl(new Date(), [Validators.required]),
+    personnel: new FormControl<string | null>(null),
+    poste: new FormControl<string | null>(null, [Validators.required]),
+  });
 
   formulaireAvenantContrat = new FormGroup({
     id: new FormControl(),
@@ -180,7 +180,8 @@ formulaireAffectation = new FormGroup({
     estActif: new FormControl(false, [Validators.required]),
   })
 
-
+  // ⚠️ Les champs « banque / modePaiement / RIB » restent dans le formulaire,
+  // mais on ne lit plus ces infos depuis `personnel` (c’est ce qui cassait).
   formulaireDossier = new FormGroup({
     id: new FormControl(),
 
@@ -214,7 +215,6 @@ formulaireAffectation = new FormGroup({
       codeGuichet: new FormControl('', [Validators.minLength(5), Validators.maxLength(5)]),
       numeroCompte: new FormControl(''),
       modePaiement: new FormControl<string | null>(null),
-
     }),
 
     autrePersonnelGroupe: this.formBuilder.group({
@@ -243,8 +243,10 @@ formulaireAffectation = new FormGroup({
   totalPages: number = 0;
   hashids: any
   private id$: any;
-  devisSbj = new BehaviorSubject(0); // remove tab
-  constructor(private personnelService: PersonnelService, //j'appelle tous les service que je veux utiliser qui sont dans le model du controller
+  devisSbj = new BehaviorSubject(0);
+
+  constructor(
+    private personnelService: PersonnelService,
     private posteService: PosteService,
     private router: Router,
     private activatedRoute: ActivatedRoute,
@@ -262,23 +264,22 @@ formulaireAffectation = new FormGroup({
     private affectationService: AffectationService,
     private piecesService: PiecesService,
     private indiceService: IndiceService,
-    //private ngWizardService: NgWizardService, // faire formulaire à étape
-    private formBuilder: FormBuilder, // pour grouper les ligne du formulaire
+    private formBuilder: FormBuilder,
     private modeDePaiementService: ModeDePaiementService,
     private statutPersonnelService: StatutPersonnelService,
-    private modalService: NgbModal) { } //générer les messages
+    private modalService: NgbModal
+  ) { }
+
   ngOnInit(): void {
     registerLocaleData(localeFr, 'fr');
     this.breadCrumbItems = [{ label: 'Forms' }, { label: 'Form Wizard', active: true }];
     this.hashids = new Hashids('mysecretkey');
     this.activatedRoute.paramMap.subscribe((params) => {
       const encodedId = params.get('id');
-
-      if (encodedId) {  // ← Vérifier que encodedId n'est pas null
+      if (encodedId) {
         this.id$ = this.decodeId(encodedId);
       } else {
         console.warn('ID parameter is missing');
-        // Gérer le cas où l'ID est manquant
       }
     });
     this.items = [
@@ -288,8 +289,8 @@ formulaireAffectation = new FormGroup({
     ];
     this.chargerIdPersonnel(this.id$);
     this.chargerListePiecesPersonnel();
-
   }
+
   decodeId(encodedId: string) {
     const [id] = this.hashids.decode(encodedId);
     return id;
@@ -302,10 +303,8 @@ formulaireAffectation = new FormGroup({
   onSearchPoste(designation: string) {
     if (designation.length >= 3) {
       this.posteService.recherchePoste(designation).subscribe(
-        (response: any) => {
-          this.listePoste = response.body.content
-        }, (error) => {
-        }
+        (response: any) => { this.listePoste = response.body.content },
+        () => {}
       );
     }
   }
@@ -313,46 +312,35 @@ formulaireAffectation = new FormGroup({
   onSearchBanque(sigle: string) {
     if (sigle.length >= 1) {
       this.banqueService.rechercheBanque(sigle).subscribe(
-        (response: any) => {
-          this.listeBanque = response.body.content
-        }, (error) => {
-        }
+        (response: any) => { this.listeBanque = response.body.content },
+        () => {}
       );
     }
   }
-
 
   onSearchDossier(designation: string) {
     if (designation.length >= 3) {
       this.dossierService.rechercheDossier(designation).subscribe(
-        (response: any) => {
-          this.listeTypeDossier = response.body.content
-        }, (error) => {
-        }
+        (response: any) => { this.listeTypeDossier = response.body.content },
+        () => {}
       );
     }
   }
-
 
   onSearchTypeDePieces(nom: string) {
     if (nom.length >= 2) {
       this.typedepieceService.rechercheTypeDePiece(nom).subscribe(
-        (response: any) => {
-          this.listeTypePieces = response.body.content
-        }, (error) => {
-        }
+        (response: any) => { this.listeTypePieces = response.body.content },
+        () => {}
       );
     }
   }
 
-
   onSearchTypeContrat(sigle: string) {
     if (sigle.length >= 1) {
       this.typedecontratService.rechercheTypeDeContrat(sigle).subscribe(
-        (response: any) => {
-          this.listeTypeContrat = response.body.content
-        }, (error) => {
-        }
+        (response: any) => { this.listeTypeContrat = response.body.content },
+        () => {}
       );
     }
   }
@@ -360,48 +348,41 @@ formulaireAffectation = new FormGroup({
   onSearchEntite(designation: string) {
     if (designation.length >= 3) {
       this.entiteService.rechercheEntite(designation).subscribe(
-        (response: any) => {
-          this.listeEntite = response.body.content
-        }, (error) => {
-        }
+        (response: any) => { this.listeEntite = response.body.content },
+        () => {}
       );
     }
   }
+
   onSearchIndice(nom: string) {
     if (nom.length >= 3) {
       this.indiceService.rechercheIndice(nom).subscribe(
-        (response: any) => {
-          this.listeIndice = response.body.content
-        }, (error) => {
-        }
+        (response: any) => { this.listeIndice = response.body.content },
+        () => {}
       );
     }
   }
+
   onSearchModeDePaiement(designation: string) {
     if (designation.length >= 3) {
       this.modeDePaiementService.rechercheModeDePaiement(designation).subscribe(
-        (response: any) => {
-          this.listeModeDePaiement = response.body.content
-        }, (error) => {
-        }
+        (response: any) => { this.listeModeDePaiement = response.body.content },
+        () => {}
       );
     }
   }
+
   onSearchStatutPersonnel(designation: string) {
     if (designation.length >= 3) {
       this.statutPersonnelService.rechercheStatutPersonnel(designation).subscribe(
-        (response: any) => {
-          this.listeStatutPersonnel = response.body.content
-        }, (error) => {
-        }
+        (response: any) => { this.listeStatutPersonnel = response.body.content },
+        () => {}
       );
     }
   }
 
-
-
   chargerIdPersonnel(id: number) {
-    this.activatedRoute.params.subscribe((params) => {
+    this.activatedRoute.params.subscribe(() => {
       this.chargeInformationPersonnel(id);
       this.chargerListePresencePersonnel();
       this.chargerListeInterimesPersonnel();
@@ -418,7 +399,6 @@ formulaireAffectation = new FormGroup({
       .pipe(
         map((response: any) => {
           this.personnel = response;
-          // Comparaison et calcul de l'âge
           const today = new Date();
           const dateDeNaissance = new Date(response.dateDeNaissance);
           if (this.personnel) {
@@ -432,9 +412,7 @@ formulaireAffectation = new FormGroup({
         startWith({ dataState: DataStateEnum.CHARGEMENT })
       )
       .pipe(
-        catchError((err) => {
-          return of({ dataState: this.dataStateEnum.CHARGE, data: undefined });
-        })
+        catchError(() => of({ dataState: this.dataStateEnum.CHARGE, data: undefined }))
       );
   }
 
@@ -451,37 +429,26 @@ formulaireAffectation = new FormGroup({
 
   isSameDayAndMonth(date: Date): boolean {
     const today = new Date();
-    return (
-      date.getMonth() === today.getMonth() &&
-      date.getDate() === today.getDate()
-    );
+    return (date.getMonth() === today.getMonth() && date.getDate() === today.getDate());
   }
 
+  goBack(): void { this.router.navigate(['rh/personnels']); }
 
-  goBack(): void {
-    this.router.navigate(['rh/personnels']);
-  }
-
-  openModal(content: any, personnel: Personnel) {
-    this.modalService.open(content)
-  }
-
-  openModalEmbaucher(content: any, personnel: Personnel) {
-    this.modalService.open(content)
-  }
+  openModal(content: any, _personnel: Personnel) { this.modalService.open(content) }
+  openModalEmbaucher(content: any, _personnel: Personnel) { this.modalService.open(content) }
 
   ajouterSignature() {
-    const formData = new FormData(); //objet formdata
-    formData.append('file', this.file as File); //mettre le ifhcier dans le formulaire
+    const formData = new FormData();
+    formData.append('file', this.file as File);
     this.personnelService.ajouterSignaturePersonnel(this.id$, formData)
       .subscribe(
-        (response: any) => {
+        () => {
           this.modalService.dismissAll()
           this.chargerIdPersonnel(this.id$)
           if (this.personnel?.signature == null) {
             this.successmsg("Signature ajouté", "La signature a été ajouté avec succès")
           } else {
-            this.successmsg("Signature modifier", "La signature a été modifié avec succès")
+            this.successmsg("Signature modifiée", "La signature a été modifiée avec succès")
           }
         },
         (error) => {
@@ -495,9 +462,7 @@ formulaireAffectation = new FormGroup({
   }
 
   uploaderFicher($event: any) {
-    if ($event.target.files.length > 0) {
-      this.file = $event.target.files[0];
-    }
+    if ($event.target.files.length > 0) { this.file = $event.target.files[0]; }
   }
 
   telechargerSignature(personnel: Personnel) {
@@ -505,31 +470,21 @@ formulaireAffectation = new FormGroup({
   }
 
   showPopOnDownloadSignature() {
-    this.successmsg(
-      'Signature telecharger',
-      "La signature a été bien téléchargé avec succès"
-    );
+    this.successmsg('Signature telechargée', "La signature a été bien téléchargée avec succès");
   }
 
-  closeModal() {
-    this.modalService.dismissAll()
-  }
+  closeModal() { this.modalService.dismissAll() }
 
   successmsg(title = 'Poste ajouté !', message = 'Vous venez d\'ajoutez avec succès un nouveau Poste !') {
     Swal.fire(title, message, 'success');
   }
 
-  errormsg(title = 'Erreur !', message: string) {
-    Swal.fire(title, message, 'error');
-  }
+  errormsg(title = 'Erreur !', message: string) { Swal.fire(title, message, 'error'); }
 
-  get formPersonnel() {
-    return this.formulaireDossier.controls;
-  }
-
+  get formPersonnel() { return this.formulaireDossier.controls; }
 
   openModalPersonnel(content: any, dossier: Personnel | undefined = undefined) {
-    if (dossier) { //modification des donnéées
+    if (dossier) {
       this.formulaireDossier.patchValue(dossier as any)
       this.formulaireDossier.get('id')?.setValue(dossier?.id)
       this.formPersonnel.identitePersonnelGroupe['controls'].matricule.setValue(dossier?.matricule?.toString())
@@ -551,17 +506,19 @@ formulaireAffectation = new FormGroup({
       this.formPersonnel.personneContacterGroupe['controls'].prenomContact.setValue(dossier?.prenomContact?.toString())
       this.formPersonnel.personneContacterGroupe['controls'].nomContact.setValue(dossier?.nomContact?.toString())
 
-      this.formPersonnel.identiteBanquePersonneGroupe['controls'].banque.setValue(dossier?.banque?.designation?.toString())
-      this.formPersonnel.identiteBanquePersonneGroupe['controls'].cleRib.setValue(dossier?.cleRib?.toString())
-      this.formPersonnel.identiteBanquePersonneGroupe['controls'].codeBanque.setValue(dossier?.codeBanque?.toString())
-      this.formPersonnel.identiteBanquePersonneGroupe['controls'].codeGuichet.setValue(dossier?.codeGuichet?.toString())
-      this.formPersonnel.identiteBanquePersonneGroupe['controls'].numeroCompte.setValue(dossier?.numeroCompte?.toString())
-      this.formPersonnel.identiteBanquePersonneGroupe['controls'].modePaiement.setValue(dossier?.modePaiement?.designation?.toString())
+      // 🧹 SUPPRIMÉ : lecture banque/modePaiement/RIB depuis `dossier`
+      // (c’est ce qui causait l’erreur, car le type `Personnel` ne les expose pas)
+      this.formPersonnel.identiteBanquePersonneGroupe['controls'].banque.setValue(null)
+      this.formPersonnel.identiteBanquePersonneGroupe['controls'].cleRib.setValue('')
+      this.formPersonnel.identiteBanquePersonneGroupe['controls'].codeBanque.setValue('')
+      this.formPersonnel.identiteBanquePersonneGroupe['controls'].codeGuichet.setValue('')
+      this.formPersonnel.identiteBanquePersonneGroupe['controls'].numeroCompte.setValue('')
+      this.formPersonnel.identiteBanquePersonneGroupe['controls'].modePaiement.setValue(null)
 
       this.formPersonnel.autrePersonnelGroupe['controls'].poste.setValue(dossier?.poste?.designation?.toString())
       this.formPersonnel.autrePersonnelGroupe['controls'].entite.setValue(dossier?.entite?.designation?.toString())
       this.formPersonnel.autrePersonnelGroupe['controls'].indice.setValue(dossier?.indice?.nom?.toString())
-    } else { // lors de la création il rafraichit à chaque niveau
+    } else {
       this.formulaireDossier.reset()
       this.formPersonnel.id.reset()
       this.formPersonnel.identitePersonnelGroupe.reset()
@@ -582,11 +539,9 @@ formulaireAffectation = new FormGroup({
     this.modalService.open(content, { size: 'lg', centered: true });
   }
 
-
   creerModifierPersonnel() {
-    let formDataPersonnel = null;
+    let formDataPersonnel: any = null;
     if (this.formulaireDossier.valid) {
-      // Récupération sécurisée des valeurs avec vérification de null/undefined
       const statutPersonnelValue = this.formPersonnel.identitePersonnelGroupe['controls'].statutPersonnel.value;
       const isStatutPersonnelNumber = statutPersonnelValue != null && !isNaN(Number(statutPersonnelValue)) && isFinite(Number(statutPersonnelValue));
 
@@ -604,6 +559,7 @@ formulaireAffectation = new FormGroup({
 
       const indiceValue = this.formPersonnel.autrePersonnelGroupe['controls'].indice.value;
       const isIndiceValid = indiceValue != null && !isNaN(Number(indiceValue)) && isFinite(Number(indiceValue));
+
       formDataPersonnel = {
         "matricule": this.formPersonnel.identitePersonnelGroupe['controls'].matricule.value || null,
         "nom": this.formPersonnel.identitePersonnelGroupe['controls'].nom.value || null,
@@ -612,7 +568,6 @@ formulaireAffectation = new FormGroup({
         "dateDeNaissance": this.formPersonnel.identitePersonnelGroupe['controls'].dateDeNaissance.value || null,
         "referenceComptable": this.formPersonnel.identitePersonnelGroupe['controls'].referenceComptable.value || null,
         "situationMatrimoniale": this.formPersonnel.identitePersonnelGroupe['controls'].situationMatrimoniale.value || null,
-        // "statutPersonnel": this.formPersonnel.identitePersonnelGroupe['controls'].statutPersonnel.value || null,
         "statutPersonnel": isStatutPersonnelNumber ? statutPersonnelValue : null,
         "nombreEnfant": this.formPersonnel.identitePersonnelGroupe['controls'].nombreEnfant.value || null,
         "pieceIdentite": this.formPersonnel.identitePersonnelGroupe['controls'].pieceIdentite.value || null,
@@ -625,17 +580,14 @@ formulaireAffectation = new FormGroup({
         "prenomContact": this.formPersonnel.personneContacterGroupe['controls'].prenomContact.value || null,
         "nomContact": this.formPersonnel.personneContacterGroupe['controls'].nomContact.value || null,
 
-        // "banque": this.formPersonnel.identiteBanquePersonneGroupe['controls'].banque.value || null,
+        // ✅ on garde l’envoi éventuel au backend, mais sans le lier à `personnel`
         "banque": isBanqueValid ? banqueValue : null,
         "cleRib": this.formPersonnel.identiteBanquePersonneGroupe['controls'].cleRib.value || null,
         "codeBanque": this.formPersonnel.identiteBanquePersonneGroupe['controls'].codeBanque.value || null,
         "codeGuichet": this.formPersonnel.identiteBanquePersonneGroupe['controls'].codeGuichet.value || null,
         "numeroCompte": this.formPersonnel.identiteBanquePersonneGroupe['controls'].numeroCompte.value || null,
-        // "modePaiement": this.formPersonnel.identiteBanquePersonneGroupe['controls'].modePaiement.value || null,
         "modePaiement": isModePaiementValid ? modePaiementValue : null,
-        // "poste": this.formPersonnel.autrePersonnelGroupe['controls'].poste.value || null,
-        // "entite": this.formPersonnel.autrePersonnelGroupe['controls'].entite.value || null,
-        // "indice": this.formPersonnel.autrePersonnelGroupe['controls'].indice.value || null,
+
         "poste": isPosteValid ? posteValue : null,
         "entite": isEntiteValid ? entiteValue : null,
         "indice": isIndiceValid ? indiceValue : null,
@@ -667,12 +619,7 @@ formulaireAffectation = new FormGroup({
                   telephoneContact: response["data"].telephoneContact,
                   prenomContact: response["data"].prenomContact,
                   nomContact: response["data"].nomContact,
-                  banque: response["data"].banque,
-                  cleRib: response["data"].cleRib,
-                  codeBanque: response["data"].codeBanque,
-                  codeGuichet: response["data"].codeGuichet,
-                  numeroCompte: response["data"].numeroCompte,
-                  modePaiement: response["data"].modePaiement,
+                  // 🧹 pas d’accès à e.banque / e.modePaiement / e.cleRib etc.
                   poste: response["data"].poste,
                   entite: response["data"].entite,
                   indice: response["data"].indice
@@ -695,7 +642,6 @@ formulaireAffectation = new FormGroup({
     } else {
       this.personnelService.creerPersonnel(formDataPersonnel).subscribe(
         (response: any) => {
-          const personnelId = response['data'].id;
           this.listeDossierPage.unshift(response['data']);
           this.formulaireDossier.reset();
           this.modalService.dismissAll();
@@ -712,7 +658,6 @@ formulaireAffectation = new FormGroup({
     }
   }
 
-
   supprimerPersonnel() {
     Swal.fire({
       title: 'Êtes vous sûr ?',
@@ -726,11 +671,9 @@ formulaireAffectation = new FormGroup({
     }).then((result) => {
       if (result.value) {
         this.personnelService.supprimerPersonnel(this.id$).subscribe({
-          next: (value: any) => {
+          next: () => {
             this.devisSbj.next(0);
-            this.listeDossierPage = this.listeDossierPage.filter(
-              (i) => i.id !== this.id$
-            );
+            this.listeDossierPage = this.listeDossierPage.filter((i) => i.id !== this.id$);
             this.goBack()
             this.successmsg('Personnel supprimer', 'Suppression réussie');
           },
@@ -741,6 +684,9 @@ formulaireAffectation = new FormGroup({
       }
     });
   }
+
+  get activationFormDebaucher() { return this.formulaireDebaucher.controls; }
+  get activationFormEmbaucher() { return this.formulaireEmbaucher.controls; }
 
   debaucherPersonnel() {
     Swal.fire({
@@ -755,11 +701,8 @@ formulaireAffectation = new FormGroup({
     }).then((result) => {
       if (result.isConfirmed) {
         this.debauche();
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        // handle cancel action if necessary
       }
-    }).catch((error) => {
-    });
+    }).catch(() => {});
   }
 
   embaucherPersonnel() {
@@ -773,28 +716,14 @@ formulaireAffectation = new FormGroup({
       confirmButtonText: 'Oui, Re Embaucher le !',
       cancelButtonText: 'Non, Annuler',
     }).then((result) => {
-      if (result.isConfirmed) {
-        this.embauche();
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        // handle cancel action if necessary
-      }
-    }).catch((error) => {
-    });
-  }
-
-
-  get activationFormDebaucher() {
-    return this.formulaireDebaucher.controls;
-  }
-
-  get activationFormEmbaucher() {
-    return this.formulaireEmbaucher.controls;
+      if (result.isConfirmed) { this.embauche(); }
+    }).catch(() => {});
   }
 
   debauche() {
     const { dateDebauchage } = this.formulaireDebaucher.value;
     const selectedDate = dateDebauchage ? new Date(dateDebauchage) : new Date();
-    this.personnelService.debaucherPersonnel(this.id$, selectedDate).subscribe((result: any) => {
+    this.personnelService.debaucherPersonnel(this.id$, selectedDate).subscribe(() => {
       Swal.fire('Personnel', 'Débauchage réussi');
       this.modalService.dismissAll();
       this.chargerIdPersonnel(this.id$);
@@ -804,12 +733,15 @@ formulaireAffectation = new FormGroup({
   embauche() {
     const { dateEmbauchage } = this.formulaireEmbaucher.value;
     const selectedDate = dateEmbauchage ? new Date(dateEmbauchage) : new Date();
-    this.personnelService.embaucherPersonnel(this.id$, selectedDate).subscribe((result) => {
+    this.personnelService.embaucherPersonnel(this.id$, selectedDate).subscribe(() => {
       Swal.fire('Personnel', 'REEmbauchage réussi');
       this.modalService.dismissAll();
       this.chargerIdPersonnel(this.id$);
     });
   }
+
+  get activationFormRetraite() { return this.formulaireRetraiter.controls; }
+
   retraitePersonnel() {
     Swal.fire({
       title: 'Êtes-vous sûr ?',
@@ -821,24 +753,14 @@ formulaireAffectation = new FormGroup({
       confirmButtonText: 'Oui, Mettre en retraite !',
       cancelButtonText: 'Non, Annuler',
     }).then((result) => {
-      if (result.isConfirmed) {
-        this.retraite();
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        // handle cancel action if necessary
-      }
-    }).catch((error) => {
-    });
-  }
-
-
-  get activationFormRetraite() {
-    return this.formulaireRetraiter.controls;
+      if (result.isConfirmed) { this.retraite(); }
+    }).catch(() => {});
   }
 
   retraite() {
     const { dateRetraite } = this.formulaireRetraiter.value;
     const selectedDate = dateRetraite ? new Date(dateRetraite) : new Date();
-    this.personnelService.retraitePersonnel(this.id$, selectedDate).subscribe((result: any) => {
+    this.personnelService.retraitePersonnel(this.id$, selectedDate).subscribe(() => {
       Swal.fire('Personnel', 'Mise en Retraite réussi');
       this.modalService.dismissAll();
       this.chargerIdPersonnel(this.id$);
@@ -861,18 +783,11 @@ formulaireAffectation = new FormGroup({
           this.totalPieces = response.body.totalElements;
           this.totalPages = response.body.totalPages;
           this.pages = this.getPages();
-          return {
-            dataState: this.dataStateEnum.CHARGE,
-            data: this.listePiecesPersonnel,
-          };
+          return { dataState: this.dataStateEnum.CHARGE, data: this.listePiecesPersonnel };
         }),
         startWith({ dataState: this.dataStateEnum.CHARGEMENT })
       )
-      .pipe(
-        catchError((err) => {
-          return of({ dataState: this.dataStateEnum.ERREUR, data: [] });
-        })
-      );
+      .pipe(catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] })));
   }
 
   chargerListePresencePersonnel() {
@@ -883,18 +798,11 @@ formulaireAffectation = new FormGroup({
           this.totalPresence = response.body.totalElements;
           this.totalPages = response.body.totalPages;
           this.pages = this.getPages();
-          return {
-            dataState: this.dataStateEnum.CHARGE,
-            data: this.listePresencePersonnel,
-          };
+          return { dataState: this.dataStateEnum.CHARGE, data: this.listePresencePersonnel };
         }),
         startWith({ dataState: this.dataStateEnum.CHARGEMENT })
       )
-      .pipe(
-        catchError((err) => {
-          return of({ dataState: this.dataStateEnum.ERREUR, data: [] });
-        })
-      );
+      .pipe(catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] })));
   }
 
   chargerListeInterimesPersonnel() {
@@ -905,18 +813,11 @@ formulaireAffectation = new FormGroup({
           this.totalInterims = response.body.totalElements;
           this.totalPages = response.body.totalPages;
           this.pages = this.getPages();
-          return {
-            dataState: this.dataStateEnum.CHARGE,
-            data: this.listeInterimesPersonnel,
-          };
+          return { dataState: this.dataStateEnum.CHARGE, data: this.listeInterimesPersonnel };
         }),
         startWith({ dataState: this.dataStateEnum.CHARGEMENT })
       )
-      .pipe(
-        catchError((err) => {
-          return of({ dataState: this.dataStateEnum.ERREUR, data: [] });
-        })
-      );
+      .pipe(catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] })));
   }
 
   chargerListeAffectationPersonnel() {
@@ -927,18 +828,11 @@ formulaireAffectation = new FormGroup({
           this.totalAffectation = response.body.totalElements;
           this.totalPages = response.body.totalPages;
           this.pages = this.getPages();
-          return {
-            dataState: this.dataStateEnum.CHARGE,
-            data: this.listeAffectationPersonnel,
-          };
+          return { dataState: this.dataStateEnum.CHARGE, data: this.listeAffectationPersonnel };
         }),
         startWith({ dataState: this.dataStateEnum.CHARGEMENT })
       )
-      .pipe(
-        catchError((err) => {
-          return of({ dataState: this.dataStateEnum.ERREUR, data: [] });
-        })
-      );
+      .pipe(catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] })));
   }
 
   chargerListeContratPersonnel() {
@@ -949,18 +843,11 @@ formulaireAffectation = new FormGroup({
           this.totalContrat = response.body.totalElements;
           this.totalPages = response.body.totalPages;
           this.pages = this.getPages();
-          return {
-            dataState: this.dataStateEnum.CHARGE,
-            data: this.listeContratsPersonnel,
-          };
+          return { dataState: this.dataStateEnum.CHARGE, data: this.listeContratsPersonnel };
         }),
         startWith({ dataState: this.dataStateEnum.CHARGEMENT })
       )
-      .pipe(
-        catchError((err) => {
-          return of({ dataState: this.dataStateEnum.ERREUR, data: [] });
-        })
-      );
+      .pipe(catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] })));
   }
 
   isTodayBetweenDates(startDate: Date, endDate: Date): boolean {
@@ -968,37 +855,26 @@ formulaireAffectation = new FormGroup({
     return startDate <= today && endDate >= today;
   }
 
-  encodeId(id: number) {
-    return this.hashids.encode(id);
-  }
+  encodeId(id: number) { return this.hashids.encode(id); }
 
   chargerListeMissionsPersonnel() {
     this.missions = this.personnelService.listerMissionsPersonnel(this.id$, this.currentPage, this.nombrePerPage, this.sort)
       .pipe(
         map((response: any) => {
           this.listeMissionPersonnel = response.body.content;
-          // Comparaison des dates pour chaque mission
           this.listeMissionPersonnel.forEach((mission: Mission) => {
-            const startDate = new Date(mission.dateDebut); // Date de début de la mission
-            const endDate = new Date(mission.dateFin); // Date de fin de la mission
+            const startDate = new Date(mission.dateDebut);
+            const endDate = new Date(mission.dateFin);
             mission.isTodayBetweenDates = this.isTodayBetweenDates(startDate, endDate);
           });
-
           this.totalMission = response.body.totalElements;
           this.totalPages = response.body.totalPages;
           this.pages = this.getPages();
-          return {
-            dataState: this.dataStateEnum.CHARGE,
-            data: this.listeMissionPersonnel,
-          };
+          return { dataState: this.dataStateEnum.CHARGE, data: this.listeMissionPersonnel };
         }),
         startWith({ dataState: this.dataStateEnum.CHARGEMENT })
       )
-      .pipe(
-        catchError((err) => {
-          return of({ dataState: this.dataStateEnum.ERREUR, data: [] });
-        })
-      );
+      .pipe(catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] })));
   }
 
   chargerListeDemandesPersonnel() {
@@ -1009,18 +885,11 @@ formulaireAffectation = new FormGroup({
           this.totalDemande = response.body.totalElements;
           this.totalPages = response.body.totalPages;
           this.pages = this.getPages();
-          return {
-            dataState: this.dataStateEnum.CHARGE,
-            data: this.listeDemandePersonnel,
-          };
+          return { dataState: this.dataStateEnum.CHARGE, data: this.listeDemandePersonnel };
         }),
         startWith({ dataState: this.dataStateEnum.CHARGEMENT })
       )
-      .pipe(
-        catchError((err) => {
-          return of({ dataState: this.dataStateEnum.ERREUR, data: [] });
-        })
-      );
+      .pipe(catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] })));
   }
 
   chargerListeCongesPersonnel() {
@@ -1031,28 +900,18 @@ formulaireAffectation = new FormGroup({
           this.totalConge = response.body.totalElements;
           this.totalPages = response.body.totalPages;
           this.pages = this.getPages();
-          return {
-            dataState: this.dataStateEnum.CHARGE,
-            data: this.listeCongePersonnel,
-          };
+          return { dataState: this.dataStateEnum.CHARGE, data: this.listeCongePersonnel };
         }),
         startWith({ dataState: this.dataStateEnum.CHARGEMENT })
       )
-      .pipe(
-        catchError((err) => {
-          return of({ dataState: this.dataStateEnum.ERREUR, data: [] });
-        })
-      );
+      .pipe(catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] })));
   }
 
   getPages(): number[] {
     const pages: number[] = [];
-    for (let i = 0; i < this.totalPages; i++) {
-      pages.push(i);
-    }
+    for (let i = 0; i < this.totalPages; i++) { pages.push(i); }
     return pages;
   }
-
 
   openModalPresence(content: any, presence: Presence | undefined = undefined) {
     if (presence) {
@@ -1063,15 +922,8 @@ formulaireAffectation = new FormGroup({
       this.formulairePresence.reset()
       this.formulairePresence.get('personnel')?.setValue(this.id$)
     }
-    this.modalService.open(content, {
-      size: 'lg',        // ← Taille large
-      backdrop: 'static', // ← Empêche la fermeture en cliquant à l'extérieur
-      keyboard: false     // ← Empêche la fermeture avec la touche Échap
-    });
-
+    this.modalService.open(content, { size: 'lg', backdrop: 'static', keyboard: false });
   }
-
-
 
   marquerPresencePersonnel() {
     Swal.fire({
@@ -1084,13 +936,8 @@ formulaireAffectation = new FormGroup({
       confirmButtonText: 'Oui, Marquer !',
       cancelButtonText: 'Non, Annuler',
     }).then((result) => {
-      if (result.isConfirmed) {
-        this.creeModifierPresence();
-      } else if (result.dismiss === Swal.DismissReason.cancel) {
-        // handle cancel action if necessary
-      }
-    }).catch((error) => {
-    });
+      if (result.isConfirmed) { this.creeModifierPresence(); }
+    }).catch(() => {});
   }
 
   creeModifierPresence() {
@@ -1108,7 +955,7 @@ formulaireAffectation = new FormGroup({
               })
               this.modalService.dismissAll()
               this.chargerIdPersonnel(this.id$)
-              this.successmsg("Présence modifier", "La présence a été modifié avec succès")
+              this.successmsg("Présence modifiée", "La présence a été modifiée avec succès")
               this.formulairePresence.reset()
             },
             (error) => {
@@ -1120,28 +967,24 @@ formulaireAffectation = new FormGroup({
             }
           )
       } else {
-        this.presenceService.creerPresence(
-          this.personnelId,    // ID du personnel
-          this.nbrJourAbasent, // Nombre de jours absents
-          this.mois).subscribe(
-            (response: any) => {
-              this.listePresencePersonnel.unshift(response['data'])
-              this.formulairePresence.reset()
-              this.modalService.dismissAll()
-              this.chargerIdPersonnel(this.id$)
-              this.successmsg("Présence marquer", "La présence a été marqué avec succès")
-            },
-            (error) => {
-              const errors = error.error.errors;
-              for (let i = 0; i < errors.length; i++) {
-                const currentError = errors[i];
-                this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
-              }
+        this.presenceService.creerPresence(this.personnelId, this.nbrJourAbasent, this.mois).subscribe(
+          (response: any) => {
+            this.listePresencePersonnel.unshift(response['data'])
+            this.formulairePresence.reset()
+            this.modalService.dismissAll()
+            this.chargerIdPersonnel(this.id$)
+            this.successmsg("Présence marquée", "La présence a été marquée avec succès")
+          },
+          (error) => {
+            const errors = error.error.errors;
+            for (let i = 0; i < errors.length; i++) {
+              const currentError = errors[i];
+              this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
             }
-          )
+          }
+        )
       }
   }
-
 
   updateDate(event: any): void {
     const dateValue = event;
@@ -1161,24 +1004,19 @@ formulaireAffectation = new FormGroup({
     }).then((result) => {
       if (result.value) {
         this.presenceService.supprimerPresence(id).subscribe({
-          next: (value: any) => {
+          next: () => {
             this.devisSbj.next(0);
-            this.listePresencePersonnel = this.listePresencePersonnel.filter(
-              (i) => i.id !== id
-            );
+            this.listePresencePersonnel = this.listePresencePersonnel.filter((i) => i.id !== id);
             this.chargerIdPersonnel(this.id$)
-            this.successmsg('Suppression réussie', 'Présence supprimer');
+            this.successmsg('Suppression réussie', 'Présence supprimée');
           },
           error: (err) => {
-            this.errormsg('Présence non supprimer', err.error.message);
+            this.errormsg('Présence non supprimée', err.error.message);
           },
         });
       }
     });
   }
-
-
-
 
   openModalContrat(content: any, contrat: Contrat | undefined = undefined) {
     if (contrat) {
@@ -1193,11 +1031,9 @@ formulaireAffectation = new FormGroup({
     this.modalService.open(content)
   }
 
-
   creeModifierContrat() {
-    const formData = new FormData(); //objet formdata
+    const formData = new FormData();
     formData.append('file', this.file as File);
-    // Ajouter les dates formatées à l'objet formData
     formData.append('dateDebut', this.formulaireContrat.get('dateDebut')?.value?.toString() || '');
     formData.append('dateFin', this.formulaireContrat.get('dateFin')?.value?.toString() || '');
     formData.append('typeContrat', this.formulaireContrat.get('typeContrat')?.value || '');
@@ -1219,7 +1055,7 @@ formulaireAffectation = new FormGroup({
               })
               this.modalService.dismissAll()
               this.chargerIdPersonnel(this.id$)
-              this.successmsg("Contrat modifier", "Le contrat a été modifié avec succès")
+              this.successmsg("Contrat modifié", "Le contrat a été modifié avec succès")
               this.formulaireContrat.reset()
             },
             (error) => {
@@ -1237,7 +1073,7 @@ formulaireAffectation = new FormGroup({
             this.formulaireContrat.reset()
             this.modalService.dismissAll()
             this.chargerIdPersonnel(this.id$)
-            this.successmsg("Contrat créer", "Le contrat a été créé avec succès")
+            this.successmsg("Contrat créé", "Le contrat a été créé avec succès")
           },
           (error) => {
             const errors = error.error.errors;
@@ -1249,7 +1085,6 @@ formulaireAffectation = new FormGroup({
         )
       }
   }
-
 
   supprimerContrat(id: number) {
     Swal.fire({
@@ -1264,16 +1099,14 @@ formulaireAffectation = new FormGroup({
     }).then((result) => {
       if (result.value) {
         this.contratService.supprimerContrat(id).subscribe({
-          next: (value: any) => {
+          next: () => {
             this.devisSbj.next(0);
-            this.listeContratsPersonnel = this.listeContratsPersonnel.filter(
-              (i) => i.id !== id
-            );
+            this.listeContratsPersonnel = this.listeContratsPersonnel.filter((i) => i.id !== id);
             this.chargerIdPersonnel(this.id$)
-            this.successmsg('Suppression réussie', 'Contrat supprimer');
+            this.successmsg('Suppression réussie', 'Contrat supprimé');
           },
           error: (err) => {
-            this.errormsg('Contrat non supprimer', err.error.message);
+            this.errormsg('Contrat non supprimé', err.error.message);
           },
         });
       }
@@ -1283,35 +1116,22 @@ formulaireAffectation = new FormGroup({
   telechargerFicheContrat(contrat: Contrat) {
     return `${this.contratService.contextPath}/telecharger/` + contrat?.fichier;
   }
-
   showPopOnDownloadFicheContrat() {
-    this.successmsg(
-      'Ficher Contrat telecharger',
-      "Le Ficher du contrat a été bien téléchargé avec succès"
-    );
+    this.successmsg('Ficher Contrat telechargé', "Le Ficher du contrat a été bien téléchargé avec succès");
   }
-
 
   telechargerRapportMission(mission: Mission) {
     return `${this.contratService.contextPath}/telecharger/` + mission?.rapport;
   }
-
   showPopOnDownloadRapportMission() {
-    this.successmsg(
-      'Rapport de Mission telecharger',
-      "Le Rapport de la Mission a été bien téléchargé avec succès"
-    );
+    this.successmsg('Rapport de Mission telechargé', "Le Rapport de la Mission a été bien téléchargé avec succès");
   }
-
 
   openModalDetails(content: any, missionnaireexternes?: MissionnaireExterne[]) {
     this.modalService.open(content);
     this.listeMissionnaireExterne = []
-    if (missionnaireexternes) {
-      this.listeMissionnaireExterne = missionnaireexternes
-    }
+    if (missionnaireexternes) { this.listeMissionnaireExterne = missionnaireexternes }
   }
-
 
   openModalPiece(content: any, pieces: Pieces | undefined = undefined) {
     if (pieces) {
@@ -1327,11 +1147,9 @@ formulaireAffectation = new FormGroup({
     this.modalService.open(content)
   }
 
-
   creeModifierPiece() {
-    const formData = new FormData(); //objet formdata
+    const formData = new FormData();
     formData.append('file', this.file as File);
-    // Ajouter les dates formatées à l'objet formData
     formData.append('commentaire', this.formulairePieces.get('commentaire')?.value || '');
     formData.append('typeDossier', this.formulairePieces.get('typeDossier')?.value || '');
     formData.append('typePiece', this.formulairePieces.get('typePiece')?.value || '');
@@ -1351,7 +1169,7 @@ formulaireAffectation = new FormGroup({
               })
               this.modalService.dismissAll()
               this.chargerIdPersonnel(this.id$)
-              this.successmsg("Pièce modifier", "La pièce a été modifié avec succès")
+              this.successmsg("Pièce modifiée", "La pièce a été modifiée avec succès")
               this.formulairePieces.reset()
             },
             (error) => {
@@ -1369,7 +1187,7 @@ formulaireAffectation = new FormGroup({
             this.formulairePieces.reset()
             this.modalService.dismissAll()
             this.chargerIdPersonnel(this.id$)
-            this.successmsg("Pièce créer", "La Pièce a été créé avec succès")
+            this.successmsg("Pièce créée", "La Pièce a été créée avec succès")
           },
           (error) => {
             const errors = error.error.errors;
@@ -1381,7 +1199,6 @@ formulaireAffectation = new FormGroup({
         )
       }
   }
-
 
   supprimerPieces(id: number) {
     Swal.fire({
@@ -1396,17 +1213,13 @@ formulaireAffectation = new FormGroup({
     }).then((result) => {
       if (result.value) {
         this.piecesService.supprimerPieces(id).subscribe({
-          next: (value) => {
+          next: () => {
             this.devisSbj.next(0);
-            this.listePiecesPersonnel = this.listePiecesPersonnel.filter(
-              (i) => i.id !== id
-            );
+            this.listePiecesPersonnel = this.listePiecesPersonnel.filter((i) => i.id !== id);
             this.chargerIdPersonnel(this.id$)
-            this.successmsg('Suppression réussie', 'Pièce supprimer');
+            this.successmsg('Suppression réussie', 'Pièce supprimée');
           },
-          error: (err) => {
-            this.errormsg('Pièce non supprimer', err.error.message);
-          },
+          error: (err) => { this.errormsg('Pièce non supprimée', err.error.message); },
         });
       }
     });
@@ -1415,12 +1228,8 @@ formulaireAffectation = new FormGroup({
   telechargerFichePiece(pieces: Pieces) {
     return `${this.piecesService.contextPath}/telecharger/` + pieces?.fichier;
   }
-
   showPopOnDownloadFichePiece() {
-    this.successmsg(
-      'Ficher Pièce telecharger',
-      "Le Ficher de la pièce a été bien téléchargé avec succès"
-    );
+    this.successmsg('Ficher Pièce telechargé', "Le Ficher de la pièce a été bien téléchargé avec succès");
   }
 
   openModalPieceDetail(pieces: Pieces, content: any) {
@@ -1430,13 +1239,8 @@ formulaireAffectation = new FormGroup({
   }
 
   chargerPieceId() {
-    this.piecesService
-      .voirPieces(this.idPiece)
-      .subscribe((response) => {
-        this.piece = response;
-      });
+    this.piecesService.voirPieces(this.idPiece).subscribe((response) => { this.piece = response; });
   }
-
 
   openModalInterim(content: any, interimes: Interimes | undefined = undefined) {
     if (interimes) {
@@ -1447,11 +1251,9 @@ formulaireAffectation = new FormGroup({
       this.formulaireInterim.reset()
       this.formulaireInterim.get('poste')?.setValue(null)
       this.formulaireInterim.get('personnel')?.setValue(this.id$)
-
     }
     this.modalService.open(content)
   }
-
 
   creeModifierInterim() {
     if (this.formulaireInterim.valid)
@@ -1470,7 +1272,7 @@ formulaireAffectation = new FormGroup({
               })
               this.modalService.dismissAll()
               this.chargerIdPersonnel(this.id$)
-              this.successmsg("Interime modifier", "L'interime a été modifié avec succès")
+              this.successmsg("Interime modifié", "L'interime a été modifié avec succès")
               this.formulaireInterim.reset()
             },
             (error) => {
@@ -1488,7 +1290,7 @@ formulaireAffectation = new FormGroup({
             this.formulaireInterim.reset()
             this.modalService.dismissAll()
             this.chargerIdPersonnel(this.id$)
-            this.successmsg("Interime créer", "L'interime a été créé avec succès")
+            this.successmsg("Interime créé", "L'interime a été créé avec succès")
           },
           (error) => {
             const errors = error.error.errors;
@@ -1500,7 +1302,6 @@ formulaireAffectation = new FormGroup({
         )
       }
   }
-
 
   supprimerInterime(id: number) {
     Swal.fire({
@@ -1515,22 +1316,19 @@ formulaireAffectation = new FormGroup({
     }).then((result) => {
       if (result.value) {
         this.interimesService.supprimerInterimes(id).subscribe({
-          next: (value: any) => {
+          next: () => {
             this.devisSbj.next(0);
-            this.listeInterimesPersonnel = this.listeInterimesPersonnel.filter(
-              (i) => i.id !== id
-            );
+            this.listeInterimesPersonnel = this.listeInterimesPersonnel.filter((i) => i.id !== id);
             this.chargerIdPersonnel(this.id$)
-            this.successmsg('Suppression réussie', 'Interime supprimer');
+            this.successmsg('Suppression réussie', 'Interime supprimé');
           },
           error: (err) => {
-            this.errormsg('Interime non supprimer', err.error.message);
+            this.errormsg('Interime non supprimé', err.error.message);
           },
         });
       }
     });
   }
-
 
   openModalInterimeDetail(interimes: Interimes, content: any) {
     this.modalService.open(content);
@@ -1539,122 +1337,111 @@ formulaireAffectation = new FormGroup({
   }
 
   chargerInterimeId() {
-    this.interimesService
-      .voirInterimes(this.idIterime)
-      .subscribe((response: any) => {
-        this.interime = response;
+    this.interimesService.voirInterimes(this.idIterime).subscribe((response: any) => { this.interime = response; });
+  }
+
+  openModalAfectation(content: any, affectation: Affectation | undefined = undefined) {
+    if (affectation) {
+      this.formulaireAffectation.patchValue({
+        id: affectation.id ?? null,
+        dateDebut: affectation.dateDebut ? new Date(affectation.dateDebut) : new Date(),
+        personnel: affectation.personnel?.id ? String(affectation.personnel.id) : null,
+        poste: affectation.poste?.id ? String(affectation.poste.id) : null,
       });
+    } else {
+      this.formulaireAffectation.reset();
+      this.formulaireAffectation.get('poste')?.setValue(null);
+      this.formulaireAffectation.get('personnel')?.setValue(this.id$ ? String(this.id$) : null);
+      this.formulaireAffectation.get('dateDebut')?.setValue(new Date());
+    }
+    this.modalService.open(content, { size: 'lg', backdrop: 'static', keyboard: false });
   }
 
-
- openModalAfectation(content: any, affectation: Affectation | undefined = undefined) {
-  if (affectation) {
-    this.formulaireAffectation.patchValue({
-      id: affectation.id ?? null,
-      dateDebut: affectation.dateDebut ? new Date(affectation.dateDebut) : new Date(),
-      personnel: affectation.personnel?.id ? String(affectation.personnel.id) : null,
-      poste: affectation.poste?.id ? String(affectation.poste.id) : null,
-    });
-  } else {
-    this.formulaireAffectation.reset();
-    this.formulaireAffectation.get('poste')?.setValue(null);
-    this.formulaireAffectation.get('personnel')?.setValue(this.id$ ? String(this.id$) : null);
-    this.formulaireAffectation.get('dateDebut')?.setValue(new Date());
+  private formatDateYYYYMMDD(d: Date | string | null): string {
+    if (!d) return '';
+    const x = new Date(d);
+    const y = x.getFullYear();
+    const m = String(x.getMonth() + 1).padStart(2, '0');
+    const dd = String(x.getDate()).padStart(2, '0');
+    return `${y}-${m}-${dd}`;
   }
-  this.modalService.open(content, { size: 'lg', backdrop: 'static', keyboard: false });
-}
 
-private formatDateYYYYMMDD(d: Date | string | null): string {
-  if (!d) return '';
-  const x = new Date(d);
-  const y = x.getFullYear();
-  const m = String(x.getMonth() + 1).padStart(2, '0');
-  const dd = String(x.getDate()).padStart(2, '0');
-  return `${y}-${m}-${dd}`;
-}
+  creeModifierAffectation() {
+    if (!this.formulaireAffectation.valid) return;
+    const v = this.formulaireAffectation.value;
+    const dto = {
+      personnel: Number(v.personnel ?? this.id$),
+      poste: Number(v.poste),
+      dateDebut: this.formatDateYYYYMMDD(v.dateDebut as Date),
+    };
 
-creeModifierAffectation() {
-  if (!this.formulaireAffectation.valid) return;
-
-  const v = this.formulaireAffectation.value;
-  const dto = {
-    personnel: Number(v.personnel ?? this.id$),
-    poste: Number(v.poste),
-    dateDebut: this.formatDateYYYYMMDD(v.dateDebut as Date),
-  };
-
-  // UPDATE
-  if (this.formulaireAffectation.get('id')?.value) {
-    this.affectationService.modifier(Number(this.formulaireAffectation.get('id')?.value), dto)
-      .subscribe(
-        (response: any) => {
-          this.listeAffectationPersonnel = this.listeAffectationPersonnel.map(e => {
-            if (e.id === response.id) {
-              return { ...e, poste: response.poste, dateDebut: response.dateDebut }; // ❌ pas de dateFin
+    if (this.formulaireAffectation.get('id')?.value) {
+      this.affectationService.modifier(Number(this.formulaireAffectation.get('id')?.value), dto)
+        .subscribe(
+          (response: any) => {
+            this.listeAffectationPersonnel = this.listeAffectationPersonnel.map(e => {
+              if (e.id === response.id) {
+                return { ...e, poste: response.poste, dateDebut: response.dateDebut };
+              }
+              return e;
+            });
+            this.modalService.dismissAll();
+            this.chargerIdPersonnel(this.id$);
+            this.successmsg("Affectation modifiée", "L'affectation a été modifiée avec succès");
+            this.formulaireAffectation.reset();
+          },
+          (error: any) => {
+            const errors = error?.error?.errors ?? [];
+            for (const currentError of errors) {
+              this.toastService.error(`${currentError.champs}: ${currentError.message}`, 'Erreur!');
             }
-            return e;
-          });
+          }
+        );
+    } else {
+      this.affectationService.creer(dto).subscribe(
+        (response: any) => {
+          this.listeAffectationPersonnel.unshift(response['data'] ?? response);
+          this.formulaireAffectation.reset();
           this.modalService.dismissAll();
           this.chargerIdPersonnel(this.id$);
-          this.successmsg("Affectation modifiée", "L'affectation a été modifiée avec succès");
-          this.formulaireAffectation.reset();
+          this.successmsg("Affectation créée", "L'affectation a été créée avec succès");
         },
-        (error: any) => { // ✅ typage
+        (error: any) => {
           const errors = error?.error?.errors ?? [];
           for (const currentError of errors) {
             this.toastService.error(`${currentError.champs}: ${currentError.message}`, 'Erreur!');
           }
         }
       );
-  } else {
-    // CREATE
-    this.affectationService.creer(dto).subscribe(
-      (response: any) => {
-        this.listeAffectationPersonnel.unshift(response['data'] ?? response);
-        this.formulaireAffectation.reset();
-        this.modalService.dismissAll();
-        this.chargerIdPersonnel(this.id$);
-        this.successmsg("Affectation créée", "L'affectation a été créée avec succès");
-      },
-      (error: any) => { // ✅ typage
-        const errors = error?.error?.errors ?? [];
-        for (const currentError of errors) {
-          this.toastService.error(`${currentError.champs}: ${currentError.message}`, 'Erreur!');
-        }
-      }
-    );
-  }
-}
-
-supprimerAffectation(id: number) {
-  Swal.fire({
-    title: 'Êtes vous sûr ?',
-    text: 'Êtes vous sûr de vouloir le supprimer. Il vous sera impossible de revenir en arrière !',
-    icon: 'warning',
-    showCancelButton: true,
-    confirmButtonColor: '#34c38f',
-    cancelButtonColor: '#f46a6a',
-    confirmButtonText: 'Oui, Supprimez le!',
-    cancelButtonText: 'Non, Annuler',
-  }).then((result) => {
-    if (result.value) {
-      this.affectationService.supprimer(id).subscribe({
-        next: () => {
-          this.devisSbj.next(0);
-          // ✅ bonne liste filtrée
-          this.listeAffectationPersonnel = this.listeAffectationPersonnel.filter(i => i.id !== id);
-          this.chargerIdPersonnel(this.id$);
-          this.successmsg('Suppression réussie', 'Affectation supprimée');
-        },
-        error: (err: any) => { // ✅ typage
-          this.errormsg('Affectation non supprimée', err?.error?.message ?? 'Erreur');
-        },
-      });
     }
-  });
-}
+  }
 
-
+  supprimerAffectation(id: number) {
+    Swal.fire({
+      title: 'Êtes vous sûr ?',
+      text: 'Êtes vous sûr de vouloir le supprimer. Il vous sera impossible de revenir en arrière !',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#34c38f',
+      cancelButtonColor: '#f46a6a',
+      confirmButtonText: 'Oui, Supprimez le!',
+      cancelButtonText: 'Non, Annuler',
+    }).then((result) => {
+      if (result.value) {
+        this.affectationService.supprimer(id).subscribe({
+          next: () => {
+            this.devisSbj.next(0);
+            this.listeAffectationPersonnel = this.listeAffectationPersonnel.filter(i => i.id !== id);
+            this.chargerIdPersonnel(this.id$);
+            this.successmsg('Suppression réussie', 'Affectation supprimée');
+          },
+          error: (err: any) => {
+            this.errormsg('Affectation non supprimée', err?.error?.message ?? 'Erreur');
+          },
+        });
+      }
+    });
+  }
 
   openModalContratDetail(contrat: Contrat, content: any) {
     this.modalService.open(content);
@@ -1664,16 +1451,12 @@ supprimerAffectation(id: number) {
   }
 
   chargerContratId() {
-    this.contratService
-      .voirUnContratPersonnel(this.idContrat)
-      .subscribe((response: any) => {
-        this.contrat = response
-        const startDate = new Date(this.contrat?.dateDebut || new Date());
-        const endDate = new Date(this.contrat?.dateFin || new Date()); // Date de fin de la mission
-        if (this.contrat) {
-          this.contrat.duree = this.calculerDureeMission(startDate, endDate);
-        }
-      });
+    this.contratService.voirUnContratPersonnel(this.idContrat).subscribe((response: any) => {
+      this.contrat = response
+      const startDate = new Date(this.contrat?.dateDebut || new Date());
+      const endDate = new Date(this.contrat?.dateFin || new Date());
+      if (this.contrat) { this.contrat.duree = this.calculerDureeMission(startDate, endDate); }
+    });
   }
 
   chargerListeAvenantContrat() {
@@ -1686,21 +1469,15 @@ supprimerAffectation(id: number) {
     )
   }
 
-
   openModalAvenant(content: any, avenant: Avenant | undefined = undefined) {
-    if (avenant) {
-      this.formulaireAvenantContrat.patchValue(avenant as any)
-    } else {
-      this.formulaireAvenantContrat.reset()
-    }
+    if (avenant) { this.formulaireAvenantContrat.patchValue(avenant as any) }
+    else { this.formulaireAvenantContrat.reset() }
     this.modalService.open(content)
   }
 
-
   creeModifierAvenant() {
-    const formData = new FormData(); //objet formdata
+    const formData = new FormData();
     formData.append('file', this.file as File);
-    // Ajouter les dates formatées à l'objet formData
     formData.append('date', this.formulaireAvenantContrat.get('date')?.value?.toString() || '');
     formData.append('estActif', this.formulaireAvenantContrat.get('estActif')?.value?.toString() || 'false');
     // @ts-ignore
@@ -1719,7 +1496,7 @@ supprimerAffectation(id: number) {
               })
               this.modalService.dismissAll()
               this.chargerIdPersonnel(this.id$)
-              this.successmsg("Avenant modifier", "L'avenant a été modifié avec succès")
+              this.successmsg("Avenant modifié", "L'avenant a été modifié avec succès")
               this.formulaireAvenantContrat.reset()
             },
             (error) => {
@@ -1737,7 +1514,7 @@ supprimerAffectation(id: number) {
             this.formulaireAvenantContrat.reset()
             this.modalService.dismissAll()
             this.chargerIdPersonnel(this.id$)
-            this.successmsg("Avenant créer", "L'avenant a été ajouté au contrat avec succès")
+            this.successmsg("Avenant créé", "L'avenant a été ajouté au contrat avec succès")
           },
           (error) => {
             const errors = error.error.errors;
@@ -1749,7 +1526,6 @@ supprimerAffectation(id: number) {
         )
       }
   }
-
 
   supprimerAvenant(id: number) {
     Swal.fire({
@@ -1764,16 +1540,14 @@ supprimerAffectation(id: number) {
     }).then((result) => {
       if (result.value) {
         this.avenantService.supprimerAvenant(id).subscribe({
-          next: (value: any) => {
+          next: () => {
             this.devisSbj.next(0);
-            this.listeAvenantContratPersonnel = this.listeAvenantContratPersonnel.filter(
-              (i) => i.id !== id
-            );
+            this.listeAvenantContratPersonnel = this.listeAvenantContratPersonnel.filter((i) => i.id !== id);
             this.chargerIdPersonnel(this.id$)
-            this.successmsg('Suppression réussie', 'Avenant supprimer');
+            this.successmsg('Suppression réussie', 'Avenant supprimé');
           },
           error: (err) => {
-            this.errormsg('Avenant non supprimer', err.error.message);
+            this.errormsg('Avenant non supprimé', err.error.message);
           },
         });
       }
@@ -1783,28 +1557,16 @@ supprimerAffectation(id: number) {
   telechargerFicheAvenant(avenant: Avenant) {
     return `${this.avenantService.contextPath}/telecharger/` + avenant?.fichier;
   }
-
   showPopOnDownloadFicheAvenant() {
-    this.successmsg(
-      'Ficher Avenant telecharger',
-      "Le Ficher de l'Avenant a été bien téléchargé avec succès"
-    );
+    this.successmsg('Ficher Avenant telechargé', "Le Ficher de l'Avenant a été bien téléchargé avec succès");
   }
-
-
-
 
   telechargerFicheDemande(demande: Demande) {
     return `${this.demandeService.contextPath}/telecharger/` + demande?.fichier;
   }
-
   showPopOnDownloadFicheDemande() {
-    this.successmsg(
-      'Ficher Demande telecharger',
-      "Le Ficher de la Demande a été bien téléchargé avec succès"
-    );
+    this.successmsg('Ficher Demande telechargé', "Le Ficher de la Demande a été bien téléchargé avec succès");
   }
-
 
   calculerDureeMission(startDate: Date, endDate: Date): string {
     const diffInMilliseconds = Math.abs(endDate.getTime() - startDate.getTime());
@@ -1813,20 +1575,12 @@ supprimerAffectation(id: number) {
     const years = Math.floor(months / 12);
 
     let duration = '';
-    if (years > 0) {
-      duration += years + ' an' + (years > 1 ? 's' : '') + ' ';
-    }
-    if (months > 0) {
-      duration += months + ' mois ';
-    }
-    if (days > 0) {
-      duration += days + ' jour' + (days > 1 ? 's' : '');
-    }
+    if (years > 0) { duration += years + ' an' + (years > 1 ? 's' : '') + ' '; }
+    if (months > 0) { duration += months + ' mois '; }
+    if (days > 0) { duration += days + ' jour' + (days > 1 ? 's' : ''); }
 
     return duration.trim();
   }
-
-
 
   activerAvenant(id: number) {
     Swal.fire({
@@ -1841,17 +1595,15 @@ supprimerAffectation(id: number) {
     }).then((result) => {
       if (result.value) {
         this.avenantService.activerAvenant(id).subscribe({
-          next: (value: any) => {
+          next: () => {
             this.chargerListeAvenantContrat()
-            this.successmsg('Activation réussie', 'Avenant activer');
+            this.successmsg('Activation réussie', 'Avenant activé');
           },
           error: (err) => {
-            this.errormsg('Avenant non activer', err.error.message);
+            this.errormsg('Avenant non activé', err.error.message);
           },
         });
       }
     });
   }
-
-
 }
