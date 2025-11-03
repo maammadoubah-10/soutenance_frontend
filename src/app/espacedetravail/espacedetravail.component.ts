@@ -152,10 +152,10 @@ today = new Date();
 quickLinks = [
   { label: 'Utilisateurs', route: '/utilisateur', icon: 'bx bx-user-circle' },
   { label: 'Ressources Humaines', route: '/rh', icon: 'bx bx-id-card' },
-  { label: 'Gestion de la Paie', route: '/marchepublic', icon: 'bx bx-wallet' },
+  { label: 'Gestion de la Paie', route: '/paie', icon: 'bx bx-wallet' },
   { label: 'Formation Interne', route: '/personnel', icon: 'bx bx-book-open' },
-  { label: 'Publication', route: '/publication', icon: 'bx bx-news' },
-  { label: 'Tâches', route: '/tache', icon: 'bx bx-task' },
+  // { label: 'Publication', route: '/publication', icon: 'bx bx-news' },
+  // { label: 'Tâches', route: '/tache', icon: 'bx bx-task' },
 ];
 
 kpis = [
@@ -176,7 +176,7 @@ features = [
     title: 'Gestion de la Paie',
     text: 'Variables, bulletins et contrôles qualité.',
     image: '/assets/home/feature-paie.jpg',
-    route: '/marchepublic',
+    route: '/paie',
   },
   {
     title: 'Formation Interne',

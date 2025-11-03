@@ -36,6 +36,7 @@
     "ng-apexcharts": "^1.9.0",
     "ng-click-outside": "^9.0.1",
     "ngx-extended-pdf-viewer": "^20.5.0-alpha.2",
+    "ngx-pagination": "^6.0.3",
     "ngx-pipes": "^3.2.2",
     "ngx-simplebar": "^0.0.1",
     "ngx-toastr": "^19.0.0",

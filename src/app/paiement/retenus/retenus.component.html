@@ -1,0 +1,150 @@
+<div class="row">
+    <app-titredepage title="Retenus" [items]="items"></app-titredepage>
+  </div>
+<div class="bg-white p-3 mt-2">
+
+    <h4 class="card-title">Liste des retenus</h4>
+    <p class="card-title-desc">Ce tableau presente la liste des <span class="text-danger">retenus</span></p>
+
+    <div class="row g-3 ">
+        <div class="col-md-1">
+            <select name="perPage" [(ngModel)]="perPage" id="" class="form-control text-center">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <div class="col-md-3 offset-md-8">
+            <button class="btn btn-primary float-end" (click)="initAction(null, '', formRetenu)">
+            <i class="bx bx-plus"></i>
+            Ajouter un nouveau
+        </button>
+        </div>
+    </div>
+
+ <table class="table align-middle table-bordered table-hover mt-3 bg-white dt-responsive nowrap no-footer dtr-inline">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Type Retenu</th>
+                <th>Personnel</th>
+                <th>Montant</th>
+                  <!-- <th>Augmentation</th> -->
+                <th class="text-center">Nbre mois rembour.</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngIf="retenus && retenus.length > 0; else noData">
+                <tr *ngFor="let retenu of retenus | paginate: { itemsPerPage: perPage, currentPage: p }; let i = index">
+                    <th scope="row">{{ i + 1 + (perPage * (p - 1)) }}</th>
+                    <td>{{ retenu.typeRetenu.designation }}</td>
+                    
+                    <td>{{ retenu.personnel.fullName}}</td>
+                    <td>{{ retenu.montant }} XOF</td>
+                    <!-- <td>{{ retenu.augmentation != null ? (retenu.augmentation)+" XOF" : "" }}</td> -->
+
+                    <td class="text-center">{{ retenu.nombreMoisRemboursement }}</td>
+                    <td (click)="$event.stopPropagation()">
+                        <i class="bx bx-edit ms-3 fs-5 btn btn-success" 
+                           type="button" 
+                           (click)="initAction(retenu, 'edit', formRetenu)"></i>
+                        <i class="bx bx-trash ms-3 fs-5 btn btn-danger" 
+                           type="button" 
+                           (click)="initAction(retenu, 'delete', delete)"></i>
+                    </td>
+                </tr>
+            </ng-container>
+            
+            <ng-template #noData>
+                <tr>
+                    <td colspan="5" class="text-center">
+                        <p class="text-muted py-3">
+                            <i class="bx bx-data fs-1"></i><br>
+                            Aucune retenue trouvée
+                        </p>
+                    </td>
+                </tr>
+            </ng-template>
+        </tbody>
+    </table>
+    
+    <pagination-controls *ngIf="retenus && retenus.length > perPage" 
+                        (pageChange)="p = $event" 
+                        previousLabel="Precedent" 
+                        nextLabel="Suivant">
+    </pagination-controls>
+</div>
+
+
+<!-- ADD retenu MODAL  -->
+<ng-template #formRetenu role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">  {{ retenuForm?.get('id')?.value == null ? 'Ajouter' : 'Modifier'}} une retenu</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <form [formGroup]="retenuForm!" (ngSubmit)="traiteFormRetenu()">
+        <div class="modal-body">
+            <div>
+                <label for="typeRetenu">Type retenu</label>
+                <ng-select formControlName="typeRetenu" name="typeRetenu" id="typeRetenu">
+                  <ng-option *ngFor="let typeRetenu of typeRetenus" [value]="typeRetenu.id">{{ typeRetenu.designation }}</ng-option>
+                </ng-select>
+            </div>
+            <div class="mt-3">
+                <label for="personnel">Personnel</label>
+                <ng-select formControlName="personnel" name="personnel">
+                    <ng-option *ngFor="let personnel of personnels" [value]="personnel.id">{{ personnel.nom+" "+personnel.prenom }}</ng-option>
+                </ng-select>
+            </div>
+            <div class="mt-3">
+                <label for="nombreMoisRemboursement">Nombre mois remboussement</label>
+                <input type="number" min="1" formControlName="nombreMoisRemboursement" name="nombreMoisRemboursement" class="form-control" id="">
+                <span *ngIf="nombreMoisRemboursement && nombreMoisRemboursement.invalid && nombreMoisRemboursement.touched" class="error">Vérifier ce champs</span>
+            </div>
+            <div class="mt-3">
+                <label for="montant">Montant</label>
+                <input type="number" min="1" formControlName="montant" name="montant" class="form-control" id="">
+                <span *ngIf="montant && montant.invalid && montant.touched" class="error">Vérifier ce champs</span>
+            </div>
+          
+        </div>
+        <div class="modal-footer">
+            <ng-container *ngIf="!loading; else elseTemplate">
+                <div class="mt-3 hstack">
+                    <span class="btn btn-secondary me-2 border" (click)="clear()">Effacer</span>
+                    <button [disabled]="!retenuForm?.valid" class="btn btn-primary">{{ retenuForm?.get('id')?.value == null ? 'Ajouter' : 'Modifier'}}</button>
+                </div>
+            </ng-container>
+            <ng-template #elseTemplate>
+                <div class="text-center mt-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </ng-template>
+        </div>
+    </form>
+</ng-template>
+
+
+<!-- DELETE retenu MODAL  -->
+<ng-template #delete role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Supprimer un retenu</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <p *ngIf="!loading">Voulez-vous vraiment supprimer le retenu {{ montant?.value }} ?</p>
+        <div *ngIf="loading" class="text-center mt-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button *ngIf="!loading" type="button" class="btn btn-danger" (click)="deleteRetenu()">Supprimer</button>
+        <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+    </div>
+</ng-template>

@@ -1,58 +1,57 @@
 import {Entites} from "./entites";
-import {Banques} from "./banques";
 import {Indice} from "./indice";
-import {ModeDePaiement} from "./mode-de-paiement";
 import {Poste} from "./poste";
 import {StatutPersonnel} from "./statut-personnel";
 import {Service} from "./service";
 
 export interface Personnel {
   id: number,
-  adresse:	string,
-  adresseSecondaire:	string,
-  banque: Banques
+  adresse: string,
+  adresseSecondaire: string,
   fullName: string
-  civilite:	civilite
-  cleRib:	string,
-  codeBanque:	string
-  codeGuichet:	string
-  dateDeNaissance:	Date
-  dateExpirationCarteSejour:	Date
-  dateDebauchage:	Date
-  dateEmbauchage:	Date
-  dateRetraite:	Date
-  debaucher:	boolean
-  retraiter:	boolean
+  civilite: civilite
+  dateDeNaissance: Date
+  dateExpirationCarteSejour: Date
+  dateDebauchage: Date
+  dateEmbauchage: Date
+  dateRetraite: Date
+  debaucher: boolean
+  retraiter: boolean
   entite: Entites
   indice: Indice
-  matricule:	string
-  modePaiement: ModeDePaiement
+  matricule: string
   nom: nom
   etatCivil: any
-  coordonnee : any
-  organismeSocial : any
-  posteGeneral : any
-  nomContact:	string
+  coordonnee: any
+  organismeSocial: any
+  posteGeneral: any
+  nomContact: string
   nombreEnfant: number,
   numeroCarteSejour: string,
-  numeroTechniqueTemporaire : string
+  numeroTechniqueTemporaire: string
   numeroCnss: string
-  numeroCompte:	string
+  // --- champs bancaires supprimés ---
+  // cleRib?: string
+  // codeBanque?: string
+  // codeGuichet?: string
+  // numeroCompte?: string
+  // banque?: any
+  // modePaiement?: any
   pieceIdentite: string,
   poste: Poste
-  prenom:	string
-  email:	string
-  nationalite : nationalitePays,
-  paysOrigine : paysOrigines,
+  prenom: string
+  email: string
+  nationalite: nationalitePays,
+  paysOrigine: paysOrigines,
   sourceCarteSejour: string
   unite: Unite
   echelon: string
   categorie: string
-  prenomContact:	string
+  prenomContact: string
   referenceComptable: number,
   isSameDayAndMonth: boolean,
   age: number,
-  situationMatrimoniale:	situationMatrimoniale,
+  situationMatrimoniale: situationMatrimoniale,
   statutPersonnel: StatutPersonnel
   telephone: number,
   telephoneContact: number
@@ -68,11 +67,11 @@ export interface Personnel {
   chefvisa: boolean
   chefDejaVise: boolean
 }
+
 export enum Unite {
   PATS='PATS',
   ENSEIGNANT = 'ENSEIGNANT',
 }
-
 
 export enum communeSenegal {
   Dakar = 'Dakar',
@@ -127,26 +126,17 @@ export enum civilite {
   PROFESSEUR = "PROFESSEUR"
 }
 
-
-
 export enum nom {
-
   CSS = "CSS",
   IPRES = "IPRES",
-
 }
+
 export enum situationMatrimoniale {
-
   Célibataire = "Célibataire",
-
   Veuve = "Veuve",
-
   Divorcée = "Divorcée",
-
   Mariée = "Mariée",
-
   Concubinage = "Concubinage",
-
   Union_libre = "Union libre",
 }
 
@@ -399,7 +389,6 @@ export enum paysOrigines {
   ZM = "Zambia",
   ZW = "Zimbabwe",
 }
-
 
 export enum nationalitePays {
   AFG = 'Afghane',

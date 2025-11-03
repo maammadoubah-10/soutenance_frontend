@@ -1,0 +1,36 @@
+<div class="row">
+    <app-titredepage title="Retenu Type" [items]="items"></app-titredepage>
+  </div>
+<div *ngIf="typeRetenu != null" class="bg-white p-3 mt-2">
+
+    <h4 class="card-title">Liste des retenus de {{ typeRetenu.designation }}</h4>
+    <p class="card-title-desc">Ce tableau presente la liste des retenus de <span class="text-danger">{{ typeRetenu.designation }}</span></p>
+
+    <div class="table-responsive mt-4">
+      <table class="table align-middle table-bordered table-hover mt-3 bg-white dt-responsive nowrap  no-footer dtr-inline">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Personnel</th>
+                <th>Retenu</th>
+                <th>Montant</th>
+                <th>Augmentation</th>
+                <th class="text-center">Nbre mois rembour.</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngFor="let retenu of retenus; let i=index">
+                <tr>
+                    <th scope="row">{{ i + 1 }}</th>
+                    <td>{{ retenu.personnel.nom + " "+retenu.personnel.prenom }}</td>
+                    <td>{{ retenu.typeRetenu.designation }}</td>
+                    <td>{{ retenu.montant}} XOF</td>
+                    <td>{{ retenu.augmentation != null ? retenu.augmentation+" XOF" : "" }}</td>
+                    <td class="text-center">{{ retenu.nombreMoisRemboursement }}</td>
+                </tr>
+            </ng-container>
+        </tbody>
+    </table>
+  </div>
+
+</div>

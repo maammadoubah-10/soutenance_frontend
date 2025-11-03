@@ -232,56 +232,6 @@
                     </div>
                   </div>
                 </li>
-
-                <h4 class="text-center">Infos Bancaire</h4>
-                <li *ngIf="personnel?.banque">
-                  <div class="d-flex"><i class="mdi mdi-bank font-size-18 text-primary"></i>
-                    <div class="ms-3">
-                      <h6 class="mb-1 fw-semibold">Nom Banque:</h6>
-                      {{personnel?.banque?.sigle}}
-                    </div>
-                  </div>
-                </li>
-                <li *ngIf="personnel?.modePaiement">
-                  <div class="d-flex"><i class="mdi mdi-bank-transfer font-size-18 text-primary"></i>
-                    <div class="ms-3">
-                      <h6 class="mb-1 fw-semibold">Mode de paiemant:</h6>
-                      {{personnel?.modePaiement?.designation}}
-                    </div>
-                  </div>
-                </li>
-                <li *ngIf="personnel?.cleRib">
-                  <div class="d-flex"><i class="mdi mdi-sort-numeric-ascending font-size-18 text-primary"></i>
-                    <div class="ms-3">
-                      <h6 class="mb-1 fw-semibold">Clé RIB:</h6>
-                      {{personnel?.cleRib}}
-                    </div>
-                  </div>
-                </li>
-                <li *ngIf="personnel?.codeGuichet">
-                  <div class="d-flex"><i class="mdi mdi-code-array font-size-18 text-primary"></i>
-                    <div class="ms-3">
-                      <h6 class="mb-1 fw-semibold">Code Guichet :</h6>
-                      {{personnel?.codeGuichet}}
-                    </div>
-                  </div>
-                </li>
-                <li *ngIf="personnel?.codeBanque">
-                  <div class="d-flex"><i class="mdi mdi-coach-lamp font-size-18 text-primary"></i>
-                    <div class="ms-3">
-                      <h6 class="mb-1 fw-semibold">Code Banque:</h6>
-                      {{personnel?.codeBanque}}
-                    </div>
-                  </div>
-                </li>
-                <li *ngIf="personnel?.numeroCompte">
-                  <div class="d-flex"><i class="mdi mdi-bank-plus font-size-18 text-primary"></i>
-                    <div class="ms-3">
-                      <h6 class="mb-1 fw-semibold">Numéro de Compte:</h6>
-                      {{personnel?.numeroCompte}}
-                    </div>
-                  </div>
-                </li>
                 <h4 class="text-center">Autres Infos</h4>
                 <li *ngIf="personnel?.entite">
                   <div class="d-flex"><i class="mdi mdi-ray-end font-size-18 text-primary"></i>

@@ -1,0 +1,102 @@
+
+<div class="bg-white p-3 mt-2">
+<div class="row">
+    <app-titredepage title="Type retenue" [items]="items"></app-titredepage>
+  </div>
+    <h4 class="card-title">Liste des types retenus</h4>
+    <p class="card-title-desc">Ce tableau presente la liste des <span class="text-danger">types retenus</span></p>
+
+
+    <div class="row g-3 ">
+        <div class="col-md-1">
+            <select name="perPage" [(ngModel)]="perPage" id="" class="form-control text-center">
+            <option value="10">10</option>
+            <option value="25">25</option>
+            <option value="50">50</option>
+            <option value="100">100</option>
+        </select>
+        </div>
+        <div class="col-md-3 offset-md-8">
+            <button class="btn btn-primary float-end" (click)="initAction(null, '', formTypeRetenu)">
+                <i class="bx bx-plus"></i>
+                Ajouter un nouveau
+            </button>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-hover mt-3 bg-white dt-responsive nowrap  no-footer dtr-inline">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Designation</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngFor="let typeRetenu of typeRetenus | paginate: { itemsPerPage: perPage, currentPage: p }; let i=index">
+                <tr (click)="show(typeRetenu)">
+                    <th scope="row">{{ i + 1 + (perPage * (p - 1)) }}</th>
+                    <td>{{ typeRetenu.designation }}</td>
+                    <td (click)="$event.stopPropagation()">
+                        <i class="bx bx-edit ms-3 fs-5 btn btn-success" type="button" (click)="initAction(typeRetenu, 'edit', formTypeRetenu)"></i>
+                        <i class="bx bx-trash ms-3 fs-5 btn btn-danger" type="button" (click)="initAction(typeRetenu, 'delete', delete)"></i>
+                    </td>
+                </tr>
+            </ng-container>
+        </tbody>
+    </table>
+    <pagination-controls (pageChange)="p = $event" previousLabel="Precedent" nextLabel="Suivant"></pagination-controls>
+</div>
+
+<!-- ADD typeRetenu MODAL  -->
+<ng-template #formTypeRetenu role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">{{typeRetenuForm?.get('id')?.value == null ? 'Ajouter' : 'Modifier'}} type retenu</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <form [formGroup]="typeRetenuForm!" (ngSubmit)="traiteFormTypeRetenu()">
+        <div class="modal-body">
+            <div>
+                <label for="">Designation</label>
+                <input type="text" formControlName="designation" name="designation" class="form-control" name="" id="">
+                <span class="error">{{ designation?.getError("unique") }}</span>
+                <span *ngIf="designation && designation.invalid && designation.touched && designation.getError('unique') == ''" class="error">Vérifier ce champs</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <ng-container *ngIf="!loading; else elseTemplate">
+                <div class="mt-3 hstack">
+                    <span class="btn btn-secondary me-2 border" (click)="clear()">Effacer</span>
+                    <button [disabled]="!typeRetenuForm?.valid" class="btn btn-primary">{{typeRetenuForm?.get('id')?.value == null ? 'Ajouter' : 'Modifier'}} </button>
+                </div>
+            </ng-container>
+            <ng-template #elseTemplate>
+                <div class="text-center mt-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </ng-template>
+        </div>
+    </form>
+</ng-template>
+
+<!-- DELETE typeRetenu MODAL  -->
+<ng-template #delete role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Supprimer un type retenu</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <p *ngIf="!loading">Voulez-vous vraiment supprimer le type retenu {{ designation?.value }} ?</p>
+        <div *ngIf="loading" class="text-center mt-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button *ngIf="!loading" type="button" class="btn btn-danger" (click)="deleteTypeRetenu()">Supprimer</button>
+        <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+    </div>
+</ng-template>

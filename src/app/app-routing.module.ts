@@ -28,14 +28,14 @@ const routes: Routes = [
       ),
     canActivate: [AuthentificationGuard],
   },
-  // {
-  //   path: 'marchepublic',
-  //   loadChildren: () =>
-  //     import('./marchepublic/marchepublic.module').then(
-  //       (m) => m.MarchepublicModule
-  //     ),
-  //   canActivate: [AuthentificationGuard],
-  // },
+  {
+    path: 'paie',
+    loadChildren: () =>
+      import('./paiement/paiement.module').then(
+        (m) => m.PaiementModule
+      ),
+    canActivate: [AuthentificationGuard],
+  },
 
   {
     path: 'courrier',
