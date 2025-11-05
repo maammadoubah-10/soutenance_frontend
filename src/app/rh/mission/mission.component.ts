@@ -100,9 +100,12 @@ export class MissionComponent implements OnInit {
 
     this.chargerListeMissionPage();
 
-    this.utilisateurService.personnelNonUtilisateur().subscribe(x => {
-      this.listePersonnel = x;
-    });
+      this.utilisateurService.personnelNonUtilisateur().subscribe(x => {
+    this.listePersonnel = (x ?? []).map(p => ({
+      ...p,
+      _displayName: this.buildDisplayNamePersonnel(p)
+    }));
+  });
 
     // Vérifie l’éligibilité à chaque changement de personnel
     this.formulaireDossier.get('personnelId')?.valueChanges.subscribe((val) => {
@@ -198,12 +201,17 @@ onSearchPersonnel(term: string) {
   if ((term ?? '').length >= 3) {
     this.personnelService.recherchePersonnel(term).subscribe(
       (response: any) => {
-        this.listePersonnel = response.body?.content ?? [];
+        const content = response.body?.content ?? response?.content ?? response ?? [];
+        this.listePersonnel = (content || []).map((p: any) => ({
+          ...p,
+          _displayName: this.buildDisplayNamePersonnel(p)
+        }));
       },
       () => {}
     );
   }
 }
+
 
 onSearchImputation(term: string) {
   if ((term ?? '').length >= 3) {
@@ -495,6 +503,16 @@ onSearchMissionnaireExterne(term: string) {
       }
     });
   }
+
+  // MissionComponent
+buildDisplayNamePersonnel(p: any): string {
+  const prenom = p?.etatCivil?.prenom ?? p?.prenom ?? '';
+  const nom    = p?.etatCivil?.nom    ?? p?.nom    ?? '';
+  const full   = `${prenom} ${nom}`.trim();
+  const matricule = p?.matricule ?? p?.code ?? '';
+  return full || matricule || `#${p?.id ?? ''}`.trim();
+}
+
 
   // --- Rapport ---
 

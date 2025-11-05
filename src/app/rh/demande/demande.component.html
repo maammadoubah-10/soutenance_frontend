@@ -362,9 +362,10 @@
               formControlName="personnelId" id="personnelId"
               [ngClass]="{'is-invalid': formulaireDossier.get('personnelId')?.invalid && formulaireDossier.get('personnelId')?.dirty, 'is-valid': formulaireDossier.get('personnelId')?.valid}"
               placeholder="Tapez les trois première lettres du nom">
-              <ng-option *ngFor="let personnels of listePersonnel" [value]="personnels.id">
-                {{personnels?.prenom + ' ' + personnels?.nom}}
-              </ng-option>
+             <ng-option *ngFor="let personnels of listePersonnel" [value]="personnels.id">
+  {{ getPersonnelLabel(personnels) }}
+</ng-option>
+
             </ng-select>
           </div>
         </div>

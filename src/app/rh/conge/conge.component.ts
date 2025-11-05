@@ -85,26 +85,19 @@ private formatDate(date: Date): string {
 
 
   chargerListeCongePage(): void {
-    this.dossiers = this.dossierService
-      .listerCongePage(this.currentPage, this.dossierPerPage, this.sort)
-      .pipe(
-        map((response: any) => {
-          this.listeDossierPage = response.body.content;
-          this.totalDossier = response.body.totalElements;
-          this.totalPages = response.body.totalPages;
-          this.pages = this.getPages();
-          return {
-            dataState: this.dataStateEnum.CHARGE,
-            data: this.listeDossierPage,
-          };
-        }),
-        startWith({ dataState: this.dataStateEnum.CHARGEMENT })
-      )
-      .pipe(
-        catchError((err) => {
-          return of({ dataState: this.dataStateEnum.ERREUR, data: [] });
-        })
-      );
+   this.dossiers = this.dossierService
+  .listerCongePage(this.currentPage, this.dossierPerPage, this.sort)
+  .pipe(
+    map((response: any) => {
+      this.listeDossierPage = response.body.content;      // ✅ bien prendre body.content
+      this.totalDossier    = response.body.totalElements;
+      this.totalPages      = response.body.totalPages;
+      this.pages           = this.getPages();
+      return { dataState: this.dataStateEnum.CHARGE, data: this.listeDossierPage };
+    }),
+    startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
+    catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] }))
+  );
   }
 
   getPages(): number[] {
@@ -246,60 +239,86 @@ creeModifierConge() {
   if (this.formulaireDossier.valid) {
     if (this.formulaireDossier.get('id')?.value) {
       // MODIFICATION
-      this.dossierService.modifierConge(this.formulaireDossier.get("id")?.value, formData)
-        .subscribe(
-          (response: any) => {
-            this.listeDossierPage = this.listeDossierPage.map(e => {
-              if (e.id == response.id) {
-                e.dateDebut = response.dateDebut;
-                e.dateFin = response.dateFin;
-                e.nbreJour = response.nbreJour;
-                e.typeConge = response.typeConge;
-                e.motif = response.motif;
-                e.personnel = response.personnel;
-                e.pieces = response.pieces;
-              }
-              return e;
-            });
-            this.modalService.dismissAll();
-            this.chargerListeCongePage();
-            this.successmsg("Congé modifié", "Le congé a été modifié avec succès");
-            this.formulaireDossier.reset();
-            this.pieces = null;
-          },
-          (error) => {
-            this.errormsg('Erreur', error.error.message);
-            for (let erreur in error.error.errors) {
-              this.errormsg('Erreur', erreur + " " + error.error.errors[erreur]);
-            }
-          }
-        );
+     // MODIFICATION
+this.dossierService.modifierConge(this.formulaireDossier.get("id")?.value, formData)
+  .subscribe(
+    (updated: Conge) => {
+      // enrichissement si personnel absent
+      if (!updated.personnel && (updated as any).personnelId) {
+        const p = this.listePersonnel.find(x => x.id === (updated as any).personnelId);
+        if (p) {
+          updated = {
+            ...updated,
+            personnel: {
+              ...p,
+              prenom: p?.etatCivil?.prenom ?? (p as any).prenom,
+              nom:    p?.etatCivil?.nom    ?? (p as any).nom,
+            } as any
+          };
+        }
+      }
+
+      this.listeDossierPage = this.listeDossierPage.map(e => e.id === updated.id ? { ...e, ...updated } : e);
+
+      this.modalService.dismissAll();
+      this.chargerListeCongePage(); // si tu veux rafraîchir la page
+      this.successmsg("Congé modifié", "Le congé a été modifié avec succès");
+      this.formulaireDossier.reset();
+      this.pieces = null;
+    },
+    (error) => {
+      this.errormsg('Erreur', error.error?.message || 'Erreur serveur');
+      for (let k in (error.error?.errors || {})) {
+        this.errormsg('Erreur', k + " " + error.error.errors[k]);
+      }
+    }
+  );
+
     } else {
       // CRÉATION
-      this.dossierService.creerConge(formData).subscribe(
-        (response: any) => {
-          this.listeDossierPage.unshift(response['data']);
-          this.formulaireDossier.reset();
-          this.pieces = null;
-          this.modalService.dismissAll();
-          this.chargerListeCongePage();
-          this.successmsg("Congé créé", "Le congé a été créé avec succès");
-        },
-        (error) => {
-          console.log(error);
-          if (error.error && error.error.errors) {
-            const errors = error.error.errors;
-            for (let i = 0; i < errors.length; i++) {
-              const currentError = errors[i];
-              this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
-            }
-          } else if (error.error && error.error.message) {
-            this.toastService.error(error.error.message, 'Erreur!');
-          } else {
-            this.toastService.error('Erreur serveur', 'Erreur!');
-          }
-        }
-      );
+      // CRÉATION
+this.dossierService.creerConge(formData).subscribe(
+  (created: Conge) => {
+    // Si l’API ne renvoie pas le personnel peuplé, on enrichit localement
+    if (!created.personnel && created.personnelId) {
+      const p = this.listePersonnel.find(x => x.id === created.personnelId);
+      if (p) {
+        created = {
+          ...created,
+          personnel: {
+            ...p,
+            // compat: certains templates lisent conge.personnel.prenom/nom
+            // alors que ton modèle affiche plutôt etatCivil.prenom/nom :
+            prenom: p?.etatCivil?.prenom ?? (p as any).prenom,
+            nom:    p?.etatCivil?.nom    ?? (p as any).nom,
+          } as any
+        };
+      }
+    }
+
+    // Insérer l’objet **directement** (pas response['data'])
+    this.listeDossierPage.unshift(created);
+
+    // reset UI
+    this.formulaireDossier.reset();
+    this.pieces = null;
+    this.modalService.dismissAll();
+    this.successmsg("Congé créé", "Le congé a été créé avec succès");
+
+    // Si tu préfères recharger depuis serveur pour être 100% synchro :
+    // this.chargerListeCongePage();
+  },
+  (error) => {
+    if (error.error?.errors?.length) {
+      for (const e of error.error.errors) {
+        this.toastService.error(`${e.champs}: ${e.message}`, 'Erreur!');
+      }
+    } else {
+      this.toastService.error(error.error?.message || 'Erreur serveur', 'Erreur!');
+    }
+  }
+);
+
     }
   }
 }

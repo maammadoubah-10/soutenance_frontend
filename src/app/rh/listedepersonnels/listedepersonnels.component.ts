@@ -91,40 +91,44 @@ export class ListedepersonnelsComponent implements OnInit {
     ];
 
     // ✅ Formulaire SANS groupe bancaire / paiement
-    this.formulaireDossier = new FormGroup({
-      id: new FormControl<number | null>(null),
+   //
+   this.formulaireDossier = new FormGroup({
+  id: new FormControl<number | null>(null),
 
-      identitePersonnelGroupe: this.formBuilder.group({
-        matricule: new FormControl('', [Validators.required]),
-        nom: new FormControl('', [Validators.required]),
-        prenom: new FormControl('', [Validators.required]),
-        civilite: new FormControl<string | null>(null, [Validators.required]),
-        dateDeNaissance: new FormControl('', [Validators.required]),
-        referenceComptable: new FormControl(''),
-        situationMatrimoniale: new FormControl<string | null>(null, [
-          Validators.required,
-        ]),
-        statutPersonnel: new FormControl<string | number | null>(null),
-        nombreEnfant: new FormControl('', [Validators.required]),
-        pieceIdentite: new FormControl('', [Validators.required]),
-        numeroCnss: new FormControl('', [Validators.required]),
-        telephone: new FormControl('', [Validators.pattern(this.PHONE_REGEX)]),
-        dateEmbauchage: new FormControl('', [Validators.required]),
-        adresse: new FormControl('', [Validators.required]),
-      }),
+  identitePersonnelGroupe: this.formBuilder.group({
+    matricule: new FormControl('', [Validators.required]),
+    nom: new FormControl('', [Validators.required]),
+    prenom: new FormControl('', [Validators.required]),
+    // ✅ nouveau
+    email: new FormControl('', [Validators.email]),
 
-      personneContacterGroupe: this.formBuilder.group({
-        telephoneContact: new FormControl('', [Validators.pattern(this.PHONE_REGEX)]),
-        prenomContact: new FormControl(''),
-        nomContact: new FormControl(''),
-      }),
+    civilite: new FormControl<string | null>(null, [Validators.required]),
+    dateDeNaissance: new FormControl('', [Validators.required]),
+    referenceComptable: new FormControl(''),
+    situationMatrimoniale: new FormControl<string | null>(null, [Validators.required]),
+    statutPersonnel: new FormControl<string | number | null>(null),
+    nombreEnfant: new FormControl('', [Validators.required]),
+    pieceIdentite: new FormControl('', [Validators.required]),
+    numeroCnss: new FormControl('', [Validators.required]),
+    telephone: new FormControl('', [Validators.pattern(this.PHONE_REGEX)]),
+    dateEmbauchage: new FormControl('', [Validators.required]),
+    adresse: new FormControl('', [Validators.required]),
+  }),
 
-      autrePersonnelGroupe: this.formBuilder.group({
-        poste: new FormControl<string | number | null>(null, [Validators.required]),
-        entite: new FormControl<string | number | null>(null), 
-        indice: new FormControl<string | number | null>(null),
-      }),
-    });
+  personneContacterGroupe: this.formBuilder.group({
+    telephoneContact: new FormControl('', [Validators.pattern(this.PHONE_REGEX)]),
+    prenomContact: new FormControl(''),
+    nomContact: new FormControl(''),
+  }),
+
+  autrePersonnelGroupe: this.formBuilder.group({
+    poste: new FormControl<string | number | null>(null, [Validators.required]),
+    entite: new FormControl<string | number | null>(null),
+    indice: new FormControl<string | number | null>(null),
+  }),
+});
+
+
 
     this.chargerListePersonnelPage();
   }
@@ -196,21 +200,38 @@ onSearchStatutPersonnel(designation: string) {
     stepper.next();
   }
 
+
+  // Dans ListedepersonnelsComponent
+private normalizeRow(x: any): Personnel {
+  return {
+    ...x,
+    nom: x?.nom ?? x?.etatCivil?.nom ?? '',
+    prenom: x?.prenom ?? x?.etatCivil?.prenom ?? '',
+    matricule: x?.etatCivil?.matricule ?? x?.matricule ?? '',
+    // <- l'adresse vient de Coordonnee (backend)
+    adresse: x?.coordonnee?.adresse ?? x?.adresseSecondaire ?? '',
+    poste: x?.poste ?? x?.posteGeneral ?? x?.poste?.posteGeneral ?? null,
+  };
+}
+
+
+private normalizePageResponse(response: any): Personnel[] {
+  const content = response?.body?.content ?? [];
+  return content.map((x: any) => this.normalizeRow(x));
+}
+
   // --- Liste + pagination ---
   chargerListePersonnelPage(): void {
     this.dossiers = this.dossierService
       .listerPersonnelPage(this.currentPage, this.dossierPerPage, this.sort)
       .pipe(
         map((response: any) => {
-          this.listeDossierPage = response?.body?.content ?? [];
-          this.totalDossier = response?.body?.totalElements ?? 0;
-          this.totalPages = response?.body?.totalPages ?? 0;
-          this.pages = this.getPages();
-          return {
-            dataState: this.dataStateEnum.CHARGE,
-            data: this.listeDossierPage,
-          };
-        }),
+  this.listeDossierPage = this.normalizePageResponse(response);
+  this.totalDossier = response?.body?.totalElements ?? 0;
+  this.totalPages = response?.body?.totalPages ?? 0;
+  this.pages = this.getPages();
+  return { dataState: this.dataStateEnum.CHARGE, data: this.listeDossierPage };
+}),
         startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
         catchError(() =>
           of({ dataState: this.dataStateEnum.ERREUR, data: [] })
@@ -243,17 +264,14 @@ onSearchStatutPersonnel(designation: string) {
     this.dossiers = this.dossierService
       .recherchePersonnelNomPage(this.nom, this.currentPage, this.dossierPerPage, this.sort)
       .pipe(
-        map((response: any) => {
-          this.listeDossierPage = response?.body?.content ?? [];
-          if (!this.listeDossierPage.length) {
-            this.errormsg('Erreur', 'Aucun enregistrement ne correspond à votre recherche');
-            this.chargerListePersonnelPage();
-          }
-          this.totalDossier = response?.body?.totalElements ?? 0;
-          this.totalPages = response?.body?.totalPages ?? 0;
-          this.pages = this.getPages();
-          return { dataState: this.dataStateEnum.CHARGE, data: this.listeDossierPage };
-        }),
+       map((response: any) => {
+  this.listeDossierPage = this.normalizePageResponse(response);
+  this.totalDossier = response?.body?.totalElements ?? 0;
+  this.totalPages = response?.body?.totalPages ?? 0;
+  this.pages = this.getPages();
+  return { dataState: this.dataStateEnum.CHARGE, data: this.listeDossierPage };
+}),
+
         startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
         catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] }))
       );
@@ -331,47 +349,50 @@ onSearchStatutPersonnel(designation: string) {
   }
 
   openModal(content: any, dossier: Personnel | undefined = undefined) {
-    if (dossier) {
-      this.formulaireDossier.patchValue({
-        id: dossier.id,
-        identitePersonnelGroupe: {
-          matricule: dossier?.matricule ?? '',
-          nom: dossier?.nom ?? '',
-          prenom: dossier?.prenom ?? '',
-          civilite: dossier?.civilite ?? null,
-          dateDeNaissance: dossier?.dateDeNaissance ?? '',
-          referenceComptable: dossier?.referenceComptable ?? '',
-          situationMatrimoniale: dossier?.situationMatrimoniale ?? null,
-          statutPersonnel: dossier?.statutPersonnel?.id ?? null,
-          nombreEnfant: dossier?.nombreEnfant ?? '',
-          pieceIdentite: dossier?.pieceIdentite ?? '',
-          numeroCnss: dossier?.numeroCnss ?? '',
-          telephone: dossier?.telephone ?? '',
-          dateEmbauchage: dossier?.dateEmbauchage ?? '',
-          adresse: dossier?.adresse ?? '',
-        },
-        personneContacterGroupe: {
-          telephoneContact: dossier?.telephoneContact ?? '',
-          prenomContact: dossier?.prenomContact ?? '',
-          nomContact: dossier?.nomContact ?? '',
-        },
-        autrePersonnelGroupe: {
-          poste: dossier?.poste?.id ?? null,
-          entite: dossier?.entite?.id ?? null,
-          indice: dossier?.indice?.id ?? null,
-        },
-      });
-    } else {
-      this.formulaireDossier.reset();
-      this.formPersonnel.identitePersonnelGroupe['controls'].civilite.setValue(null);
-      this.formPersonnel.identitePersonnelGroupe['controls'].situationMatrimoniale.setValue(null);
-      this.formPersonnel.identitePersonnelGroupe['controls'].statutPersonnel.setValue(null);
-      this.formPersonnel.autrePersonnelGroupe['controls'].poste.setValue(null);
-      this.formPersonnel.autrePersonnelGroupe['controls'].entite.setValue(null);
-      this.formPersonnel.autrePersonnelGroupe['controls'].indice.setValue(null);
-    }
-    this.modalService.open(content, { size: 'lg', centered: true });
+  if (dossier) {
+    this.formulaireDossier.patchValue({
+      id: dossier.id,
+      identitePersonnelGroupe: {
+        matricule: dossier?.matricule ?? dossier?.etatCivil?.matricule ?? '',
+        nom: dossier?.nom ?? dossier?.etatCivil?.nom ?? '',
+        prenom: dossier?.prenom ?? dossier?.etatCivil?.prenom ?? '',
+        civilite: dossier?.civilite ?? dossier?.etatCivil?.civilite ?? null,
+        dateDeNaissance: dossier?.dateDeNaissance ?? dossier?.etatCivil?.dateDeNaissance ?? '',
+        referenceComptable: dossier?.referenceComptable ?? dossier?.etatCivil?.referenceComptable ?? '',
+        situationMatrimoniale: dossier?.situationMatrimoniale ?? dossier?.etatCivil?.situationMatrimoniale ?? null,
+        statutPersonnel: dossier?.statutPersonnel?.id ?? null,
+        nombreEnfant: dossier?.nombreEnfant ?? dossier?.etatCivil?.nombreEnfant ?? '',
+        pieceIdentite: dossier?.pieceIdentite ?? dossier?.etatCivil?.pieceIdentite ?? '',
+        numeroCnss: dossier?.numeroCnss ?? dossier?.organismeSocial?.numeroCnss ?? '',
+        telephone: dossier?.telephone ?? dossier?.coordonnee?.telephone ?? '',
+        dateEmbauchage: dossier?.dateEmbauchage ?? dossier?.posteGeneral?.dateEmbauchage ?? '',
+        adresse: dossier?.coordonnee?.adresse ?? dossier?.adresseSecondaire ?? '',
+        email: dossier?.email ?? dossier?.coordonnee?.email ?? '',
+      },
+      personneContacterGroupe: {
+        telephoneContact: dossier?.telephoneContact ?? dossier?.coordonnee?.telephoneContact ?? '',
+        prenomContact: dossier?.prenomContact ?? '',
+        nomContact: dossier?.nomContact ?? '',
+      },
+      autrePersonnelGroupe: {
+        poste: dossier?.poste?.id ?? dossier?.posteGeneral?.id ?? null,
+        entite: dossier?.entite?.id ?? null,
+        indice: dossier?.indice?.id ?? null,
+      },
+    });
+  } else {
+    // (reset inchangé)
+    this.formulaireDossier.reset();
+    this.formPersonnel.identitePersonnelGroupe['controls'].civilite.setValue(null);
+    this.formPersonnel.identitePersonnelGroupe['controls'].situationMatrimoniale.setValue(null);
+    this.formPersonnel.identitePersonnelGroupe['controls'].statutPersonnel.setValue(null);
+    this.formPersonnel.autrePersonnelGroupe['controls'].poste.setValue(null);
+    this.formPersonnel.autrePersonnelGroupe['controls'].entite.setValue(null);
+    this.formPersonnel.autrePersonnelGroupe['controls'].indice.setValue(null);
   }
+  this.modalService.open(content, { size: 'lg', centered: true });
+}
+
 
   creerModifierPersonnel() {
     if (!this.formulaireDossier.valid) {
@@ -396,7 +417,7 @@ onSearchStatutPersonnel(designation: string) {
       telephone: f.identitePersonnelGroupe.controls.telephone.value ?? null,
       dateEmbauchage: f.identitePersonnelGroupe.controls.dateEmbauchage.value ?? null,
       adresse: f.identitePersonnelGroupe.controls.adresse.value ?? null,
-
+      email: f.identitePersonnelGroupe.controls.email.value ?? null,
       // Contact
       telephoneContact: f.personneContacterGroupe.controls.telephoneContact.value ?? null,
       prenomContact: f.personneContacterGroupe.controls.prenomContact.value ?? null,

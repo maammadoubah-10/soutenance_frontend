@@ -78,19 +78,26 @@
                   </span>
                 </div>
                 <h4 class="mt-2 font-size-15">
-                  {{ dossier?.matricule ? dossier?.matricule : 'Pas de Matricule' }}
+                    {{ dossier?.matricule || (dossier?.etatCivil?.matricule) || 'Pas de Matricule' }}
                 </h4>
+
                 <h5 class="font-size-15 mb-1">
                   {{ (dossier?.prenom?.length || 0) <= 13 ? dossier?.prenom : (dossier?.prenom | slice:0:10) + '...  ' }}
                   {{ (dossier?.nom?.length || 0) <= 13 ? dossier?.nom : (dossier?.nom | slice:0:10) + '...' }}
                 </h5>
               </div>
 
-              <div class="d-flex mb-2 justify-content-center gap-2 text-muted">
-                <div *ngIf="!dossier?.adresse">
-                  <i class="bx bx-map align-middle text-primary"></i> Pas d'adresse
-                </div>
-              </div>
+                      <div class="d-flex mb-2 justify-content-center gap-2 text-muted">
+            <ng-container *ngIf="dossier?.adresse || dossier?.coordonnee?.adresse; else noAddress">
+              <i class="bx bx-map align-middle text-primary"></i>
+              {{ dossier?.adresse || dossier?.coordonnee?.adresse }}
+            </ng-container>
+            <ng-template #noAddress>
+              <i class="bx bx-map align-middle text-primary"></i> Pas d'adresse
+            </ng-template>
+          </div>
+
+
 
               <div class="hstack gap-2 justify-content-center">
                 <span class="font-size-14 badge badge-soft-secondary">{{ dossier?.poste?.service?.sigle }}</span>
@@ -267,6 +274,20 @@
                     </div>
                   </div>
                 </div>
+                <div class="col-lg-6">
+  <div class="mb-3">
+    <label>Email</label>
+    <input class="form-control" placeholder="Email"
+           formControlName="email" type="email">
+    <div *ngIf="ctrl('identitePersonnelGroupe.email')?.invalid
+                 && (ctrl('identitePersonnelGroupe.email')?.dirty || ctrl('identitePersonnelGroupe.email')?.touched)"
+         class="text-danger">
+      <div *ngIf="ctrl('identitePersonnelGroupe.email')?.errors?.['email']">
+        Format d'email invalide
+      </div>
+    </div>
+  </div>
+</div>
 
                 <div class="col-lg-6">
                   <div class="mb-3">

@@ -119,11 +119,19 @@
                       </button>
                     </td>
                     <td>{{i+1}}</td>
-                    <td >
-                     <a [routerLink]="['personnels/details/' + encodeId(conge?.personnel?.id)]">
-                        {{ conge?.personnel?.prenom + ' ' + conge?.personnel?.nom }}
-                      </a>
-                    </td>
+                    <td>
+  <a [routerLink]="['personnels/details/' + encodeId(conge?.personnel?.id)]" *ngIf="conge?.personnel?.id; else noPers">
+    {{ (conge?.personnel?.prenom || conge?.personnel?.etatCivil?.prenom || '') }}
+    {{ (conge?.personnel?.nom    || conge?.personnel?.etatCivil?.nom    || '') }}
+  </a>
+  <ng-template #noPers>
+    <span>
+      {{ (conge?.personnel?.prenom || conge?.personnel?.etatCivil?.prenom || 'Inconnu') }}
+      {{ (conge?.personnel?.nom    || conge?.personnel?.etatCivil?.nom    || '') }}
+    </span>
+  </ng-template>
+</td>
+
                     <td>{{conge?.dateDebut| date:'dd MMMM yyyy':'?':'fr-FR'}}</td>
                     <td>{{conge?.dateFin| date:'dd MMMM yyyy':'?':'fr-FR'}}</td>
                     <td *ngIf="conge?.valide === true">{{'Valider'}}</td>

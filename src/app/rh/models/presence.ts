@@ -3,9 +3,9 @@ import {Personnel} from "./personnel";
 export interface Presence {
   id: number,
   date: Date,
-  estPresent: boolean,
+  estPresent?: boolean;
   personnel: Personnel
-  dateValidation : Date
+  dateValidation : string;
   // mois : number
   nbreJourAbsent: number
   annee: number

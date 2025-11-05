@@ -107,21 +107,25 @@
             <div class="card-body">
               <ul class="list-unstyled vstack gap-3 mb-0">
                 <h4 class="text-center">Identité Personnel</h4>
-                <li *ngIf="personnel?.dateDeNaissance">
-                  <div class="d-flex"><i class="bx bx-calendar font-size-18 text-primary"></i>
-                    <div class="ms-3">
-                      <h6 class="mb-1 fw-semibold">
-                        Date de Naissance:</h6><span class="text-muted">{{personnel?.dateDeNaissance| date:'dd MMMM yyyy
-                        ':'':'fr-FR'}}</span>
-                    </div>
+               <li *ngIf="personnel?.dateDeNaissance || personnel?.etatCivil?.dateDeNaissance">
+                <div class="d-flex">
+                  <i class="bx bx-calendar font-size-18 text-primary"></i>
+                  <div class="ms-3">
+                    <h6 class="mb-1 fw-semibold">Date de Naissance:</h6>
+                    <span class="text-muted">
+                      {{ (personnel?.dateDeNaissance || personnel?.etatCivil?.dateDeNaissance) | date:'dd MMMM yyyy':'':'fr-FR' }}
+                    </span>
                   </div>
-                </li>
+                </div>
+              </li>
                 <li *ngIf="personnel?.dateEmbauchage">
                   <div class="d-flex"><i class="bx bx-calendar-check font-size-18 text-primary"></i>
                     <div class="ms-3">
                       <h6 class="mb-1 fw-semibold">
-                        Date d'embauchage:</h6><span class="text-muted">{{personnel?.dateEmbauchage| date:'dd MMMM yyyy
-                        ':'':'fr-FR'}}</span>
+                        Date d'embauchage:</h6><span class="text-muted">
+  {{ (personnel?.dateEmbauchage) | date:'dd MMMM yyyy':'':'fr-FR' }}
+</span>
+
                     </div>
                   </div>
                 </li>
@@ -175,22 +179,30 @@
                     </div>
                   </div>
                 </li>
-                <li *ngIf="personnel?.situationMatrimoniale">
-                  <div class="d-flex"><i class="bx bx-user-x font-size-18 text-primary"></i>
-                    <div class="ms-3">
-                      <h6 class="mb-1 fw-semibold">Situation Matrimoniale:</h6>
-                      {{personnel?.situationMatrimoniale}}
-                    </div>
-                  </div>
-                </li>
-                <li *ngIf="personnel?.statutPersonnel">
-                  <div class="d-flex"><i class="bx bx-user-minus font-size-18 text-primary"></i>
-                    <div class="ms-3">
-                      <h6 class="mb-1 fw-semibold">Statut Personnel:</h6>
-                      {{personnel?.statutPersonnel?.designation}}
-                    </div>
-                  </div>
-                </li>
+               <li *ngIf="personnel?.situationMatrimoniale !== null && personnel?.situationMatrimoniale !== undefined || personnel?.etatCivil?.situationMatrimoniale !== null && personnel?.etatCivil?.situationMatrimoniale !== undefined">
+  <div class="d-flex">
+    <i class="bx bx-user-x font-size-18 text-primary"></i>
+    <div class="ms-3">
+      <h6 class="mb-1 fw-semibold">Situation Matrimoniale:</h6>
+      <span class="text-muted">
+        {{ (personnel?.situationMatrimoniale || personnel?.etatCivil?.situationMatrimoniale) ?? '—' }}
+      </span>
+    </div>
+  </div>
+</li>
+
+               <li *ngIf="personnel?.statutPersonnel !== null && personnel?.statutPersonnel !== undefined">
+  <div class="d-flex">
+    <i class="bx bx-user-minus font-size-18 text-primary"></i>
+    <div class="ms-3">
+      <h6 class="mb-1 fw-semibold">Statut Personnel:</h6>
+      <span class="text-muted">
+        {{ (personnel?.statutPersonnel?.designation || personnel?.statutPersonnel) ?? '—' }}
+      </span>
+    </div>
+  </div>
+</li>
+
                 <li *ngIf="personnel?.nombreEnfant">
                   <div class="d-flex"><i class="mdi mdi-numeric-2-circle font-size-18 text-primary"></i>
                     <div class="ms-3">
@@ -199,14 +211,18 @@
                     </div>
                   </div>
                 </li>
-                <li *ngIf="personnel?.telephone">
-                  <div class="d-flex"><i class="mdi mdi-numeric-8-box-multiple-outline font-size-18 text-primary"></i>
-                    <div class="ms-3">
-                      <h6 class="mb-1 fw-semibold">Téléphone:</h6>
-                        {{ (personnel?.telephone ?? '') | formatPhoneNumber }}                   
-                     </div>
-                  </div>
-                </li>
+               <li *ngIf="(personnel?.telephone ?? personnel?.coordonnee?.telephone) !== null && (personnel?.telephone ?? personnel?.coordonnee?.telephone) !== undefined">
+  <div class="d-flex">
+    <i class="mdi mdi-numeric-8-box-multiple-outline font-size-18 text-primary"></i>
+    <div class="ms-3">
+      <h6 class="mb-1 fw-semibold">Téléphone:</h6>
+      <span class="text-muted">
+        {{ ((personnel?.telephone || personnel?.coordonnee?.telephone) ?? '') | formatPhoneNumber }}
+      </span>
+    </div>
+  </div>
+</li>
+
                 <h4 class="text-center">Personne à Contacter</h4>
                 <li *ngIf="personnel?.nomContact">
                   <div class="d-flex"><i class="mdi mdi-account-minus font-size-18 text-primary"></i>
@@ -233,22 +249,30 @@
                   </div>
                 </li>
                 <h4 class="text-center">Autres Infos</h4>
-                <li *ngIf="personnel?.entite">
-                  <div class="d-flex"><i class="mdi mdi-ray-end font-size-18 text-primary"></i>
-                    <div class="ms-3">
-                      <h6 class="mb-1 fw-semibold">Entité:</h6>
-                      {{personnel?.entite?.designation}}
-                    </div>
-                  </div>
-                </li>
-                <li *ngIf="personnel?.indice">
-                  <div class="d-flex"><i class="mdi mdi-cached font-size-18 text-primary"></i>
-                    <div class="ms-3">
-                      <h6 class="mb-1 fw-semibold">Indice:</h6>
-                      {{personnel?.indice?.nom}}
-                    </div>
-                  </div>
-                </li>
+                <li *ngIf="personnel?.entite !== null && personnel?.entite !== undefined">
+  <div class="d-flex">
+    <i class="mdi mdi-ray-end font-size-18 text-primary"></i>
+    <div class="ms-3">
+      <h6 class="mb-1 fw-semibold">Entité:</h6>
+      <span class="text-muted">
+        {{ (personnel?.entite?.designation || personnel?.entite) ?? '—' }}
+      </span>
+    </div>
+  </div>
+</li>
+
+               <li *ngIf="personnel?.indice !== null && personnel?.indice !== undefined">
+  <div class="d-flex">
+    <i class="mdi mdi-cached font-size-18 text-primary"></i>
+    <div class="ms-3">
+      <h6 class="mb-1 fw-semibold">Indice:</h6>
+      <span class="text-muted">
+        {{ (personnel?.indice?.nom || personnel?.indice) ?? '—' }}
+      </span>
+    </div>
+  </div>
+</li>
+
               </ul>
             </div>
 
@@ -273,17 +297,15 @@
               </div>
             </div>
             <div class="card-body">
-              <ng-container [ngSwitch]="response.dataState" *ngIf="presences | async as response">
-                <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
-                  <div class="alert alert-info" role="alert">
-                    {{ dataStateEnum.CHARGEMENT }}
-                  </div>
-                </ng-container>
+                <ng-container *ngIf="presences | async as response" [ngSwitch]="response.dataState">               
+                   <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+      <div class="alert alert-info" role="alert">Chargement...</div>
+    </ng-container>
                 <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
-                  <div class="alert alert-info" role="alert">
-                    {{ response.dataState }}
-                  </div>
-                </ng-container>
+      <div class="alert alert-danger" role="alert">
+        Une erreur est survenue lors du chargement des présences.
+      </div>
+    </ng-container>
                 <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
                   <div class="table-responsive">
                     <table class="table table-bordered align-middle nowrap">
@@ -296,24 +318,35 @@
                         </tr>
                       </thead>
                       <tbody style="text-align: center">
-                        <tr *ngFor="let precence of listePresencePersonnel ?? []
-                 ; let i=index">
-                          <th>{{i+1}}</th>
-                          <th>{{precence?.date| date:'dd MMMM yyyy à HH:mm':'':'fr-FR'}}</th>
-                          <th *ngIf="precence?.estPresent"><span class="badge badge-soft-success">Présent</span></th>
-                          <th *ngIf="!precence?.estPresent"><span class="badge badge-soft-danger">Absent</span></th>
-                          <th>
-                            <button placement="top" ngbToolTip="Supprimer" class="btn btn-danger mx-1 mt-1 btn-sm"
-                              (click)="supprimerPresence(precence.id)">
-                              <i class="bx bx-trash-alt"></i>
-                            </button>
-                          </th>
-                        </tr>
+                        <tr *ngFor="let precence of listePresencePersonnel ?? []; let i = index">
+  <th>{{ i + 1 }}</th>
 
-                        <tr *ngIf="response.data?.length == 0">
-                          <td colspan="4" class="text-center"><i style="color: #d9534f;font-size: xxx-large"
-                              class='bx bxs-data btn btn-lg'></i><br>Aucune Présence pour {{personnel?.nom}}</td>
-                        </tr>
+  <!-- ✅ la bonne propriété est 'dateValidation' -->
+  <td>{{ precence?.dateValidation | date:'dd MMMM yyyy':'':'fr-FR' }}</td>
+
+  <!-- ✅ calcule le statut Présent/Absent côté TS -->
+  <td *ngIf="isPresent(precence); else absent">
+  <span class="badge badge-soft-success">Présent</span>
+</td>
+<ng-template #absent>
+  <span class="badge badge-soft-danger">Absent</span>
+</ng-template>
+
+
+  <td>
+    <button placement="top" ngbToolTip="Supprimer" class="btn btn-danger mx-1 mt-1 btn-sm"
+            (click)="supprimerPresence(precence.id)">
+      <i class="bx bx-trash-alt"></i>
+    </button>
+  </td>
+</tr>
+
+                      <tr *ngIf="(listePresencePersonnel?.length ?? 0) === 0">
+  <td colspan="4" class="text-center">
+    <i style="color:#d9534f;font-size:xxx-large" class='bx bxs-data btn btn-lg'></i><br>
+    Aucune Présence pour {{ personnel?.nom }}
+  </td>
+</tr>
                       </tbody>
                     </table>
                     <div class="row justify-content-between align-items-center mb-3" *ngIf="totalPresence > 5">
@@ -456,50 +489,68 @@
                           <th scope="col">Statut</th>
                           <th scope="col">Action</th>
                         </tr>
-                      </thead>
-                      <tbody style="text-align: center">
-                        <tr *ngFor="let contrat of listeContratsPersonnel ?? []
-                 ; let i=index">
-                          <th>{{i+1}}</th>
-                          <th>{{contrat?.dateDebut| date:'dd MMMM yyyy':'':'fr-FR'}}</th>
-                          <th>{{contrat?.dateFin| date:'dd MMMM yyyy':'':'fr-FR'}}</th>
-                          <th>{{contrat?.typeContrat?.designation}}</th>
-                          <ng-container *ngIf="contrat?.fichier != null; else templateA">
-                            <th class="text-center"><a target="_blank" href="{{ telechargerFicheContrat(contrat) }}"
-                                (click)="showPopOnDownloadFicheContrat()" class="btn btn-secondary btn-label btn-sm"
-                                style="font-size: 10px;">
-                                <i class="mdi mdi-download label-icon"></i>
-                                Télécharger
-                              </a></th>
-                          </ng-container>
-                          <ng-template #templateA>
-                            <th class="text-center">Aucun Fichier</th>
-                          </ng-template>
-                          <th *ngIf="contrat?.status"><span class="badge badge-soft-success">En Cours</span></th>
-                          <th *ngIf="!contrat?.status"><span class="badge badge-soft-danger">Terminer</span></th>
-                          <th>
+                      </thead><!-- dans le <thead> rien à changer si l’intitulé te convient -->
 
-                            <button placement="top" ngbToolTip="Détail" class="btn btn-primary mx-1 mt-1 btn-sm"
-                              (click)="openModalContratDetail(contrat,detailContratAvenant)">
-                              <i class="mdi mdi-eye"></i>
-                            </button>
+<tbody style="text-align: center">
+  <tr *ngFor="let c of (listeContratsPersonnel ?? []); let i = index">
+    <th>{{ i + 1 }}</th>
 
-                            <button placement="top" ngbToolTip="Modifier" class="btn btn-info mx-1 mt-1 btn-sm"
-                              (click)="openModalContrat(contratContente, contrat)">
-                              <i class="bx bx-pencil"></i>
-                            </button>
-                            <button placement="top" ngbToolTip="Supprimer" class="btn btn-danger mx-1 mt-1 btn-sm"
-                              (click)="supprimerContrat(contrat.id)">
-                              <i class="bx bx-trash-alt"></i>
-                            </button>
-                          </th>
-                        </tr>
+    <!-- Dates robustes (prend dateDebutContrat/dateFinContrat ou fallback) -->
+    <td>{{ getContratDebut(c) | date:'dd MMMM yyyy':'':'fr-FR' }}</td>
+    <td>{{ getContratFin(c)   | date:'dd MMMM yyyy':'':'fr-FR' }}</td>
 
-                        <tr *ngIf="response.data?.length == 0">
-                          <td colspan="7" class="text-center"><i style="color: #d9534f;font-size: xxx-large"
-                              class='bx bxs-data btn btn-lg'></i><br>Aucune Contrat pour {{personnel?.nom}}</td>
-                        </tr>
-                      </tbody>
+    <!-- Type / Nature -->
+    <td>{{ getContratNature(c) }}</td>
+
+    <!-- Fichier -->
+    <td class="text-center">
+      <ng-container *ngIf="c?.fichier; else noFile">
+        <a target="_blank"
+           [href]="telechargerFicheContrat(c)"
+           (click)="showPopOnDownloadFicheContrat()"
+           class="btn btn-secondary btn-label btn-sm" style="font-size:10px;">
+          <i class="mdi mdi-download label-icon"></i> Télécharger
+        </a>
+      </ng-container>
+      <ng-template #noFile>Aucun fichier</ng-template>
+    </td>
+
+    <!-- Statut -->
+    <td>
+      <span *ngIf="isContratEnCours(c); else terminee" class="badge badge-soft-success">En cours</span>
+      <ng-template #terminee>
+        <span class="badge badge-soft-danger">Terminée</span>
+      </ng-template>
+    </td>
+
+    <!-- Actions (inchangées) -->
+    <td>
+      <button class="btn btn-primary mx-1 mt-1 btn-sm"
+              (click)="openModalContratDetail(c, detailContratAvenant)">
+        <i class="mdi mdi-eye"></i>
+      </button>
+
+      <button class="btn btn-info mx-1 mt-1 btn-sm"
+              (click)="openModalContrat(contratContente, c)">
+        <i class="bx bx-pencil"></i>
+      </button>
+
+      <button class="btn btn-danger mx-1 mt-1 btn-sm"
+              (click)="supprimerContrat(c.id)">
+        <i class="bx bx-trash-alt"></i>
+      </button>
+    </td>
+  </tr>
+
+  <tr *ngIf="(listeContratsPersonnel?.length ?? 0) === 0">
+    <td colspan="7" class="text-center">
+      <i style="color:#d9534f;font-size:xxx-large" class='bx bxs-data btn btn-lg'></i><br>
+      Aucun contrat pour {{ personnel?.nom }}
+    </td>
+  </tr>
+</tbody>
+
+
                     </table>
                     <div class="row justify-content-between align-items-center mb-3" *ngIf="totalContrat > 5">
                       <div class="col-auto me-auto"></div>
@@ -1321,168 +1372,231 @@
         </div>
 
         <div class="col-lg-12 d-flex">
-          <h2 class="mb-3">Demande</h2>
+  <h2 class="mb-3">Demande</h2>
+</div>
+
+<div class="card">
+  <div class="card-body border-bottom">
+    <div class="d-flex align-items-center">
+      <h4 class="card-title">Liste des demandes de {{ personnel?.nom }}</h4>
+    </div>
+  </div>
+
+  <div class="card-body">
+    <ng-container [ngSwitch]="response?.dataState" *ngIf="demandes | async as response">
+      <!-- ÉTAT : Chargement -->
+      <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
+        <div class="alert alert-info" role="alert">
+          {{ dataStateEnum.CHARGEMENT }}
         </div>
-        <div class="card">
-          <div class="card-body border-bottom">
-            <div class="d-flex align-items-center">
-              <h4 class="card-title">Liste des demandes de {{personnel?.nom}}</h4>
+      </ng-container>
+
+      <!-- ÉTAT : Erreur -->
+      <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
+        <div class="alert alert-info" role="alert">
+          {{ response.dataState }}
+        </div>
+      </ng-container>
+
+      <!-- ÉTAT : Chargé -->
+      <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
+        <div class="table-responsive">
+          <table class="table table-bordered align-middle nowrap">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Statut demande</th>
+                <!-- <th scope="col">Type de demande</th> -->
+                <th scope="col">Date de Début</th>
+                <th scope="col">Date de Fin</th>
+                <th scope="col">Fichier</th>
+                <th scope="col">Commentaire</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              <tr
+                *ngFor="let demande of listeDemandePersonnel ?? []; let i = index"
+                [ngClass]="getDemandeRowClass(demande)"
+              >
+                <th scope="row">{{ i + 1 }}</th>
+
+                <!-- Statut (fallbacks + compat) -->
+               <th scope="row">
+  {{
+    ($any(demande)._statutLabel)
+    || demande?.statutDemande?.nom
+    || ($any(demande).statutDemande?.libelle)
+    || ($any(demande).statut)
+    || ($any(demande).statutLibelle)
+    || ($any(demande).etat)
+    || '—'
+  }}
+</th>
+
+
+                <!-- Dates -->
+                <th>{{ demande?.dateDebut | date:'dd MMMM yyyy':'':'fr-FR' }}</th>
+                <th>{{ demande?.dateFin   | date:'dd MMMM yyyy':'':'fr-FR' }}</th>
+
+                <!-- Fichier (détecte plusieurs clés possibles) -->
+               <ng-container *ngIf="hasFichier(demande); else noFileTpl">
+  <th class="text-center">
+    <a
+      target="_blank"
+      [href]="telechargerFicheDemande(demande)"
+      (click)="showPopOnDownloadFicheDemande()"
+      class="btn btn-secondary btn-label btn-sm"
+      style="font-size: 10px;"
+    >
+      <i class="mdi mdi-download label-icon"></i>
+      Télécharger
+    </a>
+  </th>
+</ng-container>
+
+               <ng-template #noFileTpl>
+  <th class="text-center">Aucun Fichier</th>
+</ng-template>
+
+                <!-- Commentaire / motif (fallbacks) -->
+                <th scope="row" style="text-align: justify">
+  {{
+    ($any(demande)._commentaire)
+    || demande?.commentaire
+    || ($any(demande).message)
+    || ($any(demande).motif)
+    || ($any(demande).observations)
+    || ''
+  }}
+</th>
+
+              </tr>
+
+              <!-- Aucune demande -->
+              <tr *ngIf="(listeDemandePersonnel?.length || 0) === 0">
+                <td colspan="7" class="text-center">
+                  <i style="color: #d9534f;font-size: xxx-large" class="bx bxs-data btn btn-lg"></i><br>
+                  Aucune demande pour {{ personnel?.nom }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+
+          <!-- Pagination (sur totalDemande, pas totalMission) -->
+          <div class="row justify-content-between align-items-center mb-3" *ngIf="totalDemande > 5">
+            <div class="col-auto me-auto"></div>
+            <div class="col-auto">
+              <div class="d-flex align-items-center">
+                <button
+                  class="btn btn-primary mr-2 mx-3 btn-sm"
+                  (click)="currentPage = currentPage - 1; chargerListeDemandesPersonnel()"
+                  [disabled]="currentPage === 0"
+                >
+                  Précédent
+                </button>
+
+                <ng-container *ngIf="pages.length > 1">
+                  <ng-container *ngIf="pages.length <= 11; else longPager">
+                    <ng-container *ngFor="let page of pages">
+                      <button
+                        class="btn btn-primary btn-sm mx-1"
+                        (click)="currentPage = page; chargerListeDemandesPersonnel()"
+                        [disabled]="currentPage === page"
+                      >
+                        {{ page + 1 }}
+                      </button>
+                    </ng-container>
+                  </ng-container>
+
+                  <ng-template #longPager>
+                    <ng-container *ngIf="currentPage <= 6; else middleOrEndPager">
+                      <ng-container *ngFor="let page of pages.slice(0, 5)">
+                        <button
+                          class="btn btn-primary btn-sm mx-1"
+                          (click)="currentPage = page; chargerListeDemandesPersonnel()"
+                          [disabled]="currentPage === page"
+                        >
+                          {{ page + 1 }}
+                        </button>
+                      </ng-container>
+                      <button class="btn btn-primary btn-sm mx-1" disabled>...</button>
+                      <ng-container *ngFor="let page of pages.slice(-5)">
+                        <button
+                          class="btn btn-primary btn-sm mx-1"
+                          (click)="currentPage = page; chargerListeDemandesPersonnel()"
+                          [disabled]="currentPage === page"
+                        >
+                          {{ page + 1 }}
+                        </button>
+                      </ng-container>
+                    </ng-container>
+
+                    <ng-template #middleOrEndPager>
+                      <ng-container *ngIf="currentPage > 6 && currentPage < pages.length - 5; else endPager">
+                        <ng-container *ngFor="let page of pages.slice(currentPage - 4, currentPage)">
+                          <button
+                            class="btn btn-primary btn-sm mx-1"
+                            (click)="currentPage = page; chargerListeDemandesPersonnel()"
+                            [disabled]="currentPage === page"
+                          >
+                            {{ page + 1 }}
+                          </button>
+                        </ng-container>
+                        <button class="btn btn-primary btn-sm mx-1" disabled>...</button>
+                        <ng-container *ngFor="let page of pages.slice(currentPage, currentPage + 4)">
+                          <button
+                            class="btn btn-primary btn-sm mx-1"
+                            (click)="currentPage = page; chargerListeDemandesPersonnel()"
+                            [disabled]="currentPage === page"
+                          >
+                            {{ page + 1 }}
+                          </button>
+                        </ng-container>
+                      </ng-container>
+
+                      <ng-template #endPager>
+                        <ng-container *ngFor="let page of pages.slice(0, 5)">
+                          <button
+                            class="btn btn-primary btn-sm mx-1"
+                            (click)="currentPage = page; chargerListeDemandesPersonnel()"
+                            [disabled]="currentPage === page"
+                          >
+                            {{ page + 1 }}
+                          </button>
+                        </ng-container>
+                        <button class="btn btn-primary btn-sm mx-1" disabled>...</button>
+                        <ng-container *ngFor="let page of pages.slice(-5)">
+                          <button
+                            class="btn btn-primary btn-sm mx-1"
+                            (click)="currentPage = page; chargerListeDemandesPersonnel()"
+                            [disabled]="currentPage === page"
+                          >
+                            {{ page + 1 }}
+                          </button>
+                        </ng-container>
+                      </ng-template>
+                    </ng-template>
+                  </ng-template>
+                </ng-container>
+
+                <button
+                  class="btn btn-primary btn-sm mx-3"
+                  (click)="currentPage = currentPage + 1; chargerListeDemandesPersonnel()"
+                  [disabled]="currentPage + 1 === totalPages"
+                >
+                  Suivant
+                </button>
+              </div>
             </div>
           </div>
-          <div class="card-body">
-            <ng-container [ngSwitch]="response?.dataState" *ngIf="demandes | async as response">
-              <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
-                <div class="alert alert-info" role="alert">
-                  {{ dataStateEnum.CHARGEMENT }}
-                </div>
-              </ng-container>
-              <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
-                <div class="alert alert-info" role="alert">
-                  {{ response.dataState }}
-                </div>
-              </ng-container>
-              <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
-                <div class="table-responsive">
-                  <table class="table table-bordered align-middle nowrap">
-                    <thead>
-                      <tr>
-                        <th scope="col">#</th>
-                        <th scope="col">Statut demande</th>
-                        <!-- <th scope="col">Type de demande</th> -->
-                        <th scope="col">Date de Debut</th>
-                        <th scope="col">Date de Fin</th>
-                        <th scope="col">Fichier</th>
-                        <th scope="col">Commentaire</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr [ngClass]="{'table-success': demande?.statutDemande?.id === 2,
-          'table-warning': demande?.statutDemande?.id === 3 || demande?.statutDemande?.id === 1,
-          'table-danger': demande?.statutDemande?.id === 4 || demande?.statutDemande?.id === 5 }" *ngFor="let demande of listeDemandePersonnel ?? []
-                 ; let i=index">
-                        <th scope="row">{{i+1}}</th>
-                        <th scope="row">{{demande?.statutDemande?.nom}}</th>
-                        <!-- <th scope="row">{{demande?.typeDemande?.nom}}</th> -->
-                        <th>{{demande?.dateDebut| date:'dd MMMM yyyy':'':'fr-FR'}}</th>
-                        <th>{{demande?.dateFin| date:'dd MMMM yyyy':'':'fr-FR'}}</th>
-                        <ng-container *ngIf="demande?.fichier != null; else templateA">
-                          <th class="text-center"><a target="_blank" href="{{ telechargerFicheDemande(demande) }}"
-                              (click)="showPopOnDownloadFicheDemande()" class="btn btn-secondary btn-label btn-sm"
-                              style="font-size: 10px;">
-                              <i class="mdi mdi-download label-icon"></i>
-                              Télécharger
-                            </a></th>
-                        </ng-container>
-                        <ng-template #templateA>
-                          <th class="text-center">Aucun Fichier</th>
-                        </ng-template>
-                        <th scope="row" style="text-align: justify">{{demande?.commentaire}}</th>
-                      </tr>
-
-                      <tr *ngIf="listeMissionPersonnel.length == 0">
-                        <td colspan="7" class="text-center"><i style="color: #d9534f;font-size: xxx-large"
-                            class='bx bxs-data btn btn-lg'></i><br>Aucune demande pour {{personnel?.nom}}</td>
-                      </tr>
-                    </tbody>
-                  </table>
-                  <div class="row justify-content-between align-items-center mb-3" *ngIf="totalMission > 5">
-                    <div class="col-auto me-auto"></div>
-                    <div class="col-auto">
-                      <div class="d-flex align-items-center">
-                        <button class="btn btn-primary mr-2 mx-3 btn-sm"
-                          (click)="currentPage = currentPage - 1; chargerListeDemandesPersonnel()"
-                          [disabled]="currentPage === 0">
-                          Précédent
-                        </button>
-                        <ng-container *ngIf="pages.length > 1">
-                          <ng-container *ngIf="pages.length <= 11">
-                            <ng-container *ngFor="let page of pages">
-                              <button class="btn btn-primary btn-sm mx-1"
-                                (click)="currentPage = page; chargerListeDemandesPersonnel()"
-                                [disabled]="currentPage === page">
-                                {{ page +1}}
-                              </button>
-                            </ng-container>
-                          </ng-container>
-                          <ng-container *ngIf="pages.length > 11">
-                            <ng-container *ngIf="currentPage <= 6">
-                              <ng-container *ngFor="let page of pages.slice(0, 5)">
-                                <button class="btn btn-primary btn-sm mx-1"
-                                  (click)="currentPage = page; chargerListeDemandesPersonnel()"
-                                  [disabled]="currentPage === page">
-                                  {{ page + 1 }}
-                                </button>
-                              </ng-container>
-                              <button class="btn btn-primary btn-sm mx-1" disabled>
-                                ...
-                              </button>
-                              <ng-container *ngFor="let page of pages.slice(-5)">
-                                <button class="btn btn-primary btn-sm mx-1"
-                                  (click)="currentPage = page; chargerListeDemandesPersonnel()"
-                                  [disabled]="currentPage === page">
-                                  {{ page + 1 }}
-                                </button>
-                              </ng-container>
-                            </ng-container>
-                            <ng-container *ngIf="currentPage > 6 && currentPage < pages.length - 5">
-                              <ng-container *ngFor="
-                      let page of pages.slice(currentPage - 4, currentPage)
-                    ">
-                                <button class="btn btn-primary btn-sm mx-1"
-                                  (click)="currentPage = page; chargerListeDemandesPersonnel()"
-                                  [disabled]="currentPage === page">
-                                  {{ page + 1 }}
-                                </button>
-                              </ng-container>
-                              <button class="btn btn-primary btn-sm mx-1" disabled>
-                                ...
-                              </button>
-                              <ng-container *ngFor="
-                      let page of pages.slice(currentPage, currentPage + 4)
-                    ">
-                                <button class="btn btn-primary btn-sm mx-1"
-                                  (click)="currentPage = page; chargerListeDemandesPersonnel()"
-                                  [disabled]="currentPage === page">
-                                  {{ page + 1 }}
-                                </button>
-                              </ng-container>
-                            </ng-container>
-
-
-                            <ng-container *ngIf="currentPage >= pages.length - 5">
-                              <ng-container *ngFor="let page of pages.slice(0, 5)">
-                                <button class="btn btn-primary btn-sm mx-1"
-                                  (click)="currentPage = page; chargerListeDemandesPersonnel()"
-                                  [disabled]="currentPage === page">
-                                  {{ page + 1 }}
-                                </button>
-                              </ng-container>
-                              <button class="btn btn-primary btn-sm mx-1" disabled>
-                                ...
-                              </button>
-                              <ng-container *ngFor="let page of pages.slice(-5)">
-                                <button class="btn btn-primary btn-sm mx-1"
-                                  (click)="currentPage = page; chargerListeDemandesPersonnel()"
-                                  [disabled]="currentPage === page">
-                                  {{ page + 1 }}
-                                </button>
-                              </ng-container>
-                            </ng-container>
-                          </ng-container>
-                        </ng-container>
-                        <button class="btn btn-primary btn-sm mx-3"
-                          (click)="currentPage = currentPage + 1; chargerListeDemandesPersonnel()"
-                          [disabled]="currentPage+1 === totalPages">
-                          Suivant
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </ng-container>
-            </ng-container>
-          </div>
+          <!-- /Pagination -->
         </div>
+      </ng-container>
+    </ng-container>
+  </div>
+</div>
+
 
         <div class="col-lg-12 d-flex">
           <h2 class="mb-3">Congé</h2>
