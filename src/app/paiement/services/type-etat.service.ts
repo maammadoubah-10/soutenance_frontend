@@ -10,7 +10,7 @@ import { Etat } from '../models/etat';
 })
 export class TypeEtatService {
 
-  private _url:string = environment.hostmicroservicepaie+"type-etats"
+  private _url:string = environment.hostmicroservicepaie+"type/etat"
 
   constructor(private http: HttpClient) {
 

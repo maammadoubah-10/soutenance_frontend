@@ -32,6 +32,7 @@ import { DetailmissionComponent } from './mission/detailmission/detailmission.co
 import { AffectationComponent } from './affectation/affectation.component';
 import { PresenceComponent } from './presence/presence.component';
 import { RhDashboardComponent } from './rh-dashboard.component';
+import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
 //import { RhDashboardComponent } from './rh-dashboard.component';
 //import { NgApexchartsModule } from 'ng-apexcharts';
 @NgModule({
@@ -74,7 +75,8 @@ import { RhDashboardComponent } from './rh-dashboard.component';
     //NgxPaginationModule,
     NgbTooltipModule,
     MatStepperModule ,
-    NgApexchartsModule
+    NgApexchartsModule,
+    NgxExtendedPdfViewerModule,
 ]
 })
 export class RhModule { }

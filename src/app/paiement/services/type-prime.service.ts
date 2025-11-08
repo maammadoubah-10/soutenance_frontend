@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { environment } from 'src/environments/environment';
 import { TypePrime } from '../models/type-prime';
 import { Observable } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { Prime } from '../models/prime';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'

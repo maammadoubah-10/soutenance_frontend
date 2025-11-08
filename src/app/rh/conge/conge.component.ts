@@ -16,6 +16,7 @@ import {registerLocaleData} from "@angular/common";
 import localeFr from "@angular/common/locales/fr";
 import {Demande} from "../models/demande";
 import { UtilisateurService } from '../../utilisateur/services/utilisateur.service';
+import { SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-conge',
@@ -23,6 +24,21 @@ import { UtilisateurService } from '../../utilisateur/services/utilisateur.servi
   styleUrls: ['./conge.component.scss']
 })
 export class CongeComponent implements OnInit {
+
+  //Propriétés pour le composant ngx-extended-pdf-viewer pour telecharger debut
+  showSidebarButton: boolean = false;
+  showFindButton: boolean = false;
+  showSecondaryToolbarButton: boolean = false;
+  handTool: boolean = true;
+  showDownloadButton: boolean = true;
+  showPrintButton: boolean = false;
+  contextMenuAllowed: boolean = false;
+  showOpenFileButton: boolean = false;
+  @ViewChild('contentVisualiser', { static: true }) contentVisualiser?: ElementRef;
+    pdfUrl: string= "";
+  // fin
+  //pdfUrl: SafeResourceUrl | undefined;
+
   @ViewChild('fileInput') fileInput!: ElementRef<HTMLInputElement>;
  
   pieces: File | null = null;

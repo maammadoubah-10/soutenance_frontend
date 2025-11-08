@@ -1,0 +1,32 @@
+<app-titredepage title="Categories" [items]="items"></app-titredepage>
+
+<div *ngIf="category != null" class="bg-white p-3 mt-2">
+
+  <h4 class="card-title">Liste des salaires de base de {{ category.categorie }}</h4>
+  <p class="card-title-desc">Ce tableau presente la liste des salaires de base de <span class="text-danger">{{
+      category.categorie }}</span></p>
+
+  <div class="table-responsive mt-4">
+    <table class="table table-bordered table-hover mt-3 bg-white dt-responsive nowrap  no-footer dtr-inline">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Montant</th>
+          <th>Categorie</th>
+          <th>Echelon</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let salaireBase of salaireBases; let i=index">
+          <tr>
+            <th scope="row">{{ i + 1 }}</th>
+            <td>{{ salaireBase.montant}} XOF</td>
+            <td>{{ salaireBase.categorie.categorie }}</td>
+            <td>{{ salaireBase.echelon.echelon }}</td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </div>
+
+</div>

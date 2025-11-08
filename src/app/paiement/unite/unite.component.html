@@ -1,0 +1,217 @@
+<div class="container-fluid px-3 main">
+  <!-- En-tête de page -->
+  <div class="row">
+    <app-titredepage title="Unites" [items]="items"></app-titredepage>
+  </div>
+
+  <!-- Carte principale -->
+  <div class="card">
+    <div class="card-body">
+      <!-- En-tête de la carte -->
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h4 class="card-title mb-1">Liste des unites</h4>
+          <p class="card-title-desc text-muted mb-0">
+            Gestion des différents unites disponibles dans le système
+          </p>
+        </div>
+        <button class="btn btn-primary rounded-pill" 
+                (click)="initAction(null, 'create', formModal)">
+          <i class="bx bx-plus me-1"></i>
+          Ajouter
+        </button>
+      </div>
+
+      <!-- Contrôles de pagination -->
+      <div class="row g-3 align-items-center mb-3">
+        <div class="col-md-2">
+          <select [(ngModel)]="perPage" 
+                  (change)="loadModesPaiement()" 
+                  class="form-select">
+            <option value="10">10 / page</option>
+            <option value="25">25 / page</option>
+            <option value="50">50 / page</option>
+            <option value="100">100 / page</option>
+          </select>
+        </div>
+        <div class="col-md-10 text-end text-muted">
+          {{ totalItems }} unites trouvés
+        </div>
+      </div>
+
+      <!-- Tableau des données -->
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle mb-0">
+          <thead class="table-light">
+            <tr>
+              <th width="80">#</th>
+              <th>Désignation</th>
+              <th width="150" class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- État de chargement -->
+            <tr *ngIf="loading">
+              <td colspan="3" class="text-center py-4">
+                <div class="spinner-border text-primary" role="status">
+                  <span class="visually-hidden">Chargement...</span>
+                </div>
+                <p class="mt-2 mb-0 text-muted">Chargement des données...</p>
+              </td>
+            </tr>
+
+            <!-- Données -->
+            <ng-container *ngIf="!loading">
+              <tr *ngFor="let mode of modesPaiement | paginate: { itemsPerPage: perPage, currentPage: currentPage }; let i = index"
+                  class="cursor-pointer">
+                <th scope="row" class="fw-normal">
+                  {{ i + 1 + (perPage * (currentPage - 1)) }}
+                </th>
+                <td>{{ mode.designation }}</td>
+                <td class="text-center">
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button type="button" 
+                            class="btn btn-outline-success"
+                            (click)="initAction(mode, 'edit', formModal)"
+                            title="Modifier">
+                      <i class="bx bx-edit"></i>
+                    </button>
+                    <button type="button" 
+                            class="btn btn-outline-danger"
+                            (click)="initAction(mode, 'delete', deleteModal)"
+                            title="Supprimer">
+                      <i class="bx bx-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- État vide -->
+              <tr *ngIf="modesPaiement.length === 0">
+                <td colspan="3" class="text-center py-4">
+                  <i class="bx bx-data display-4 text-muted d-block mb-2"></i>
+                  <p class="text-muted mb-0">Aucun mode de paiement trouvé</p>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pagination -->
+      <div class="d-flex justify-content-between align-items-center mt-3" 
+           *ngIf="modesPaiement.length > 0 && !loading">
+        <div class="text-muted">
+          Page {{ currentPage }} sur {{(totalItems / perPage) }}
+        </div>
+        <pagination-controls 
+          (pageChange)="currentPage = $event; loadModesPaiement()"
+          previousLabel="Précédent"
+          nextLabel="Suivant"
+          screenReaderPaginationLabel="Pagination"
+          screenReaderPageLabel="page"
+          screenReaderCurrentLabel="Page courante">
+        </pagination-controls>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de création/modification -->
+<ng-template #formModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {{ action === 'create' ? 'Nouveau Mode de Paiement' : 'Modifier le Mode de Paiement' }}
+    </h5>
+    <button type="button" class="btn-close" 
+            (click)="modal.dismiss()" 
+            [disabled]="submitting"></button>
+  </div>
+  
+  <div class="modal-body">
+    <form [formGroup]="modePaiementForm" (ngSubmit)="action === 'create' ? creerModePaiement() : modifierModePaiement()">
+      <!-- Champ Désignation -->
+      <div class="mb-3">
+        <label for="designation" class="form-label">
+          Désignation <span class="text-danger">*</span>
+        </label>
+        <input type="text" 
+               id="designation"
+               class="form-control" 
+               formControlName="designation"
+               placeholder="Saisir la désignation du mode de paiement"
+               [class.is-invalid]="designation?.invalid && designation?.touched">
+        
+        <!-- Messages d'erreur -->
+        <div class="invalid-feedback" *ngIf="designation?.errors?.['required'] && designation?.touched">
+          La désignation est obligatoire
+        </div>
+        <div class="invalid-feedback" *ngIf="designation?.errors?.['minlength'] && designation?.touched">
+          La désignation doit contenir au moins 2 caractères
+        </div>
+        <div class="invalid-feedback" *ngIf="designation?.errors?.['maxlength'] && designation?.touched">
+          La désignation ne peut pas dépasser 100 caractères
+        </div>
+      </div>
+
+      <!-- Actions du formulaire -->
+      <div class="d-flex justify-content-end gap-2 pt-3">
+        <button type="button" 
+                class="btn btn-secondary" 
+                (click)="modal.dismiss()"
+                [disabled]="submitting">
+          Annuler
+        </button>
+        <button type="submit" 
+                class="btn btn-primary"
+                [disabled]="modePaiementForm.invalid || submitting">
+          <span *ngIf="submitting" class="spinner-border spinner-border-sm me-2"></span>
+          {{ submitting ? 'Traitement...' : (action === 'create' ? 'Créer' : 'Modifier') }}
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+
+<!-- Modal de suppression -->
+<ng-template #deleteModal let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title text-danger">
+      <i class="bx bx-trash me-2"></i>
+      Confirmation de suppression
+    </h5>
+    <button type="button" class="btn-close" 
+            (click)="modal.dismiss()"
+            [disabled]="submitting"></button>
+  </div>
+  
+  <div class="modal-body">
+    <div class="text-center mb-3">
+      <i class="bx bx-error-circle display-4 text-danger"></i>
+    </div>
+    
+    <p class="text-center mb-0">
+      Êtes-vous sûr de vouloir supprimer l'unite
+      <strong>"{{ selectedModePaiement?.designation }}"</strong> ?
+    </p>
+    <p class="text-center text-muted small mt-2 mb-0">
+      Cette action est irréversible.
+    </p>
+  </div>
+  
+  <div class="modal-footer justify-content-center">
+    <button type="button" 
+            class="btn btn-secondary" 
+            (click)="modal.dismiss()"
+            [disabled]="submitting">
+      Annuler
+    </button>
+    <button type="button" 
+            class="btn btn-danger"
+            (click)="supprimerModePaiement()"
+            [disabled]="submitting">
+      <span *ngIf="submitting" class="spinner-border spinner-border-sm me-2"></span>
+      {{ submitting ? 'Suppression...' : 'Supprimer' }}
+    </button>
+  </div>
+</ng-template>

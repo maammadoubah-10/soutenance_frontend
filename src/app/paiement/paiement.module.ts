@@ -20,6 +20,18 @@ import { TypeRetenusComponent } from './type-retenus/type-retenus.component';
 import { SingleTypeRetenuComponent } from './type-retenus/single-type-retenu/single-type-retenu.component';
 import { RetenusComponent } from './retenus/retenus.component';
 import { ModepaiementComponent } from './modepaiement/modepaiement.component';
+import { UniteComponent } from './unite/unite.component';
+import { EchelonsComponent } from './echelons/echelons.component';
+import { SingleEchelonComponent } from './echelons/single-echelon/single-echelon.component';
+import { CategoriesComponent } from './categories/categories.component';
+import { SingleCategoryComponent } from './categories/single-category/single-category.component';
+import { AvancementsComponent } from './avancements/avancements.component';
+import { AutorisationsComponent } from './autorisations/autorisations.component';
+import { TypeAutorisationsComponent } from './type-autorisations/type-autorisations.component';
+import { SingleTypeAutorisationComponent } from './type-autorisations/single-type-autorisation/single-type-autorisation.component';
+import { PrimesComponent } from './primes/primes.component';
+import { TypeEtatsComponent } from './type-etats/type-etats.component';
+import { SingleTypeEtatComponent } from './type-etats/single-type-etat/single-type-etat.component';
 @NgModule({
   declarations: [
     PaiementComponent,
@@ -29,6 +41,18 @@ import { ModepaiementComponent } from './modepaiement/modepaiement.component';
     SingleTypeRetenuComponent,
     RetenusComponent,
     ModepaiementComponent,
+    UniteComponent,
+    EchelonsComponent,
+    SingleEchelonComponent,
+    CategoriesComponent,
+    SingleCategoryComponent,
+    AvancementsComponent,
+    AutorisationsComponent,
+    TypeAutorisationsComponent,
+    SingleTypeAutorisationComponent,
+    PrimesComponent,
+    TypeEtatsComponent,
+    SingleTypeEtatComponent
   ],
   imports: [
     CommonModule,

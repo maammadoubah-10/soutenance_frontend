@@ -1,0 +1,209 @@
+<app-titredepage title="Primes" [items]="items"></app-titredepage>
+
+<div class="bg-white p-3 mt-2">
+
+    <h4 class="card-title">Liste des primes</h4>
+    <p class="card-title-desc">Ce tableau presente la liste des <span class="text-danger">primes</span></p>
+
+
+    <div class="row g-3 ">
+        <div class="col-md-1">
+            <select name="perPage" [(ngModel)]="perPage" id="" class="form-control text-center">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <div class="col-md-3 offset-md-8">
+            <button class="btn btn-primary rounded-pill float-end" (click)="initAction(null, '', content)">
+                <i class="bx bx-plus"></i>
+                Ajouter un nouveau
+            </button>
+        </div>
+    </div>
+
+
+    <table class="table table-bordered table-hover mt-3 bg-white dt-responsive nowrap  no-footer dtr-inline">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Prime</th>
+                <th>Montant</th>
+                <th>Catégorie</th>
+                <th>Poste</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngFor="let prime of primes | paginate: { itemsPerPage: perPage, currentPage: p }; let i=index">
+                <tr (click)="show(prime)">
+                    <th scope="row">{{ i + 1 + (perPage * (p - 1)) }}</th>
+                    <td>{{ prime.typePrime.designation }}</td>
+                    <td>{{ prime.montant }} XOF</td>
+                    <td>{{ prime?.categorie?.categorie }}</td>
+                    <td>{{ prime?.poste?.designation }}</td>
+                    <td (click)="$event.stopPropagation()">
+                        <i class="bx bx-edit ms-3 fs-5 btn btn-success" type="button" (click)="initAction(prime, 'edit', edit)"></i>
+                        <i class="bx bx-trash ms-3 fs-5 btn btn-danger" type="button" (click)="initAction(prime, 'delete', delete)"></i>
+                    </td>
+                </tr>
+            </ng-container>
+        </tbody>
+    </table>
+    <pagination-controls (pageChange)="p = $event" previousLabel="Precedent" nextLabel="Suivant"></pagination-controls>
+</div>
+
+
+
+
+
+
+<!-- ADD prime MODAL  -->
+<ng-template #content role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Formulaire d'ajout de prime</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="primeForm" (ngSubmit)="createPrime()">
+            <div>
+                <label for="montant">Montant</label>
+                <input type="number" formControlName="montant" name="montant" class="form-control" id="montant">
+                <span *ngIf="montant && montant.invalid && montant.touched" class="error">Vérifier ce champs</span>
+            </div>
+            <div class="mt-3">
+                <label for="typePrime">Type de prime</label>
+                <select formControlName="typePrime" name="typePrime" class="form-control" id="typePrime">
+                <option *ngFor="let typePrime of typePrimes" [ngValue]="typePrime.id">{{ typePrime.designation }}</option>
+              </select>
+            </div>
+
+            <h6 class="mt-3">Prime associer à : </h6>
+            <div class="hstack mt-2">
+                <div>
+                    <input type="radio" name="type" id="type1" value="poste" formControlName="type">
+                    <label for="type1" class="ms-3">Poste</label>
+                </div>
+                <div class="ms-5">
+                    <input type="radio" name="type" id="type2" value="categorie" formControlName="type">
+                    <label for="type2" class="ms-3">Catégorie</label>
+                </div>
+            </div>
+
+            <div class="mt-2" *ngIf="type?.value === 'poste'">
+                <label for="poste">Poste</label>
+                <select formControlName="poste" name="poste" class="form-control" id="poste">
+                  <option *ngFor="let poste of postes" [ngValue]="poste.id">{{ poste.designation }}</option>
+                </select>
+            </div>
+            <div class="mt-2" *ngIf="type?.value === 'categorie'">
+                <label for="categorie">Catégorie</label>
+                <select formControlName="categorie" name="categorie" class="form-control" id="categorie">
+                  <option *ngFor="let categorie of categories" [ngValue]="categorie.id">{{ categorie.categorie }}</option>
+                </select>
+            </div>
+
+            <ng-container *ngIf="!loading; else elseTemplate">
+                <div class="mt-3 hstack">
+                    <span class="btn btn-secondary me-2 border" (click)="clear()">Effacer</span>
+                    <button [disabled]="!primeForm.valid" class="btn btn-primary">Sauvegarder</button>
+                </div>
+            </ng-container>
+            <ng-template #elseTemplate>
+                <div class="text-center mt-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </ng-template>
+        </form>
+    </div>
+</ng-template>
+
+
+
+
+
+<!-- UPDATE prime MODAL  -->
+<ng-template #edit role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Formulaire de modification du prime</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="primeForm" (ngSubmit)="updatePrime()">
+            <div>
+                <label for="montant">Montant</label>
+                <input type="number" formControlName="montant" name="montant" class="form-control" id="montant">
+                <span *ngIf="montant && montant.invalid && montant.touched" class="error">Vérifier ce champs</span>
+            </div>
+            <div class="mt-3">
+                <label for="typePrime">Type de prime</label>
+                <select formControlName="typePrime" name="typePrime" class="form-control" id="typePrime">
+                <option *ngFor="let typePrime of typePrimes" [ngValue]="typePrime.id">{{ typePrime.designation }}</option>
+              </select>
+            </div>
+            <h6 class="mt-3">Prime associer à : </h6>
+            <div class="hstack mt-2">
+                <div>
+                    <input type="radio" name="type" id="type11" value="poste" formControlName="type">
+                    <label for="type11" class="ms-3">Poste</label>
+                </div>
+                <div class="ms-5">
+                    <input type="radio" name="type" id="type22" value="categorie" formControlName="type">
+                    <label for="type22" class="ms-3">Catégorie</label>
+                </div>
+            </div>
+
+            <div class="mt-2" *ngIf="type?.value === 'poste'">
+                <label for="poste">Poste</label>
+                <select formControlName="poste" name="poste" class="form-control" id="poste">
+                  <option *ngFor="let poste of postes" [ngValue]="poste.id">{{ poste.designation }}</option>
+                </select>
+            </div>
+            <div class="mt-2" *ngIf="type?.value === 'categorie'">
+                <label for="categorie">Catégorie</label>
+                <select formControlName="categorie" name="categorie" class="form-control" id="categorie">
+                  <option *ngFor="let categorie of categories" [ngValue]="categorie.id">{{ categorie.categorie }}</option>
+                </select>
+            </div>
+            <ng-container *ngIf="!loading; else elseTemplate">
+                <div class="mt-3 hstack">
+                    <span class="btn btn-secondary me-2 border" (click)="clear()">Effacer</span>
+                    <button [disabled]="!primeForm.valid" class="btn btn-primary">Sauvegarder</button>
+                </div>
+            </ng-container>
+            <ng-template #elseTemplate>
+                <div class="text-center mt-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </ng-template>
+        </form>
+    </div>
+</ng-template>
+
+
+
+
+<!-- DELETE prime MODAL  -->
+<ng-template #delete role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Supprimer un prime</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <p *ngIf="!loading">Voulez-vous vraiment supprimer le prime {{ montant?.value }} ?</p>
+        <div *ngIf="loading" class="text-center mt-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button *ngIf="!loading" type="button" class="btn btn-danger" (click)="deletePrime()">Supprimer</button>
+        <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+    </div>
+</ng-template>

@@ -1,0 +1,127 @@
+<app-titredepage title="Categories" [items]="items"></app-titredepage>
+
+<div class="bg-white p-3 mt-2">
+
+    <h4 class="card-title">Liste des categories</h4>
+    <p class="card-title-desc">Ce tableau presente la liste des <span class="text-danger">categories</span></p>
+
+    <div class="row g-3 ">
+        <div class="col-md-1">
+            <select name="perPage" [(ngModel)]="perPage" id="" class="form-control text-center">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <div class="col-md-3 offset-md-8">
+            <button class="btn btn-primary float-end" (click)="initAction(null, '', formCategory)">
+                <i class="bx bx-plus"></i>
+                Ajouter un nouveau
+            </button>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-hover mt-3 bg-white dt-responsive nowrap  no-footer dtr-inline">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Designation</th>
+                <th>Unite</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngIf="categories && categories.length > 0">
+                <ng-container
+                    *ngFor="let category of categories | paginate: { itemsPerPage: perPage, currentPage: p }; let i=index">
+                    <tr (click)="show(category)">
+                        <th scope="row">{{ i + 1 + (perPage * (p - 1)) }}</th>
+                        <td>{{ category.designation }}</td>
+                        <td>{{ category?.unite?.designation }}</td>
+                        <td (click)="$event.stopPropagation()">
+                            <i class="bx bx-edit ms-3 fs-5 btn btn-success" type="button"
+                                (click)="initAction(category, 'edit', formCategory)"></i>
+                            <i class="bx bx-trash ms-3 fs-5 btn btn-danger" type="button"
+                                (click)="initAction(category, 'delete', delete)"></i>
+                        </td>
+                    </tr>
+                </ng-container>
+            </ng-container>
+        </tbody>
+    </table>
+    <pagination-controls (pageChange)="p = $event" previousLabel="Precedent" nextLabel="Suivant"></pagination-controls>
+</div>
+
+<!-- ADD category MODAL  -->
+<ng-template #formCategory role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"> {{ categoryForm.get('id')?.value == null ? 'Ajouter' :
+            'Modifier' }} une categorie</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <form [formGroup]="categoryForm" (ngSubmit)="traiteformCategory()">
+        <div class="modal-body">
+            <!-- <div>
+                <label for="categorie">Categorie</label>
+                <input type="text" formControlName="categorie" name="categorie" class="form-control" id="categorie">
+                <span class="error">{{ categorie?.getError("unique") }}</span>
+                <span *ngIf="categorie && categorie.invalid && categorie.touched && categorie.getError('unique') == ''" class="error">Vérifier ce champs</span>
+            </div> -->
+            <div>
+                <label for="designation">Designation</label>
+                <input type="text" formControlName="designation" name="designation" class="form-control"
+                    id="designation">
+                <span class="error">{{ categorie?.getError("unique") }}</span>
+                <span
+                    *ngIf="designation && designation.invalid && designation.touched && designation.getError('unique') == ''"
+                    class="error">Vérifier ce champs</span>
+            </div>
+
+            <div class="mt-3">
+                <label for="unite">Unite</label>
+                <ng-select formControlName="unite" name="unite">
+                    <ng-option *ngFor="let unite of unite" [value]="unite.id">{{ unite.designation
+                        }}</ng-option>
+                </ng-select>
+            </div>
+
+            <div class="modal-footer">
+                <ng-container *ngIf="!loading; else elseTemplate">
+                    <div class="mt-3 hstack">
+                        <span class="btn btn-secondary me-2 border" (click)="clear()">Effacer</span>
+                        <button [disabled]="!categoryForm.valid" class="btn btn-primary">{{
+                            categoryForm.get('id')?.value == null ? 'Ajouter' : 'Modifier' }}</button>
+                    </div>
+                </ng-container>
+                <ng-template #elseTemplate>
+                    <div class="text-center mt-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="sr-only">Loading...</span>
+                        </div>
+                    </div>
+                </ng-template>
+            </div>
+        </div>
+    </form>
+</ng-template>
+
+<!-- DELETE category MODAL  -->
+<ng-template #delete role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Supprimer un type contrat</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <p *ngIf="!loading">Voulez-vous vraiment supprimer le type contrat {{ categorie?.value }} ?</p>
+        <div *ngIf="loading" class="text-center mt-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button *ngIf="!loading" type="button" class="btn btn-danger" (click)="deleteCategory()">Supprimer</button>
+        <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+    </div>
+</ng-template>

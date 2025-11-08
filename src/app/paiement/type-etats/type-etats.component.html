@@ -1,0 +1,136 @@
+<app-titredepage title="Type prime" [items]="items"></app-titredepage>
+
+<div class="bg-white p-3 mt-2">
+
+    <h4 class="card-title">Liste des types etats</h4>
+    <p class="card-title-desc">Ce tableau presente la liste des <span class="text-danger">types etats</span></p>
+
+
+    <div class="row g-3 ">
+        <div class="col-md-1">
+            <select name="perPage" [(ngModel)]="perPage" id="" class="form-control text-center">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        </div>
+        <div class="col-md-3 offset-md-8">
+            <button class="btn btn-primary rounded-pill float-end" (click)="initAction(null, '', content)">
+            <i class="bx bx-plus"></i>
+            Ajouter un nouveau
+          </button>
+        </div>
+    </div>
+
+
+    <table class="table table-bordered table-hover mt-3 bg-white dt-responsive nowrap  no-footer dtr-inline">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Designation</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngFor="let typeEtat of typeEtats | paginate: { itemsPerPage: perPage, currentPage: p }; let i=index">
+                <tr (click)="show(typeEtat)">
+                    <th scope="row">{{ i + 1 + (perPage * (p - 1)) }}</th>
+                    <td>{{ typeEtat.designation }}</td>
+                    <td (click)="$event.stopPropagation()">
+                        <i class="bx bx-edit ms-3 fs-5 btn btn-success" type="button" (click)="initAction(typeEtat, 'edit', edit)"></i>
+                        <i class="bx bx-trash ms-3 fs-5 btn btn-danger" type="button" (click)="initAction(typeEtat, 'delete', delete)"></i>
+                    </td>
+                </tr>
+            </ng-container>
+        </tbody>
+    </table>
+    <pagination-controls (pageChange)="p = $event" previousLabel="Precedent" nextLabel="Suivant"></pagination-controls>
+</div>
+
+
+
+
+
+
+<!-- ADD typeEtat MODAL  -->
+<ng-template #content role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Formulaire d'ajout de type etat</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="typeEtatForm" (ngSubmit)="createTypeEtat()">
+            <div>
+              <label for="">Designation</label>
+              <input type="text" formControlName="designation" name="designation" class="form-control" name="" id="">
+              <span class="error">{{ designation?.getError("unique") }}</span>
+              <span *ngIf="designation && designation.invalid && designation.touched && designation.getError('unique') == ''" class="error">Vérifier ce champs</span>
+            </div>
+            <ng-container *ngIf="!loading; else elseTemplate">
+                <div class="mt-3 hstack">
+                    <span class="btn btn-secondary me-2 border" (click)="clear()">Effacer</span>
+                    <button [disabled]="!typeEtatForm.valid" class="btn btn-primary">Sauvegarder</button>
+                </div>
+            </ng-container>
+            <ng-template #elseTemplate>
+                <div class="text-center mt-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </ng-template>
+        </form>
+    </div>
+</ng-template>
+
+<!-- UPDATE typeEtat MODAL  -->
+<ng-template #edit role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Formulaire de modification du type etat</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="typeEtatForm" (ngSubmit)="updateTypeEtat()">
+            <div>
+              <label for="">Designation</label>
+              <input type="text" formControlName="designation" name="designation" class="form-control" name="" id="">
+              <span class="error">{{ designation?.getError("unique") }}</span>
+              <span *ngIf="designation && designation.invalid && designation.touched && designation.getError('unique') == ''" class="error">Vérifier ce champs</span>
+            </div>
+            <ng-container *ngIf="!loading; else elseTemplate">
+                <div class="mt-3 hstack">
+                    <span class="btn btn-secondary me-2 border" (click)="clear()">Effacer</span>
+                    <button [disabled]="!typeEtatForm.valid" class="btn btn-primary">Sauvegarder</button>
+                </div>
+            </ng-container>
+            <ng-template #elseTemplate>
+                <div class="text-center mt-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </ng-template>
+        </form>
+    </div>
+</ng-template>
+
+<!-- DELETE typeEtat MODAL  -->
+<ng-template #delete role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Supprimer un type etat</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <p *ngIf="!loading">Voulez-vous vraiment supprimer le type etat {{ designation?.value }} ?</p>
+        <div *ngIf="loading" class="text-center mt-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button *ngIf="!loading" type="button" class="btn btn-danger" (click)="deleteTypeEtat()">Supprimer</button>
+        <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+    </div>
+</ng-template>

@@ -50,6 +50,12 @@ export const MENU: MenuItem[] = [
         link: 'retenus',
     },
     {
+        id: 10,
+        label: 'Unites',
+        icon: 'bx-car',
+        link: 'unite',
+    },
+    {
         id: 5,
         label: 'Etats',
         icon: 'bx-car',

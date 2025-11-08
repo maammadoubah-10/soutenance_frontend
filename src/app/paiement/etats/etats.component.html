@@ -1,0 +1,237 @@
+<app-breadcrumb section="Définition" pageName="Liste des etats"></app-breadcrumb>
+
+<div class="bg-white p-3 mt-2 overflow-auto">
+
+    <h4 class="card-title">Liste des etats</h4>
+    <p class="card-title-desc">Ce tableau presente la liste des <span class="text-danger">etats</span></p>
+
+
+    <div class="row g-3 ">
+        <div class="col-md-1">
+            <select name="perPage" [(ngModel)]="perPage" id="" class="form-control text-center">
+          <option value="10">10</option>
+          <option value="25">25</option>
+          <option value="50">50</option>
+          <option value="100">100</option>
+        </select>
+        </div>
+        <div class="col-md-3 offset-md-8">
+            <!-- <button class="btn btn-primary rounded-pill float-end" (click)="initAction(null, '', content)">
+            <i class="bx bx-plus"></i>
+            Ajouter un nouveau
+          </button> -->
+          <div class="col-3">
+            <button class="btn btn-primary my-3" (click)="downloadAsPDF1()">Exporter en PDF</button>
+        </div>
+        </div> 
+      
+
+    </div>
+
+    <div  id="pdfTable" #pdfTable>
+        <div class="d-flex align-items-center mb-5">
+            <div style="height: 150px; width: 50%;">
+                <img src="assets/images/logo_onip.jpg" style="height: 100%; width: 100%; object-fit: cover;" alt="">
+            </div>
+            <h1 class="ms-5" style="font-size: 44px;">Fiche de salaire</h1>
+        </div>
+        <table class="table table-bordered border-dark table-hover mt-3 bg-white dt-responsive  no-footer dtr-inline">
+            
+            <thead>
+                <tr style="font-size: 12px;">
+                    <th>#</th>
+                    <th class="text-center">Personnel</th>
+                    <th class="text-center">Salaire de base</th>
+                    <th class="text-center">Indem. de résid</th>
+                    <th class="text-center">Rappel Sal. + Ind. Rés</th>
+                    <th class="text-center">Prime de logement</th>
+                    <th class="text-center">Prime d'Elect. Et Eau</th>
+                    <th class="text-center">Prime de Risq. Prof. (Satur.)</th>
+                    <th class="text-center">Prime de Tech.</th>
+                    <th class="text-center">Prime de Resp.</th>
+                    <th class="text-center">Prime d'Habil.</th>
+                    <th class="text-center">Prime de nuit + rap.</th>
+                    <th class="text-center">Prime de Téléphone</th>
+                    <th class="text-center">Prime de Caisse</th>
+                    <th class="text-center">Prime de Pharmacie</th>
+                    <th class="text-center">Prime d'amor.</th>
+                    <th class="text-center">Carburant</th>
+                    <!-- <th class="text-center">Gratification</th> -->
+                    <th class="text-center">Prime de sujétion</th>
+                    <th class="text-center">Indem. de domes</th>
+                    <!-- <th class="text-center">Heures suppl.</th>
+                    <th class="text-center">Entrennes</th> -->
+                    <th class="text-center">Salaire Brut</th>
+                    <th class="text-center">Retenue CNSS</th>
+                    <th class="text-center">Retenue IPTS</th>
+                    <!-- <th class="text-center">Prêt Collec. inter.</th>
+                    <th class="text-center">Avance Divers</th>
+                    <th class="text-center">Prêt Collec. Banque</th>
+                    <th class="text-center">Santé</th>
+                    <th class="text-center">Oppo. et log. assuré</th>
+                    <th class="text-center">Divers achats</th>
+                    <th class="text-center">Trop perçu</th>
+                    <th class="text-center">Moins perçu</th> -->
+                    <th class="text-center">Net à payer</th>
+                </tr>
+            </thead>
+            <tbody>
+                <ng-container *ngFor="let bulletinSalaire of bulletinsSalaire | paginate: { itemsPerPage: perPage, currentPage: p }; let i=index">
+                    <tr style="font-size: 12px;">
+                        <td scope="row">{{ i + 1 + (perPage * (p - 1)) }}</td>
+                        <td class="text-center"> {{ bulletinSalaire?.personnel.nom + " " +  bulletinSalaire?.personnel.prenom }} </td>
+                        <td class="text-center"> {{ bulletinSalaire?.salaireDeBase }} </td>
+                        <td class="text-center"> {{ bulletinSalaire?.primes['Indeminité de résidence'] }}</td>
+                        <td class="text-center"> {{ bulletinSalaire?.primes['Indeminité de résidence'] != null ? bulletinSalaire?.primes['Indeminité de résidence'] + bulletinSalaire?.salaireDeBase : "" }}</td>
+                        <td class="text-center"> {{ bulletinSalaire?.primes['Prime de logement'] }}</td>
+                        <td class="text-center"> {{ bulletinSalaire?.primes['Prime d\'électricité et d\'eau'] }} </td>
+                        <td class="text-center"> {{ bulletinSalaire?.primes['Prime de risque (Saturnisme)'] }} </td>
+                        <td class="text-center"> {{ bulletinSalaire?.primes['Prime de Technicité'] }}</td>
+                        <td class="text-center"> {{ bulletinSalaire?.primes['Prime de Responsabilité'] }}</td>
+                        <td class="text-center"> {{ bulletinSalaire?.primes['Prime d\'habillement'] }}</td>
+                        <td class="text-center"> {{ bulletinSalaire?.primes['Prime d\'endurance pour travaux de nuit'] }}</td>
+                        <td class="text-center"> {{ bulletinSalaire?.primes['Prime de Téléphone'] }}</td>
+                        <td class="text-center"> {{ bulletinSalaire?.primes['Prime de Caisse'] }}</td>
+                        <td class="text-center"> {{ bulletinSalaire?.primes['Prime de Pharmacie'] }}</td>
+                        <td class="text-center"> {{ bulletinSalaire?.primes['Prime d\'amortissement et d\'entretien de véhicules'] }}</td>
+                        <td class="text-center"> {{ bulletinSalaire?.primes['Dotation en Carburant'] }}</td>
+                        <!-- <td class="text-center">Gratification</td> -->
+                        <td class="text-center"> {{ bulletinSalaire?.primes['Prime de sujétion'] }}</td>
+                        <td class="text-center"> {{ bulletinSalaire?.primes['Prime de domesticité'] }}</td>
+                        <!-- <td class="text-center">Heures suppl.</td>
+                        <td class="text-center">Entrennes</td> -->
+                        <td class="text-center"> {{ bulletinSalaire?.salaireBrut }} </td>
+                        <td class="text-center">{{ bulletinSalaire?.prelevements['CNSS'] *  bulletinSalaire?.salaireDeBase  }}</td>
+                        <td class="text-center">{{ bulletinSalaire?.prelevements['ITS'] }}</td>
+                        <!-- <td class="text-center">Prêt Collec. inter.</td>
+                        <td class="text-center">Avance Divers</td>
+                        <td class="text-center">Prêt Collec. Banque</td>
+                        <td class="text-center">Santé</td>
+                        <td class="text-center">Oppo. et log. assuré</td>
+                        <td class="text-center">Divers achats</td>
+                        <td class="text-center">Trop perçu</td>
+                        <td class="text-center">Moins perçu</td> -->
+                        <td class="text-center">{{ bulletinSalaire?.salaireNet }} </td>
+                    </tr>
+                </ng-container>
+            </tbody>
+        </table>
+    </div>
+    <pagination-controls (pageChange)="p = $event" previousLabel="Precedent" nextLabel="Suivant"></pagination-controls>
+</div>
+
+<!-- ADD etat MODAL  -->
+<ng-template #content role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Formulaire d'ajout d'etat</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="etatForm" (ngSubmit)="createEtat()">
+            <div>
+                <label for="dateDebut">Date debut</label>
+                <input type="date" formControlName="dateDebut" name="dateDebut" class="form-control" id="">
+                <span *ngIf="dateDebut && dateDebut.invalid && dateDebut.touched" class="error">Vérifier ce champs</span>
+            </div>
+            <div class="mt-3">
+                <label for="dateFin">Date fin</label>
+                <input type="date" formControlName="dateFin" name="dateFin" class="form-control" id="">
+                <span *ngIf="dateFin && dateFin.invalid && dateFin.touched" class="error">Vérifier ce champs</span>
+            </div>
+            <div class="mt-3">
+                <label for="entite">Entite</label>
+                <select formControlName="entite" name="entite" class="form-control" id="entite">
+                  <option *ngFor="let entite of entites" [ngValue]="entite.id">{{ entite.designation }}</option>
+                </select>
+            </div>
+            <div class="mt-3">
+                <label for="typeEtat">Type etat</label>
+                <select formControlName="typeEtat" name="typeEtat" class="form-control" id="entite">
+                  <option *ngFor="let typeEtat of typeEtats" [ngValue]="typeEtat.id">{{ typeEtat.designation }}</option>
+                </select>
+            </div>
+            <ng-container *ngIf="!loading; else elseTemplate">
+                <div class="mt-3 hstack">
+                    <span class="btn btn-secondary me-2 border" (click)="clear()">Effacer</span>
+                    <button [disabled]="!etatForm.valid" class="btn btn-primary">Sauvegarder</button>
+                </div>
+            </ng-container>
+            <ng-template #elseTemplate>
+                <div class="text-center mt-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </ng-template>
+        </form>
+    </div>
+</ng-template>
+
+
+<!-- UPDATE etat MODAL  -->
+<ng-template #edit role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Formulaire de modification du etat</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <form [formGroup]="etatForm" (ngSubmit)="updateEtat()">
+            <div>
+                <label for="dateDebut">Date debut </label>
+                <input type="date" formControlName="dateDebut" name="dateDebut" class="form-control" id="">
+                <span *ngIf="dateDebut && dateDebut.invalid && dateDebut.touched" class="error">Vérifier ce champs</span>
+            </div>
+            <div class="mt-3">
+                <label for="dateFin">Date fin</label>
+                <input type="date" formControlName="dateFin" name="dateFin" class="form-control" id="">
+                <span *ngIf="dateFin && dateFin.invalid && dateFin.touched" class="error">Vérifier ce champs</span>
+            </div>
+            <div class="mt-3">
+                <label for="entite">Entite</label>
+                <select formControlName="entite" name="entite" class="form-control" id="entite">
+                  <option *ngFor="let entite of entites" [ngValue]="entite.id">{{ entite.designation }}</option>
+                </select>
+            </div>
+            <div class="mt-3">
+                <label for="typeEtat">Type etat</label>
+                <select formControlName="typeEtat" name="typeEtat" class="form-control" id="entite">
+                  <option *ngFor="let typeEtat of typeEtats" [ngValue]="typeEtat.id">{{ typeEtat.designation }}</option>
+                </select>
+            </div>
+            <ng-container *ngIf="!loading; else elseTemplate">
+                <div class="mt-3 hstack">
+                    <span class="btn btn-secondary me-2 border" (click)="clear()">Effacer</span>
+                    <button [disabled]="!etatForm.valid" class="btn btn-primary">Sauvegarder</button>
+                </div>
+            </ng-container>
+            <ng-template #elseTemplate>
+                <div class="text-center mt-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </ng-template>
+        </form>
+    </div>
+</ng-template>
+
+
+<!-- DELETE etat MODAL  -->
+<ng-template #delete role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Supprimer un etat</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <p *ngIf="!loading">Voulez-vous vraiment supprimer l'etat {{ dateDebut.value }}-{{ dateFin.value }} ?</p>
+        <div *ngIf="loading" class="text-center mt-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button *ngIf="!loading" type="button" class="btn btn-danger" (click)="deleteEtat()">Supprimer</button>
+        <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+    </div>
+</ng-template>

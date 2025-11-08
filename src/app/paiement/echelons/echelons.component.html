@@ -1,0 +1,148 @@
+<app-titredepage title="Echelons" [items]="items"></app-titredepage>
+
+<div class="bg-white p-3 mt-2">
+
+    <h4 class="card-title">Liste des echelons</h4>
+    <p class="card-title-desc">Ce tableau presente la liste des <span class="text-danger">echelons</span></p>
+
+
+    <div class="row g-3 ">
+        <div class="col-md-1">
+            <select name="perPage" [(ngModel)]="perPage" id="" class="form-control text-center">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <div class="col-md-3 offset-md-8">
+            <button class="btn btn-primary float-end" (click)="initAction(null, '', formEchelon)">
+                <i class="bx bx-plus"></i>
+                Ajouter un nouveau
+            </button>
+        </div>
+    </div>
+
+
+    <table class="table table-bordered table-hover mt-3 bg-white dt-responsive nowrap no-footer dtr-inline">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Echelon</th>
+                <th>Designation</th>
+                <th>Unite</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngIf="echelons && echelons.length > 0">
+                <ng-container
+                    *ngFor="let echelon of echelons | paginate: { itemsPerPage: perPage, currentPage: p }; let i=index">
+                    <tr (click)="show(echelon)">
+                        <th scope="row">{{ i + 1 + (perPage * (p - 1)) }}</th>
+                        <!-- CORRECTION ICI : echelon.designation au lieu de echelon.echelon -->
+                        <td>{{ echelon.echelon }}</td>
+                        <td>{{ echelon.designation }}</td>
+                        <td>{{ echelon?.unite?.designation }}</td>
+                        <td (click)="$event.stopPropagation()">
+                            <i class="bx bx-edit ms-3 fs-5 btn btn-success" type="button"
+                                (click)="initAction(echelon, 'edit', formEchelon)"></i>
+                            <i class="bx bx-trash ms-3 fs-5 btn btn-danger" type="button"
+                                (click)="initAction(echelon, 'delete', delete)"></i>
+                        </td>
+                    </tr>
+                </ng-container>
+            </ng-container>
+
+            <!-- Ajout d'un état vide pour mieux gérer l'absence de données -->
+            <tr *ngIf="echelons && echelons.length === 0">
+                <td colspan="3" class="text-center text-muted py-3">
+                    Aucun échelon trouvé
+                </td>
+            </tr>
+
+            <!-- État de chargement -->
+            <tr *ngIf="!echelons">
+                <td colspan="3" class="text-center text-muted py-3">
+                    Chargement en cours...
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <pagination-controls (pageChange)="p = $event" previousLabel="Precedent" nextLabel="Suivant"></pagination-controls>
+</div>
+
+<!-- ADD echelon MODAL  -->
+<ng-template #formEchelon role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel"> {{ echelonForm.get('id')?.value == null ? 'Ajouter' :
+            'Modifier'}} echelon</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <form [formGroup]="echelonForm" (ngSubmit)="traiteformEchelon()">
+        <div class="modal-body">
+            <div>
+                <label for="echelon">Echelon</label>
+                <input type="number" formControlName="echelon" name="echelon" class="form-control" id="echelon">
+                <span class="error">{{ echelon?.getError("unique") }}</span>
+                <span *ngIf="echelon && echelon.invalid && echelon.touched && echelon.getError('unique') == ''"
+                    class="error">Vérifier ce champs</span>
+            </div>
+
+            <div>
+                <label for="designation">Designation</label>
+                <input type="text" formControlName="designation" name="designation" class="form-control"
+                    id="designation">
+                <span class="error">{{ echelon?.getError("unique") }}</span>
+                <span
+                    *ngIf="designation && designation.invalid && designation.touched && designation.getError('unique') == ''"
+                    class="error">Vérifier ce champs</span>
+            </div>
+
+            <div class="mt-3">
+                <label for="unite">Unite</label>
+                <ng-select formControlName="unite" name="unite">
+                    <ng-option *ngFor="let personnel of unite" [value]="personnel.id">{{ personnel.designation
+                        }}</ng-option>
+                </ng-select>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <ng-container *ngIf="!loading; else elseTemplate">
+                <div class="mt-3 hstack">
+                    <span class="btn btn-secondary me-2 border" (click)="clear()">Effacer</span>
+                    <button [disabled]="!echelonForm.valid" class="btn btn-primary">{{ echelonForm.get('id')?.value ==
+                        null ? 'Ajouter' : 'Modifier'}}</button>
+                </div>
+            </ng-container>
+            <ng-template #elseTemplate>
+                <div class="text-center mt-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </ng-template>
+        </div>
+    </form>
+</ng-template>
+
+
+<!-- DELETE echelon MODAL  -->
+<ng-template #delete role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Supprimer un echelon</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <p *ngIf="!loading">Voulez-vous vraiment supprimer l'echelon {{ echelon?.value }} ?</p>
+        <div *ngIf="loading" class="text-center mt-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button *ngIf="!loading" type="button" class="btn btn-danger" (click)="deleteEchelon()">Supprimer</button>
+        <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+    </div>
+</ng-template>

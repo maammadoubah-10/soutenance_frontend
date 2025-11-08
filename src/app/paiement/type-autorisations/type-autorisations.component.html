@@ -1,0 +1,101 @@
+<app-titredepage title="Autorisations" [items]="items"></app-titredepage>
+
+<div class="bg-white p-3 mt-2">
+
+    <h4 class="card-title">Liste des types autorisations</h4>
+    <p class="card-title-desc">Ce tableau presente la liste des <span class="text-danger">types autorisations</span></p>
+
+
+    <div class="row g-3">
+        <div class="col-md-1">
+            <select name="perPage" [(ngModel)]="perPage" id="" class="form-control text-center">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
+        </div>
+        <div class="col-md-3 offset-md-8">
+            <button class="btn btn-primary float-end" (click)="initAction(null, '', formTypeAutorisation)">
+                <i class="bx bx-plus"></i>
+                Ajouter un nouveau
+            </button>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-hover mt-3 bg-white dt-responsive nowrap  no-footer dtr-inline">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Designation</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngFor="let typeAutorisation of typeAutorisations | paginate: { itemsPerPage: perPage, currentPage: p }; let i=index">
+                <tr (click)="show(typeAutorisation)">
+                    <th scope="row">{{ i + 1 + (perPage * (p - 1)) }}</th>
+                    <td>{{ typeAutorisation.designation }}</td>
+                    <td (click)="$event.stopPropagation()">
+                        <i class="bx bx-edit ms-3 fs-5 btn btn-success" type="button" (click)="initAction(typeAutorisation, 'edit', formTypeAutorisation)"></i>
+                        <i class="bx bx-trash ms-3 fs-5 btn btn-danger" type="button" (click)="initAction(typeAutorisation, 'delete', delete)"></i>
+                    </td>
+                </tr>
+            </ng-container>
+        </tbody>
+    </table>
+    <pagination-controls (pageChange)="p = $event" previousLabel="Precedent" nextLabel="Suivant"></pagination-controls>
+</div>
+
+<!-- ADD typeAutorisation MODAL  -->
+<ng-template #formTypeAutorisation role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">{{ typeAutorisationForm.get('id')?.value == null ? 'Ajouter' : 'Modifier' }} type autorisation</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <form [formGroup]="typeAutorisationForm" (ngSubmit)="traiteFormTypeAutorisation()">
+        <div class="modal-body">
+            <div>
+                <label for="">Designation</label>
+                <input type="text" formControlName="designation" name="designation" class="form-control" name="" id="">
+                <span class="error">{{ designation?.getError("unique") }}</span>
+                <span *ngIf="designation && designation.invalid && designation.touched && designation.getError('unique') == ''" class="error">Vérifier ce champs</span>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <ng-container *ngIf="!loading; else elseTemplate">
+                <div class="mt-3 hstack">
+                    <span class="btn btn-secondary me-2 border" (click)="clear()">Effacer</span>
+                    <button [disabled]="!typeAutorisationForm.valid" class="btn btn-primary"> {{typeAutorisationForm.get('id')?.value == null ? 'Ajouter' : 'Modifier'}} </button>
+                </div>
+            </ng-container>
+            <ng-template #elseTemplate>
+                <div class="text-center mt-3">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+            </ng-template>  
+        </div>
+    </form>
+</ng-template>
+
+<!-- DELETE typeAutorisation MODAL  -->
+<ng-template #delete role="document" let-modal>
+    <div class="modal-header">
+        <h5 class="modal-title" id="editModalLabel">Supprimer un type autorisation</h5>
+        <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
+    </div>
+    <div class="modal-body">
+        <p *ngIf="!loading">Voulez-vous vraiment supprimer le type autorisation {{ designation?.value }} ?</p>
+        <div *ngIf="loading" class="text-center mt-3">
+            <div class="spinner-border text-primary" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+        </div>
+    </div>
+    <div class="modal-footer">
+        <button *ngIf="!loading" type="button" class="btn btn-danger" (click)="deleteTypeAutorisation()">Supprimer</button>
+        <button type="button" class="btn btn-light" (click)="modal.close('Close click')">Close</button>
+    </div>
+</ng-template>

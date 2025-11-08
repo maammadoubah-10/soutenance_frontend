@@ -1,0 +1,33 @@
+<app-titredepage title="Definition Type Etat " [items]="items"></app-titredepage>
+
+<div *ngIf="typeEtat != null" class="bg-white p-3 mt-2">
+
+    <h4 class="card-title">Liste des etats de {{ typeEtat.designation }}</h4>
+    <p class="card-title-desc">Ce tableau presente la liste des etats de <span class="text-danger">{{ typeEtat.designation }}</span></p>
+
+    <div class="table-responsive mt-4">
+      <table class="table table-bordered table-hover mt-3 bg-white dt-responsive nowrap  no-footer dtr-inline">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Date Debut</th>
+                <th>Date Fin</th>
+                <th>Entité</th>
+                <th>Type etat</th>
+            </tr>
+        </thead>
+        <tbody>
+            <ng-container *ngFor="let etat of etats; let i=index">
+                <tr>
+                    <th scope="row">{{ i + 1 }}</th>
+                    <td>{{ etat.dateDebut }}</td>
+                    <td>{{ etat.dateFin }}</td>
+                    <td>{{ etat.entite.designation }}</td>
+                    <td>{{ etat.typeEtat.designation }}</td>
+                </tr>
+            </ng-container>
+        </tbody>
+    </table>
+  </div>
+
+</div>
