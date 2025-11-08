@@ -119,4 +119,44 @@ export class PresenceService {
   supprimerPresence(id: number) {
     return this.httpClient.delete<any>(`${this.contextPath}/${id}`);
   }
+
+
+  private getMyPersonnelIdFromToken(): number | null {
+  const raw = sessionStorage.getItem('token') || localStorage.getItem('token') || '';
+  if (!raw) return null;
+  try {
+    const payload = JSON.parse(atob(raw.split('.')[1] || ''));
+    const id = payload?.personnelId ?? payload?.personnel_id ?? payload?.personnelID;
+    const asNum = typeof id === 'number' ? id : Number(id);
+    return Number.isFinite(asNum) ? asNum : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Mes présences (paginated) via /personnels/{id}/presences */
+listerMesPresences(
+  page = 0,
+  size = 10,
+  sortField = 'dateValidation',
+  sortDir: 'asc' | 'desc' = 'desc'
+) {
+  const meId = this.getMyPersonnelIdFromToken();
+  if (meId == null) {
+    // on renvoie un Observable qui échoue proprement
+    return this.httpClient.get<any>('__invalid__/no-token'); // forcera l'erreur catch côté component
+  }
+
+  const params = new HttpParams()
+    .set('page', page)
+    .set('size', size)
+    .set('sort', `${sortField},${sortDir}`);
+
+  // ⚠️ cette route correspond à PersonnelRelationsController.listPresences
+  return this.httpClient.get<any>(
+    `${this.base}/personnels/${meId}/presences`,
+    { observe: 'response', params }
+  );
+}
+
 }

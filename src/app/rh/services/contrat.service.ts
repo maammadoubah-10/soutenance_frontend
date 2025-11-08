@@ -65,4 +65,30 @@ export class ContratService {
     return this.httpClient.get(url, { responseType: 'arraybuffer', headers })
       .pipe(catchError(() => { throw new Error('Erreur HTTP lors du téléchargement.'); }));
   }
+
+
+  // src/app/rh/services/contrat.service.ts
+// 👇 Ajoute ces méthodes dans la classe ContratService
+
+/** Mes contrats (via JWT) */
+mesContrats(page = 0, size = 10, sort = 'desc') {
+  const url = `${this.contextPath}/moi?page=${page}&size=${size}&sort=${sort}`;
+  // @ts-ignore
+  return this.httpClient.get<any>(url, { observe: 'response' });
+}
+
+/** Contrats actifs (date fin null ou future) */
+contratsActifs(page = 0, size = 10, sort = 'desc') {
+  const url = `${this.contextPath}/actifs?page=${page}&size=${size}&sort=${sort}`;
+  // @ts-ignore
+  return this.httpClient.get<any>(url, { observe: 'response' });
+}
+
+/** Contrats expirés (date fin passée) */
+contratsExpires(page = 0, size = 10, sort = 'desc') {
+  const url = `${this.contextPath}/expires?page=${page}&size=${size}&sort=${sort}`;
+  // @ts-ignore
+  return this.httpClient.get<any>(url, { observe: 'response' });
+}
+
 }

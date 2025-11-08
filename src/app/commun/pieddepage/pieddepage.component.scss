@@ -1,0 +1,16 @@
+.app-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  background-color: #300360;
+  color: #fff; /* ✅ tout le texte en blanc */
+  z-index: 1040;
+}
+
+.footer-text {
+  color: #fff !important; /* ✅ force le texte du "Design & Develop..." à être blanc */
+}

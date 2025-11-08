@@ -55,6 +55,8 @@ import { RhDashboardComponent } from './rh-dashboard.component';
     PresenceComponent,
     RhDashboardComponent
     
+    
+    
   ],
   imports: [
     CommonModule,
@@ -74,7 +76,8 @@ import { RhDashboardComponent } from './rh-dashboard.component';
     //NgxPaginationModule,
     NgbTooltipModule,
     MatStepperModule ,
-    NgApexchartsModule
+    NgApexchartsModule,
+    
 ]
 })
 export class RhModule { }

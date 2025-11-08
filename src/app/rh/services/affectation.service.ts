@@ -61,4 +61,16 @@ export class AffectationService {
       { dateDebut }
     );
   }
+
+
+  listerMesAffectations(page = 0, size = 10, sort: string = 'id,desc') {
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('size', String(size))
+      .set('sort', String(sort));
+    return this.http.get<any>(`${this.contextPath}/moi`, {
+      observe: 'response',
+      params
+    });
+  }
 }

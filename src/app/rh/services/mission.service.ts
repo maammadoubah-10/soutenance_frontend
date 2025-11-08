@@ -95,6 +95,14 @@ public listerMissionPage(page: number, size: number, sort: string): Observable<M
   return this.httpClient.get<Mission>(url, { observe: 'response' });
 }
 
+public listerMesMissions(page: number, size: number, sort: string) {
+  const sortParam = (sort?.toLowerCase() === 'desc' || sort?.toLowerCase() === 'asc')
+    ? `id,${sort}` : (sort || 'id,desc');
+  const url = `${this.contextPath}/moi?page=${page}&size=${size}&sort=${encodeURIComponent(sortParam)}`;
+  // @ts-ignore
+  return this.httpClient.get<any>(url, { observe: 'response' });
+}
+
 
   public listerMissionRefusePage(page: number, size: number, sort: string): Observable<Mission> {
     const url = `${this.contextPath+'/rejetees'}?page=${page}&size=${size}&sort=${sort}`;

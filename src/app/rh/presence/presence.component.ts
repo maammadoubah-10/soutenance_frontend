@@ -5,7 +5,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { of, Observable } from 'rxjs';
 import { catchError, map, startWith } from 'rxjs/operators';
-
 import { PresenceService } from '../services/presence.service';
 import { PersonnelService } from '../services/personnel.service';
 import { Presence } from '../models/presence';

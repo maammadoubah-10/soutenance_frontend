@@ -28,6 +28,8 @@ const routes: Routes = [
 
       // ⬇️ Dashboard RH
       { path: 'tableaudebord', component: RhDashboardComponent },
+      { path: 'mon-dashboard', component: RhDashboardComponent},
+
 
       // ⬇️ Le reste des écrans RH
       { path: 'postes', component: PosteComponent },
@@ -43,6 +45,46 @@ const routes: Routes = [
       { path: 'missions/details/:id', component: DetailmissionComponent },
       { path: 'affectations', component: AffectationComponent },
       { path: 'presences', component: PresenceComponent },
+      { 
+        path: 'mes-presences',
+        loadComponent: () =>
+          import('./presence/mes-presences.component').then(m => m.MesPresencesComponent)
+      },
+// src/app/rh/rh-routing.module.ts
+        { 
+          path: 'mes-demandes',
+          loadComponent: () =>
+            import('./demande/mes-demandes.component').then(m => m.MesDemandesComponent)
+        },
+
+         {
+  path: 'mes-conges',
+  loadComponent: () =>
+    import('./conge/mes-conges.component').then(m => m.MesCongesComponent)
+},
+
+// ... routes existantes
+{
+  path: 'mes-affectations',
+  loadComponent: () =>
+    import('./affectation/mes-affectations.component')
+      .then(m => m.MesAffectationsComponent)
+},
+ 
+{
+  path: 'mes-missions',
+  loadComponent: () =>
+    import('./mission/mes-missions.component').then(m => m.MesMissionsComponent)
+},
+// src/app/rh/rh-routing.module.ts
+{
+  path: 'mes-contrats',
+  loadComponent: () =>
+    import('./contrat/mes-contrats.component').then(m => m.MesContratsComponent)
+},
+
+
+
     ],
   },
 ];

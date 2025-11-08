@@ -204,13 +204,20 @@ onFileSelected(event: any): void {
     }
   }
 
-private formatDateForInput(date: Date | string): string {
-  const dateObj = new Date(date);
-  const year = dateObj.getFullYear();
-  const month = ('0' + (dateObj.getMonth() + 1)).slice(-2);
-  const day = ('0' + dateObj.getDate()).slice(-2);
-  return `${year}-${month}-${day}`;
+private formatDateForInput(d?: string | Date | null): string {
+  if (!d) return '';                      // rien → chaîne vide (OK pour <input type="date">)
+  const s = typeof d === 'string' ? d.trim() : null;
+
+  // déjà au format YYYY-MM-DD ?
+  if (s && /^\d{4}-\d{2}-\d{2}$/.test(s)) return s;
+
+  // convertir string → Date si besoin
+  const dt = typeof d === 'string' ? new Date(d) : d;
+  if (isNaN(dt.getTime())) return '';     // sécurité si invalide
+
+  return dt.toISOString().slice(0, 10);   // YYYY-MM-DD
 }
+
 
 creeModifierConge() {
   let formData = new FormData();

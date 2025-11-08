@@ -7,7 +7,7 @@ import moment from 'moment';
 import { map, catchError, startWith, tap } from 'rxjs/operators';
 import { Observable, of } from 'rxjs';
 import { UtilisateurAuthentifie } from '../authentification/models/utilisateur-authentifie';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import {registerLocaleData} from "@angular/common";
 import localeFr from "@angular/common/locales/fr";
 import { AuthentificationService } from '../authentification/services/authentication.service';
@@ -23,7 +23,7 @@ export const SIDEBAR_TYPE = 'red';
 
 export class EspacedetravailComponent implements OnInit , AfterViewInit{
   year: number = new Date().getFullYear();
-  profilSrc :any;
+ // profilSrc :any;
   isHolidayToday: boolean = false;
   isHolidayTomorrow: boolean = false;
   holidayNameTomorrow: string = '';
@@ -31,7 +31,7 @@ export class EspacedetravailComponent implements OnInit , AfterViewInit{
   holidayNameNextDay: string = '';
   isRegularDay: boolean = false;
   motivationMessage: string = '';
-
+    profilSrc: SafeUrl | null = null;
  email: string | null = null;
   items?: Array<{}>;
   dataStateEnum = DataStateEnum;
@@ -132,7 +132,7 @@ export class EspacedetravailComponent implements OnInit , AfterViewInit{
   }
 
 
-  afficherImageDeProfil(image_de_profil: string) {
+  afficherImageDeProfil(image_de_profil?: string): void {
     if (!image_de_profil) return;
 
   const obs = this.authenficationSerice.recuperationDeImageDeProfil(image_de_profil);

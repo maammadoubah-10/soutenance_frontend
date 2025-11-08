@@ -1,10 +1,10 @@
 // src/app/.../services/conge.service.ts
 import { Injectable } from '@angular/core';
 import { environment } from "../../../environments/environment";
-import { HttpClient, HttpHeaders, HttpResponse } from "@angular/common/http";
+//import { HttpClient, HttpHeaders, HttpResponse } from "@angular/common/http";
 import { Observable } from "rxjs";
 import { Conge } from "../models/conge";
-
+import { HttpClient, HttpHeaders, HttpResponse, HttpParams } from "@angular/common/http";
 interface PageConge {
   content: Conge[];
   totalElements: number;
@@ -28,6 +28,14 @@ export class CongeService {
   rechercheCongePage(sort: string, designation: string): Observable<HttpResponse<PageConge>> {
     const url = `${this.contextPath}?sort=${sort}&designation=${designation}`;
     return this.httpClient.get<PageConge>(url, { observe: 'response' });
+  }
+
+    listerMesConges(page=0, size=10, sort='id,desc') {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sort', sort);
+    return this.httpClient.get<PageConge>(`${this.contextPath}/moi`, { observe: 'response', params });
   }
 
   rechercheConge(nom: string): Observable<HttpResponse<Conge[]>> {
