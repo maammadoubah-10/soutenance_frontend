@@ -1,63 +1,67 @@
+// src/app/.../services/conge.service.ts
 import { Injectable } from '@angular/core';
-import {environment} from "../../../environments/environment";
-import {HttpClient, HttpHeaders} from "@angular/common/http";
-import {Observable} from "rxjs";
-import {Conge} from "../models/conge";
+import { environment } from "../../../environments/environment";
+//import { HttpClient, HttpHeaders, HttpResponse } from "@angular/common/http";
+import { Observable } from "rxjs";
+import { Conge } from "../models/conge";
+import { HttpClient, HttpHeaders, HttpResponse, HttpParams } from "@angular/common/http";
+interface PageConge {
+  content: Conge[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+}
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class CongeService {
-
-  public contextPath: string = environment.hostmicroservicepersonnel + "conges";
+  public contextPath = environment.hostmicroservicepersonnel + "conges";
 
   constructor(private httpClient: HttpClient) {}
 
-  public listerCongePage(page: number, size: number, sort: string): Observable<Conge> {
+  // IMPORTANT: observe: 'response' et bon typage
+  listerCongePage(page: number, size: number, sort: string): Observable<HttpResponse<PageConge>> {
     const url = `${this.contextPath}?page=${page}&size=${size}&sort=${sort}`;
-    // @ts-ignore
-    return this.httpClient.get<Conges>(url, { observe: 'response' });
+    return this.httpClient.get<PageConge>(url, { observe: 'response' });
   }
 
-  public rechercheCongePage(sort: string, designation: string): Observable<Conge> {
-    const url = `${this.contextPath}?&sort=${sort}&designation=${designation}`;
-    // @ts-ignore
-    return this.httpClient.get<Conges>(url, { observe: 'response' });
+  rechercheCongePage(sort: string, designation: string): Observable<HttpResponse<PageConge>> {
+    const url = `${this.contextPath}?sort=${sort}&designation=${designation}`;
+    return this.httpClient.get<PageConge>(url, { observe: 'response' });
   }
 
-  public rechercheConge(nom: string): Observable<Conge> {
+    listerMesConges(page=0, size=10, sort='id,desc') {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sort', sort);
+    return this.httpClient.get<PageConge>(`${this.contextPath}/moi`, { observe: 'response', params });
+  }
+
+  rechercheConge(nom: string): Observable<HttpResponse<Conge[]>> {
     const url = `${this.contextPath}?nom=${nom}`;
-    // @ts-ignore
-    return this.httpClient.get<Conge>(url, { observe: 'response' });
+    return this.httpClient.get<Conge[]>(url, { observe: 'response' });
   }
 
-  public creerConge(data: any): Observable<Conge> {
-    return this.httpClient.post<Conge>(
-      this.contextPath,
-      data
-    );
+  creerConge(data: FormData): Observable<Conge> {
+    return this.httpClient.post<Conge>(this.contextPath, data);
   }
 
-  public modifierConge(id:any, data:any):Observable<Conge>{
-    return this.httpClient.patch<Conge>(
-      this.contextPath +"/"+id,data)
+  modifierConge(id: number, data: FormData): Observable<Conge> {
+    return this.httpClient.patch<Conge>(`${this.contextPath}/${id}`, data);
   }
 
-  public supprimerConge(id: number) {
-    return this.httpClient.delete<any>(this.contextPath + "/" + id);
+  supprimerConge(id: number) {
+    return this.httpClient.delete<void>(`${this.contextPath}/${id}`);
   }
 
-
-  telechargerTitreConge(id:number): Observable<any> {
-    const url = `${this.contextPath+'/'+id+'/telecharger'}`;
-    const headers = new HttpHeaders({ 'Content-Type': 'application/pdf' });
-    return this.httpClient.get(url, { responseType: 'arraybuffer', headers: headers });
+  telechargerTitreConge(id: number): Observable<ArrayBuffer> {
+    const url = `${this.contextPath}/${id}/telecharger`;
+    const headers = new HttpHeaders({ Accept: 'application/pdf' });
+    return this.httpClient.get(url, { responseType: 'arraybuffer', headers });
   }
 
-
-  public voirConge(id:number,){
-    return this.httpClient.get<any>(
-      this.contextPath+ '/'+id
-    )}
-
+  voirConge(id: number) {
+    return this.httpClient.get<Conge>(`${this.contextPath}/${id}`);
+  }
 }

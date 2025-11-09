@@ -56,6 +56,8 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
     PresenceComponent,
     RhDashboardComponent
     
+    
+    
   ],
   imports: [
     CommonModule,
@@ -77,6 +79,7 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
     MatStepperModule ,
     NgApexchartsModule,
     NgxExtendedPdfViewerModule,
+  
 ]
 })
 export class RhModule { }

@@ -33,7 +33,8 @@ export class AffectationComponent implements OnInit {
   total = 0;
   currentPage = 0;
   pageSize = 10;
-  sort = 'desc';
+  public sort: 'asc' | 'desc' = 'desc';
+
   pages: number[] = [];
   totalPages = 0;
 

@@ -1,18 +1,21 @@
 <div id="layout-wrapper">
-  <app-entetedepage (settingsButtonClicked)="onSettingsButtonClicked()"
-                    (mobileMenuButtonClicked)="onToggleMobileMenu()">
+  <app-entetedepage
+    (settingsButtonClicked)="onSettingsButtonClicked()"
+    (mobileMenuButtonClicked)="onToggleMobileMenu()">
   </app-entetedepage>
 
   <div class="layout-wrapper">
-    <div class="d-flex" style="min-height:calc(100vh - 70px);margin-top:70px">
+    <div class="d-flex main-container">
       <!-- Menu fixe -->
-      <app-menu style="flex:0 0 250px;width:250px;position:sticky;top:70px;height:calc(100vh - 70px);overflow-y:auto"></app-menu>
-      
-      <!-- Contenu avec scroll indépendant -->
-      <div class="flex-grow-1" style="min-width:0;padding:20px;background:#f6f9ff;overflow-y:auto;height:calc(100vh - 70px)">
+      <app-menu class="sidebar-fixed"></app-menu>
+
+      <!-- Contenu qui scrolle -->
+      <div class="content-scrollable">
         <router-outlet></router-outlet>
-        <app-pieddepage></app-pieddepage>
       </div>
     </div>
   </div>
+
+  <!-- ✅ Footer FIXE, hors du contenu scrollable -->
+  <app-pieddepage></app-pieddepage>
 </div>

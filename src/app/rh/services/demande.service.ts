@@ -1,174 +1,241 @@
 import { Injectable } from '@angular/core';
-import {environment} from "../../../environments/environment";
-import {HttpClient, HttpHeaders, HttpResponse} from "@angular/common/http";
-import {Observable} from "rxjs";
-import {Demande} from "../models/demande";
-import {catchError} from "rxjs/operators";
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpResponse,
+  HttpParams
+} from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../environments/environment';
+import { Demande } from '../models/demande';
 
-const httpOptions = {
-  headers: new HttpHeaders({ 'Content-Type': 'application/json' })
-};
-@Injectable({
-  providedIn: 'root'
-})
+const jsonHeaders = new HttpHeaders({ 'Content-Type': 'application/json' });
+
+/** Petite interface utilitaire pour les réponses paginées Spring Data */
+export interface PageResp<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;      // page courante (0-based)
+  size: number;        // taille page
+  sort?: any;
+}
+
+@Injectable({ providedIn: 'root' })
 export class DemandeService {
+  public contextPath = environment.hostmicroservicepersonnel + 'demandes';
 
-  public contextPath: string = environment.hostmicroservicepersonnel + "demandes";
+  constructor(private http: HttpClient) {}
 
-  constructor(private httpClient: HttpClient) {}
+  /** ----- Téléchargements (Blob) ----- */
+  telechargerFichier(demandeId: number): Observable<Blob> {
+    const url = `${this.contextPath}/${demandeId}/telecharger`;
+    const token = sessionStorage.getItem('token');
+    if (!token) throw new Error('Authorization token not found');
 
-  telechargerFichier(demandeId: number): Observable<ArrayBuffer> {
-    const url = `${this.contextPath}/${demandeId}/telecharger/`;
-
-    // Récupérer le token depuis la session storage
-    const authToken = sessionStorage.getItem("token");
-
-    // Vérifier si le token est présent
-    if (!authToken) {
-      throw new Error("Authorization token not found");
-    }
-
-    // Ajouter le token à l'en-tête
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${authToken}`
+    return this.http.get(url, {
+      responseType: 'blob',
+      headers: new HttpHeaders({ Authorization: `Bearer ${token}` })
     });
-
-    // Utilisation de la méthode HTTP GET pour télécharger le fichier
-    return this.httpClient.get(url, { responseType: 'arraybuffer', headers })
-      .pipe(
-        catchError(this.handleError)  // Gérer les erreurs si nécessaire
-      );
   }
 
-  telechargerFichierDemandeApresValidationDg(demandeId: number): Observable<ArrayBuffer> {
-    const url = `${this.contextPath}/${demandeId}/telechargerDemande/`;
+  telechargerFichierDemandeApresValidationDg(demandeId: number): Observable<Blob> {
+    const url = `${this.contextPath}/${demandeId}/telechargerDemande`;
+    const token = sessionStorage.getItem('token');
+    if (!token) throw new Error('Authorization token not found');
 
-    // Récupérer le token depuis la session storage
-    const authToken = sessionStorage.getItem("token");
-
-    // Vérifier si le token est présent
-    if (!authToken) {
-      throw new Error("Authorization token not found");
-    }
-
-    // Ajouter le token à l'en-tête
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${authToken}`
+    return this.http.get(url, {
+      responseType: 'blob',
+      headers: new HttpHeaders({ Authorization: `Bearer ${token}` })
     });
-
-    // Utilisation de la méthode HTTP GET pour télécharger le fichier
-    return this.httpClient.get(url, { responseType: 'arraybuffer', headers })
-      .pipe(
-        catchError(this.handleError)  // Gérer les erreurs si nécessaire
-      );
   }
 
-  private handleError(error: any): Observable<any> {
-    console.error('Une erreur s\'est produite:', error);
-    throw new Error('Une erreur s\'est produite lors de la requête HTTP.');
-  }
-  public listerDemandePage(page: number, size: number, sort: string): Observable<Demande> {
-    const url = `${this.contextPath+'/encours'}?page=${page}&size=${size}&sort=${sort}`;
-    // @ts-ignore
-    return this.httpClient.get<Demandes>(url, { observe: 'response' });
-  }
-
-  public listerDemandeRefusePage(page: number, size: number, sort: string): Observable<Demande> {
-    const url = `${this.contextPath+'/rejetees'}?page=${page}&size=${size}&sort=${sort}`;
-    // @ts-ignore
-    return this.httpClient.get<Demandes>(url, { observe: 'response' });
-  }
-
-  public listerDemandeValidePage(page: number, size: number, sort: string): Observable<Demande> {
-    const url = `${this.contextPath + '/validees'}?page=${page}&size=${size}&sort=${sort}`;
-    // @ts-ignore
-    return this.httpClient.get<Demandes>(url, {observe: 'response'});
+  /** ----- Mes demandes paginées ----- */
+  listerMesDemandes(
+    page = 0,
+    size = 10,
+    sort = 'id,desc'
+  ): Observable<HttpResponse<PageResp<any>>> {
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('size', String(size))
+      .set('sort', String(sort));
+    // Le token partira via ton HttpInterceptor si présent
+    return this.http.get<PageResp<any>>(`${this.contextPath}/moi`, {
+      observe: 'response',
+      params
+    });
   }
 
-
-  public listerDemandePersonnel(personnelId: number, page: number, size: number, sort: string): Observable<any> {
-    const url = `${this.contextPath + '/personnel/'+ personnelId}?page=${page}&size=${size}&sort=${sort}`;
-    // @ts-ignore
-    return this.httpClient.get<any>(url, { observe: 'response' });
+  /** ----- Listes diverses (réponses paginées) ----- */
+  listerDemandePage(
+    page: number,
+    size: number,
+    sort: string
+  ): Observable<HttpResponse<PageResp<Demande>>> {
+    const url = `${this.contextPath}/encours`;
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('size', String(size))
+      .set('sort', String(sort));
+    return this.http.get<PageResp<Demande>>(url, { observe: 'response', params });
   }
 
-  public listerDemandeParService(chefId: number, page: number, size: number, sort: string): Observable<any> {
-    const url = `${this.contextPath + '/demandes/'+ chefId}?page=${page}&size=${size}&sort=${sort}`;
-    // @ts-ignore
-    return this.httpClient.get<any>(url, { observe: 'response' });
-  }
-  public rechercheDemandePage(sort: string, designation: string): Observable<Demande> {
-    const url = `${this.contextPath}?&sort=${sort}&designation=${designation}`;
-    // @ts-ignore
-    return this.httpClient.get<Demande>(url, { observe: 'response' });
-  }
-
-  public rechercheDemande(nom: string): Observable<Demande> {
-    const url = `${this.contextPath}?nom=${nom}`;
-    // @ts-ignore
-    return this.httpClient.get<Demande>(url, { observe: 'response' });
+  listerDemandeRefusePage(
+    page: number,
+    size: number,
+    sort: string
+  ): Observable<HttpResponse<PageResp<Demande>>> {
+    const url = `${this.contextPath}/rejetees`;
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('size', String(size))
+      .set('sort', String(sort));
+    return this.http.get<PageResp<Demande>>(url, { observe: 'response', params });
   }
 
-  public creerDemande(data: any): Observable<Demande> {
-    return this.httpClient.post<Demande>(
-      this.contextPath,
-      data
-    );
+  listerDemandeValidePage(
+    page: number,
+    size: number,
+    sort: string
+  ): Observable<HttpResponse<PageResp<Demande>>> {
+    const url = `${this.contextPath}/validees`;
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('size', String(size))
+      .set('sort', String(sort));
+    return this.http.get<PageResp<Demande>>(url, { observe: 'response', params });
   }
 
-
-  public modifierDemandePersonnel(dateDebut: Date, dateFin: Date, demandeId: number, nbreJour: number): Observable<Demande> {
-    const url = `${this.contextPath + '/' +demandeId+ '/chefValidation/oui'}?dateDebut=${dateDebut}&dateFinStr=${dateFin}&nbreJour=${nbreJour}`;
-    return this.httpClient.patch<Demande>(url, null);
+  listerDemandePersonnel(
+    personnelId: number,
+    page: number,
+    size: number,
+    sort: string
+  ): Observable<HttpResponse<PageResp<Demande>>> {
+    const url = `${this.contextPath}/personnel/${personnelId}`;
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('size', String(size))
+      .set('sort', String(sort));
+    return this.http.get<PageResp<Demande>>(url, { observe: 'response', params });
   }
 
-  public modifierDemandeCsrhPersonnel(demandeId: number, dateDebut: string, dateFin: string, nbreJour: number): Observable<Demande> {
-    const url = `${this.contextPath + '/csrh/oui'}?dateDebut=${dateDebut}&dateFin=${dateFin}&demandeId=${demandeId}&nbreJour=${nbreJour}`;
-    return this.httpClient.patch<Demande>(url, null);
+  listerDemandeParService(
+    chefId: number,
+    page: number,
+    size: number,
+    sort: string
+  ): Observable<HttpResponse<PageResp<Demande>>> {
+    const url = `${this.contextPath}/demandes/${chefId}`;
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('size', String(size))
+      .set('sort', String(sort));
+    return this.http.get<PageResp<Demande>>(url, { observe: 'response', params });
   }
 
-  public refusDemandeCsrhPersonnel(demandeId: number, message: string): Observable<Demande> {
-    const url = `${this.contextPath}/${demandeId}/csrhValidation/non?message=${message}`;
-    return this.httpClient.patch<Demande>(url, null);
+  rechercheDemandePage(
+    sort: string,
+    designation: string
+  ): Observable<HttpResponse<PageResp<Demande>>> {
+    const url = `${this.contextPath}`;
+    const params = new HttpParams()
+      .set('sort', String(sort))
+      .set('designation', String(designation));
+    return this.http.get<PageResp<Demande>>(url, { observe: 'response', params });
   }
 
-  public refusDemandePersonnel(demandeId: number, message: string): Observable<Demande> {
-    const url = `${this.contextPath}/${demandeId}/chefValidation/non?message=${message}`;
-    return this.httpClient.patch<Demande>(url, null);
+  rechercheDemande(nom: string): Observable<HttpResponse<PageResp<Demande>>> {
+    const url = `${this.contextPath}`;
+    const params = new HttpParams().set('nom', String(nom));
+    return this.http.get<PageResp<Demande>>(url, { observe: 'response', params });
   }
 
-  public validerDemandeSgPersonnel(demandeId: number): Observable<Demande> {
-    const url = `${this.contextPath +  '/sg/oui'}?demandeId=${demandeId}`;
-    return this.httpClient.patch<Demande>(url, null);
+  /** ----- Création / modification / suppression ----- */
+  creerDemande(data: FormData | any): Observable<Demande> {
+    return this.http.post<Demande>(this.contextPath, data);
   }
 
-  public refuserDemandeSgPersonnel(demandeId: number, message: string): Observable<Demande> {
-    const url = `${this.contextPath + '/sg/non'}?demandeId=${demandeId}&message=${message}`;
-    return this.httpClient.patch<Demande>(url, null);
+  modifierDemandePersonnel(
+    dateDebut: Date,
+    dateFin: Date,
+    demandeId: number,
+    nbreJour: number
+  ): Observable<Demande> {
+    const url = `${this.contextPath}/${demandeId}/chefValidation/oui`;
+    const params = new HttpParams()
+      .set('dateDebut', String(dateDebut))
+      .set('dateFin', String(dateFin))
+      .set('nbreJour', String(nbreJour));
+    return this.http.patch<Demande>(url, null, { params });
   }
 
-  public validerDemandeDgPersonnel(demandeId: number): Observable<Demande> {
-    const url = `${this.contextPath +  '/dg/oui'}?demandeId=${demandeId}`;
-    return this.httpClient.patch<Demande>(url, null);
+  modifierDemandeCsrhPersonnel(
+    demandeId: number,
+    dateDebut: string,
+    dateFin: string,
+    nbreJour: number
+  ): Observable<Demande> {
+    const url = `${this.contextPath}/csrh/oui`;
+    const params = new HttpParams()
+      .set('demandeId', String(demandeId))
+      .set('dateDebut', dateDebut)
+      .set('dateFin', dateFin)
+      .set('nbreJour', String(nbreJour));
+    return this.http.patch<Demande>(url, null, { params });
   }
 
-  public refuserDemandeDgPersonnel(demandeId: number, message: string): Observable<Demande> {
-    const url = `${this.contextPath + '/dg/non'}?demandeId=${demandeId}&message=${message}`;
-    return this.httpClient.patch<Demande>(url, null);
+  refusDemandeCsrhPersonnel(demandeId: number, message: string): Observable<Demande> {
+    const url = `${this.contextPath}/${demandeId}/csrhValidation/non`;
+    const params = new HttpParams().set('message', message);
+    return this.http.patch<Demande>(url, null, { params });
   }
 
-
-  public modifierDemande(id:any, data:any):Observable<Demande>{
-    return this.httpClient.patch<Demande>(
-      this.contextPath +"/"+id,data)
+  refusDemandePersonnel(demandeId: number, message: string): Observable<Demande> {
+    const url = `${this.contextPath}/${demandeId}/chefValidation/non`;
+    const params = new HttpParams().set('message', message);
+    return this.http.patch<Demande>(url, null, { params });
   }
 
-  public supprimerDemande(id: number) {
-    return this.httpClient.delete<any>(this.contextPath + "/" + id);
+  validerDemandeSgPersonnel(demandeId: number): Observable<Demande> {
+    const url = `${this.contextPath}/sg/oui`;
+    const params = new HttpParams().set('demandeId', String(demandeId));
+    return this.http.patch<Demande>(url, null, { params });
   }
 
-  public voirDemande(id:number,){
-    return this.httpClient.get<any>(
-      this.contextPath+ '/'+id
-    )}
+  refuserDemandeSgPersonnel(demandeId: number, message: string): Observable<Demande> {
+    const url = `${this.contextPath}/sg/non`;
+    const params = new HttpParams()
+      .set('demandeId', String(demandeId))
+      .set('message', message);
+    return this.http.patch<Demande>(url, null, { params });
+  }
+
+  validerDemandeDgPersonnel(demandeId: number): Observable<Demande> {
+    const url = `${this.contextPath}/dg/oui`;
+    const params = new HttpParams().set('demandeId', String(demandeId));
+    return this.http.patch<Demande>(url, null, { params });
+  }
+
+  refuserDemandeDgPersonnel(demandeId: number, message: string): Observable<Demande> {
+    const url = `${this.contextPath}/dg/non`;
+    const params = new HttpParams()
+      .set('demandeId', String(demandeId))
+      .set('message', message);
+    return this.http.patch<Demande>(url, null, { params });
+  }
+
+  modifierDemande(id: number, data: FormData | any): Observable<Demande> {
+    return this.http.patch<Demande>(`${this.contextPath}/${id}`, data);
+  }
+
+  supprimerDemande(id: number): Observable<any> {
+    // ⚠️ ton backend écoute sur DELETE /demandes/delete/{id}
+    return this.http.delete<any>(`${this.contextPath}/delete/${id}`);
+  }
+
+  voirDemande(id: number): Observable<Demande> {
+    return this.http.get<Demande>(`${this.contextPath}/${id}`);
+  }
 }

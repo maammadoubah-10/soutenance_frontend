@@ -1,158 +1,332 @@
 <div class="container-fluid">
-  <app-titredepage title="Ressources Humaines" [items]="[{label:'RH'}, {label:'Tableau de bord', active:true}]"></app-titredepage>
 
-  <!-- States -->
-  <div *ngIf="loading" class="alert alert-info mb-3">Chargement…</div>
-  <div *ngIf="!loading && errorMsg" class="alert alert-danger mb-3">{{ errorMsg }}</div>
+  <!-- ========= ADMIN ========= -->
+  <ng-container *ngIf="isAdmin; else personnelTpl">
+    <app-titredepage
+      title="Ressources Humaines"
+      [items]="[{label:'RH'}, {label:'Tableau de bord', active:true}]">
+    </app-titredepage>
 
-  <!-- ====== KPI ====== -->
-  <div class="row flex-grow-1" *ngIf="!loading && !errorMsg">
-    <div class="col-md-3 grid-margin stretch-card">
-      <div class="card kpi-card h-100">
-        <div class="card-body d-flex align-items-center justify-content-between">
-          <div>
-            <h6 class="card-title mb-1">Total Personnel</h6>
-            <h3 class="mb-0">{{ kpi.totalPersonnel }}</h3>
+    <!-- States -->
+    <div *ngIf="loading" class="alert alert-info mb-3">Chargement…</div>
+    <div *ngIf="!loading && errorMsg" class="alert alert-danger mb-3">{{ errorMsg }}</div>
+
+    <!-- ====== KPI ====== -->
+    <div class="row flex-grow-1" *ngIf="!loading && !errorMsg">
+      <div class="col-md-3 grid-margin stretch-card">
+        <div class="card kpi-card h-100">
+          <div class="card-body d-flex align-items-center justify-content-between">
+            <div>
+              <h6 class="card-title mb-1">Total Personnel</h6>
+              <h3 class="mb-0">{{ kpi.totalPersonnel }}</h3>
+            </div>
+            <div class="avatar-sm">
+              <div class="avatar-title bg-light rounded-circle text-primary font-size-24">
+                <i class="bx bxs-user"></i>
+              </div>
+            </div>
           </div>
-          <div class="avatar-sm">
-            <div class="avatar-title bg-light rounded-circle text-primary font-size-24">
-              <i class="bx bxs-user"></i>
+        </div>
+      </div>
+
+      <div class="col-md-3 grid-margin stretch-card">
+        <div class="card kpi-card h-100">
+          <div class="card-body d-flex align-items-center justify-content-between">
+            <div>
+              <h6 class="card-title mb-1">Postes ouverts</h6>
+              <h3 class="mb-0">{{ kpi.postesOuverts }}</h3>
+            </div>
+            <div class="avatar-sm">
+              <div class="avatar-title bg-light rounded-circle text-warning font-size-24">
+                <i class="bx bx-briefcase"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 grid-margin stretch-card">
+        <div class="card kpi-card h-100">
+          <div class="card-body d-flex align-items-center justify-content-between">
+            <div>
+              <h6 class="card-title mb-1">En absence</h6>
+              <h3 class="mb-0">{{ kpi.enAbsence }}</h3>
+            </div>
+            <div class="avatar-sm">
+              <div class="avatar-title bg-light rounded-circle text-info font-size-24">
+                <i class="bx bx-time"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3 grid-margin stretch-card">
+        <div class="card kpi-card h-100">
+          <div class="card-body d-flex align-items-center justify-content-between">
+            <div>
+              <h6 class="card-title mb-1">Taux de turnover</h6>
+              <h3 class="mb-0">{{ kpi.tauxTurnover }}%</h3>
+            </div>
+            <div class="avatar-sm">
+              <div class="avatar-title bg-light rounded-circle text-danger font-size-24">
+                <i class="bx bx-refresh"></i>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="col-md-3 grid-margin stretch-card">
-      <div class="card kpi-card h-100">
-        <div class="card-body d-flex align-items-center justify-content-between">
-          <div>
-            <h6 class="card-title mb-1">Postes ouverts</h6>
-            <h3 class="mb-0">{{ kpi.postesOuverts }}</h3>
+    <!-- ====== ROW 1 : Effectif + Absence ====== -->
+    <div class="row" *ngIf="!loading && !errorMsg">
+      <div class="col-lg-8 grid-margin stretch-card">
+        <div class="card chart-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="card-title mb-0">Effectif total (6 derniers mois)</h6>
+            </div>
+            <apx-chart
+              [series]="headcountArea.series"
+              [chart]="headcountArea.chart"
+              [xaxis]="headcountArea.xaxis"
+              [dataLabels]="headcountArea.dataLabels"
+              [stroke]="headcountArea.stroke"
+              [fill]="headcountArea.fill"
+              [grid]="headcountArea.grid"
+              [legend]="headcountArea.legend"
+              [tooltip]="headcountArea.tooltip">
+            </apx-chart>
           </div>
-          <div class="avatar-sm">
-            <div class="avatar-title bg-light rounded-circle text-warning font-size-24">
-              <i class="bx bx-briefcase"></i>
+        </div>
+      </div>
+
+      <div class="col-lg-4 grid-margin stretch-card">
+        <div class="card chart-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="card-title mb-0">Taux d’absence</h6>
+            </div>
+            <apx-chart
+              [series]="absenceRadial.series"
+              [chart]="absenceRadial.chart"
+              [labels]="absenceRadial.labels"
+              [plotOptions]="absenceRadial.plotOptions"
+              [fill]="absenceRadial.fill"
+              [tooltip]="absenceRadial.tooltip">
+            </apx-chart>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== ROW 2 : Entrées/Sorties + Départements ====== -->
+    <div class="row" *ngIf="!loading && !errorMsg">
+      <div class="col-lg-6 grid-margin stretch-card">
+        <div class="card chart-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="card-title mb-0">Entrées vs Sorties</h6>
+            </div>
+            <apx-chart
+              [series]="hiresDeparturesBar.series"
+              [chart]="hiresDeparturesBar.chart"
+              [xaxis]="hiresDeparturesBar.xaxis"
+              [yaxis]="hiresDeparturesBar.yaxis"
+              [plotOptions]="hiresDeparturesBar.plotOptions"
+              [dataLabels]="hiresDeparturesBar.dataLabels"
+              [grid]="hiresDeparturesBar.grid"
+              [tooltip]="hiresDeparturesBar.tooltip"
+              [legend]="hiresDeparturesBar.legend">
+            </apx-chart>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6 grid-margin stretch-card">
+        <div class="card chart-card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="card-title mb-0">Répartition par service</h6>
+            </div>
+            <apx-chart
+              [series]="departmentsDonut.series"
+              [chart]="departmentsDonut.chart"
+              [labels]="departmentsDonut.labels" 
+              [legend]="departmentsDonut.legend"
+              [responsive]="departmentsDonut.responsive"
+              [tooltip]="departmentsDonut.tooltip">
+            </apx-chart>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-container>
+
+  <!-- ========= PERSONNEL ========= -->
+  <ng-template #personnelTpl>
+    <app-titredepage
+      title="Mon espace RH"
+      [items]="[{label:'RH'}, {label:'Mon tableau de bord', active:true}]">
+    </app-titredepage>
+
+    <!-- States -->
+    <div *ngIf="loading" class="alert alert-info mb-3">Chargement…</div>
+    <div *ngIf="!loading && errorMsg" class="alert alert-danger mb-3">{{ errorMsg }}</div>
+
+    <!-- ====== KPI PERSONNEL ====== -->
+    <div class="row g-3" *ngIf="!loading && !errorMsg">
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="card kpi-card kpi-modern h-100">
+          <div class="card-body d-flex align-items-center justify-content-between">
+            <div>
+              <div class="kpi-label">Contrat actif</div>
+              <div class="kpi-value">{{ persoKpi.contratActif ? 'Oui' : 'Non' }}</div>
+            </div>
+            <div class="kpi-icon bg-soft-primary">
+              <i class="bx bx-id-card"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="card kpi-card kpi-modern h-100">
+          <div class="card-body d-flex align-items-center justify-content-between">
+            <div>
+              <div class="kpi-label">Solde de congés</div>
+              <div class="kpi-value">{{ persoKpi.soldeConges }} j</div>
+            </div>
+            <div class="kpi-icon bg-soft-warning">
+              <i class="bx bx-sun"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="card kpi-card kpi-modern h-100">
+          <div class="card-body d-flex align-items-center justify-content-between">
+            <div>
+              <div class="kpi-label">Présences (mois)</div>
+              <div class="kpi-value">{{ persoKpi.presencesMois }}</div>
+            </div>
+            <div class="kpi-icon bg-soft-info">
+              <i class="bx bx-calendar-check"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-12 col-md-6 col-xl-3">
+        <div class="card kpi-card kpi-modern h-100">
+          <div class="card-body d-flex align-items-center justify-content-between">
+            <div>
+              <div class="kpi-label">Missions en cours</div>
+              <div class="kpi-value">{{ persoKpi.missionsEnCours }}</div>
+            </div>
+            <div class="kpi-icon bg-soft-danger">
+              <i class="bx bxs-plane-take-off"></i>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <div class="col-md-3 grid-margin stretch-card">
-      <div class="card kpi-card h-100">
-        <div class="card-body d-flex align-items-center justify-content-between">
-          <div>
-            <h6 class="card-title mb-1">En absence</h6>
-            <h3 class="mb-0">{{ kpi.enAbsence }}</h3>
-          </div>
-          <div class="avatar-sm">
-            <div class="avatar-title bg-light rounded-circle text-info font-size-24">
-              <i class="bx bx-time"></i>
+    <!-- Actions rapides -->
+    <div class="row g-3 mt-1" *ngIf="!loading && !errorMsg">
+      <div class="col-12">
+        <div class="quick-actions d-flex flex-wrap gap-2">
+          <a routerLink="/rh/mes-presences" class="btn btn-light action-chip"><i class="bx bx-time me-1"></i> Mes présences</a>
+          <a routerLink="/rh/mes-conges" class="btn btn-light action-chip"><i class="bx bx-sun me-1"></i> Mes congés</a>
+          <a routerLink="/rh/mes-missions" class="btn btn-light action-chip"><i class="bx bxs-plane-alt me-1"></i> Mes missions</a>
+          <a routerLink="/rh/mon-contrat" class="btn btn-light action-chip"><i class="bx bx-file me-1"></i> Mon contrat</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== ROW 1 : Présences 30j + Absence ====== -->
+    <div class="row g-3 mt-1" *ngIf="!loading && !errorMsg">
+      <div class="col-12 col-lg-8">
+        <div class="card chart-card glassy">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="card-title mb-0">Présences — 30 derniers jours</h6>
             </div>
+            <apx-chart
+              [series]="presenceArea.series"
+              [chart]="presenceArea.chart"
+              [xaxis]="presenceArea.xaxis"
+              [dataLabels]="presenceArea.dataLabels"
+              [stroke]="presenceArea.stroke"
+              [fill]="presenceArea.fill"
+              [grid]="presenceArea.grid"
+              [legend]="presenceArea.legend"
+              [tooltip]="presenceArea.tooltip">
+            </apx-chart>
           </div>
         </div>
       </div>
-    </div>
 
-    <div class="col-md-3 grid-margin stretch-card">
-      <div class="card kpi-card h-100">
-        <div class="card-body d-flex align-items-center justify-content-between">
-          <div>
-            <h6 class="card-title mb-1">Taux de turnover</h6>
-            <h3 class="mb-0">{{ kpi.tauxTurnover }}%</h3>
-          </div>
-          <div class="avatar-sm">
-            <div class="avatar-title bg-light rounded-circle text-danger font-size-24">
-              <i class="bx bx-refresh"></i>
+      <div class="col-12 col-lg-4">
+        <div class="card chart-card glassy">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="card-title mb-0">Taux d’absence (mois)</h6>
             </div>
+            <apx-chart
+              [series]="absenceRadial.series"
+              [chart]="absenceRadial.chart"
+              [labels]="absenceRadial.labels"
+              [plotOptions]="absenceRadial.plotOptions"
+              [fill]="absenceRadial.fill"
+              [tooltip]="absenceRadial.tooltip">
+            </apx-chart>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== ROW 1 : Effectif + Absence ====== -->
-  <div class="row" *ngIf="!loading && !errorMsg">
-    <div class="col-lg-8 grid-margin stretch-card">
-      <div class="card chart-card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <h6 class="card-title mb-0">Effectif total (6 derniers mois)</h6>
-          </div>
-          <apx-chart
-            [series]="headcountArea.series"
-            [chart]="headcountArea.chart"
-            [xaxis]="headcountArea.xaxis"
-            [dataLabels]="headcountArea.dataLabels"
-            [stroke]="headcountArea.stroke"
-            [fill]="headcountArea.fill"
-            [grid]="headcountArea.grid"
-            [legend]="headcountArea.legend"
-            [tooltip]="headcountArea.tooltip">
-          </apx-chart>
         </div>
       </div>
     </div>
 
-    <div class="col-lg-4 grid-margin stretch-card">
-      <div class="card chart-card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <h6 class="card-title mb-0">Taux d’absence</h6>
+    <!-- ====== ROW 2 : Missions vs Congés + Répartition congés ====== -->
+    <div class="row g-3 mt-1" *ngIf="!loading && !errorMsg">
+      <div class="col-12 col-lg-6">
+        <div class="card chart-card glassy">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="card-title mb-0">Missions vs Congés — 6 derniers mois</h6>
+            </div>
+            <apx-chart
+              [series]="missionsCongesBar.series"
+              [chart]="missionsCongesBar.chart"
+              [xaxis]="missionsCongesBar.xaxis"
+              [yaxis]="missionsCongesBar.yaxis"
+              [plotOptions]="missionsCongesBar.plotOptions"
+              [dataLabels]="missionsCongesBar.dataLabels"
+              [grid]="missionsCongesBar.grid"
+              [tooltip]="missionsCongesBar.tooltip"
+              [legend]="missionsCongesBar.legend">
+            </apx-chart>
           </div>
-          <apx-chart
-            [series]="absenceRadial.series"
-            [chart]="absenceRadial.chart"
-            [labels]="absenceRadial.labels"
-            [plotOptions]="absenceRadial.plotOptions"
-            [fill]="absenceRadial.fill"
-            [tooltip]="absenceRadial.tooltip">
-          </apx-chart>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- ====== ROW 2 : Entrées/Sorties + Départements ====== -->
-  <div class="row" *ngIf="!loading && !errorMsg">
-    <div class="col-lg-6 grid-margin stretch-card">
-      <div class="card chart-card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <h6 class="card-title mb-0">Entrées vs Sorties</h6>
+      <div class="col-12 col-lg-6">
+        <div class="card chart-card glassy">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+              <h6 class="card-title mb-0">Répartition des types de congés</h6>
+            </div>
+            <apx-chart
+              [series]="departmentsDonut.series"
+              [chart]="departmentsDonut.chart"
+              [labels]="departmentsDonut.labels"
+              [legend]="departmentsDonut.legend"
+              [responsive]="departmentsDonut.responsive"
+              [tooltip]="departmentsDonut.tooltip">
+            </apx-chart>
           </div>
-          <apx-chart
-            [series]="hiresDeparturesBar.series"
-            [chart]="hiresDeparturesBar.chart"
-            [xaxis]="hiresDeparturesBar.xaxis"
-            [yaxis]="hiresDeparturesBar.yaxis"
-            [plotOptions]="hiresDeparturesBar.plotOptions"
-            [dataLabels]="hiresDeparturesBar.dataLabels"
-            [grid]="hiresDeparturesBar.grid"
-            [tooltip]="hiresDeparturesBar.tooltip"
-            [legend]="hiresDeparturesBar.legend">
-          </apx-chart>
         </div>
       </div>
     </div>
-
-    <div class="col-lg-6 grid-margin stretch-card">
-      <div class="card chart-card">
-        <div class="card-body">
-          <div class="d-flex justify-content-between align-items-center mb-2">
-            <h6 class="card-title mb-0">Répartition par service</h6>
-          </div>
-          <apx-chart
-            [series]="departmentsDonut.series"
-            [chart]="departmentsDonut.chart"
-            [labels]="departmentsDonut.labels"
-            [legend]="departmentsDonut.legend"
-            [responsive]="departmentsDonut.responsive"
-            [tooltip]="departmentsDonut.tooltip">
-          </apx-chart>
-        </div>
-      </div>
-    </div>
-  </div>
+  </ng-template>
 </div>

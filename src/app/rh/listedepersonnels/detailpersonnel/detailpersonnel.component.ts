@@ -1,15 +1,15 @@
 import { Component, LOCALE_ID, OnInit } from '@angular/core';
-import { BehaviorSubject, Observable, of } from "rxjs";
+import { BehaviorSubject, Observable, of } from 'rxjs';
 // @ts-ignore
-import Hashids from 'hashids'
-import { registerLocaleData } from "@angular/common";
-import localeFr from "@angular/common/locales/fr";
-import { ActivatedRoute, Router } from "@angular/router";
-import { NgbModal } from "@ng-bootstrap/ng-bootstrap";
-import { catchError, map, startWith } from "rxjs/operators";
-import Swal from "sweetalert2";
+import Hashids from 'hashids';
+import { registerLocaleData } from '@angular/common';
+import localeFr from '@angular/common/locales/fr';
+import { ActivatedRoute, Router } from '@angular/router';
+import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
+import { catchError, map, startWith } from 'rxjs/operators';
+import Swal from 'sweetalert2';
 
-import { FormBuilder, FormControl, FormGroup, Validators } from "@angular/forms";
+import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { DataStateEnum, ModelDataState } from '../../../state/state';
 import { civilite, Personnel, situationMatrimoniale } from '../../models/personnel';
 import { Affectation } from '../../models/affectation';
@@ -59,10 +59,10 @@ import { MatStepper } from '@angular/material/stepper';
   providers: [{ provide: LOCALE_ID, useValue: 'fr' }],
 })
 export class DetailpersonnelComponent implements OnInit {
-
   items: any[] = [];
-  dataStateEnum = DataStateEnum
-  state?: DataStateEnum
+  dataStateEnum = DataStateEnum;
+  state?: DataStateEnum;
+
   personnel$?: Observable<ModelDataState<Personnel | undefined>>;
   affectations?: Observable<ModelDataState<Affectation[]>>;
   contrats?: Observable<ModelDataState<Contrat[]>>;
@@ -72,34 +72,40 @@ export class DetailpersonnelComponent implements OnInit {
   interims?: Observable<ModelDataState<Interimes[]>>;
   presences?: Observable<ModelDataState<Presence[]>>;
   pieces?: Observable<ModelDataState<Pieces[]>>;
+
   personnel?: Personnel;
   personnelId: number = 0;
+
   mois: number = 0;
-  nbrJourAbasent: number = 0
+  nbrJourAbasent: number = 0;
+
   contrat?: Contrat;
-  listeDossierPage: Personnel[] = []
-  listePoste: Poste[] = []
-  listeService: Service[] = []
-  listeBanque: Banques[] = []
-  listeEntite: Entites[] = []
-  listeIndice: Indice[] = []
-  listeMissionnaireExterne: MissionnaireExterne[] = []
-  listeTypeContrat: TypeDeContrat[] = []
-  listeTypeDossier: Dossier[] = []
-  listeTypePieces: TypeDePiece[] = []
-  listeModeDePaiement: ModeDePaiement[] = []
-  listeStatutPersonnel: StatutPersonnel[] = []
-  listeAffectationPersonnel: Affectation[] = []
-  listeInterimesPersonnel: Interimes[] = []
-  listePresencePersonnel: Presence[] = []
-  listePiecesPersonnel: Pieces[] = []
-  listeContratsPersonnel: Contrat[] = []
-  listeMissionPersonnel: Mission[] = []
-  listeDemandePersonnel: Demande[] = []
-  listeCongePersonnel: Conge[] = []
-  listeAvenantContratPersonnel: Avenant[] = []
+
+  listeDossierPage: Personnel[] = [];
+  listePoste: Poste[] = [];
+  listeService: Service[] = [];
+  listeBanque: Banques[] = [];
+  listeEntite: Entites[] = [];
+  listeIndice: Indice[] = [];
+  listeMissionnaireExterne: MissionnaireExterne[] = [];
+  listeTypeContrat: TypeDeContrat[] = [];
+  listeTypeDossier: Dossier[] = [];
+  listeTypePieces: TypeDePiece[] = [];
+  listeModeDePaiement: ModeDePaiement[] = [];
+  listeStatutPersonnel: StatutPersonnel[] = [];
+  listeAffectationPersonnel: Affectation[] = [];
+  listeInterimesPersonnel: Interimes[] = [];
+  listePresencePersonnel: Presence[] = [];
+  listePiecesPersonnel: Pieces[] = [];
+  listeContratsPersonnel: Contrat[] = [];
+  listeMissionPersonnel: Mission[] = [];
+  listeDemandePersonnel: Demande[] = [];
+  listeCongePersonnel: Conge[] = [];
+  listeAvenantContratPersonnel: Avenant[] = [];
+
   piece?: Pieces;
   interime?: Interimes;
+
   public typeCivilites = Object.values(civilite);
   public situationMatrimoniales = Object.values(situationMatrimoniale);
   PHONE_REGEX = /^[+]?[(]?[0-9]{1,6}[)]?[-\s.]?[0-9]{3,6}[-\s.]?[0-9]{3,6}$/;
@@ -115,29 +121,29 @@ export class DetailpersonnelComponent implements OnInit {
   public idIterime: number = 0;
   public designation: string = '';
   public sigle: string = '';
-  file: File | undefined
+  file: File | undefined;
 
   formulaireDebaucher = new FormGroup({
     id: new FormControl(''),
-    dateDebauchage: new FormControl(new Date, [Validators.required]),
-  })
+    dateDebauchage: new FormControl(new Date(), [Validators.required]),
+  });
 
   formulaireEmbaucher = new FormGroup({
     id: new FormControl(''),
-    dateEmbauchage: new FormControl(new Date, [Validators.required]),
-  })
+    dateEmbauchage: new FormControl(new Date(), [Validators.required]),
+  });
 
   formulaireRetraiter = new FormGroup({
     id: new FormControl(''),
-    dateRetraite: new FormControl(new Date, [Validators.required]),
-  })
+    dateRetraite: new FormControl(new Date(), [Validators.required]),
+  });
 
   formulairePresence = new FormGroup({
-    id: new FormControl(),
-    date: new FormControl('', [Validators.required]),
-    estPresent: new FormControl('', [Validators.required]),
-    personnel: new FormControl(''),
-  })
+    id: new FormControl<number | null>(null),
+    mois: new FormControl<number | null>(null, [Validators.required]),
+    nbreJourAbsent: new FormControl<number | null>(0, [Validators.min(0)]),
+    dateValidation: new FormControl<Date | null>(null),
+  });
 
   formulaireContrat = new FormGroup({
     id: new FormControl(),
@@ -146,7 +152,7 @@ export class DetailpersonnelComponent implements OnInit {
     typeContrat: new FormControl('', [Validators.required]),
     status: new FormControl<string | null>(null, [Validators.required]),
     personnel: new FormControl<string | null>(null),
-  })
+  });
 
   formulairePieces = new FormGroup({
     id: new FormControl(),
@@ -154,7 +160,7 @@ export class DetailpersonnelComponent implements OnInit {
     typeDossier: new FormControl('', [Validators.required]),
     personnel: new FormControl(''),
     typePiece: new FormControl('', [Validators.required]),
-  })
+  });
 
   formulaireInterim = new FormGroup({
     id: new FormControl(),
@@ -163,7 +169,7 @@ export class DetailpersonnelComponent implements OnInit {
     personnel: new FormControl<string | null>(null),
     poste: new FormControl('', [Validators.required]),
     commentaire: new FormControl(''),
-  })
+  });
 
   // ✅ AFFECTATION sans dateFin
   formulaireAffectation = new FormGroup({
@@ -178,11 +184,88 @@ export class DetailpersonnelComponent implements OnInit {
     date: new FormControl<Date | null>(new Date(), [Validators.required]),
     contrat: new FormControl(null),
     estActif: new FormControl(false, [Validators.required]),
-  })
+  });
 
-  // ⚠️ Les champs « banque / modePaiement / RIB » restent dans le formulaire,
-  // mais on ne lit plus ces infos depuis `personnel` (c’est ce qui cassait).
-  formulaireDossier = new FormGroup({
+  totalDossier: number = 0;
+  totalPieces: number = 0;
+  totalPresence: number = 0;
+  totalInterims: number = 0;
+  totalAffectation: number = 0;
+  totalContrat: number = 0;
+  totalAvenant: number = 0;
+  totalMission: number = 0;
+  totalConge: number = 0;
+  totalDemande: number = 0;
+  currentPage: number = 0;
+  dossierPerPage: number = 8;
+  nombrePerPage: number = 5;
+  breadCrumbItems: Array<{ label: string; active?: boolean }> = [];
+  sort: string = 'desc';
+  public pages: number[] = [];
+  totalPages: number = 0;
+  hashids: any;
+  private id$: any;
+  devisSbj = new BehaviorSubject(0);
+
+  constructor(
+    private personnelService: PersonnelService,
+    private posteService: PosteService,
+    private router: Router,
+    private activatedRoute: ActivatedRoute,
+    private toastService: ToastrService,
+    private banqueService: BanquesService,
+    private avenantService: AvenantService,
+    private typedecontratService: TypeDeContratService,
+    private entiteService: EntitesService,
+    private typedepieceService: TypeDePieceService,
+    private dossierService: DossierService,
+    private demandeService: DemandeService,
+    private presenceService: PresenceService,
+    private contratService: ContratService,
+    private interimesService: InterimesService,
+    private affectationService: AffectationService,
+    private piecesService: PiecesService,
+    private indiceService: IndiceService,
+    private formBuilder: FormBuilder,
+    private modeDePaiementService: ModeDePaiementService,
+    private statutPersonnelService: StatutPersonnelService,
+    private modalService: NgbModal
+  ) {}
+
+  ngOnInit(): void {
+    registerLocaleData(localeFr, 'fr');
+    this.breadCrumbItems = [{ label: 'Forms' }, { label: 'Form Wizard', active: true }];
+    this.hashids = new Hashids('mysecretkey');
+
+    this.activatedRoute.paramMap.subscribe((params) => {
+      const encodedId = params.get('id');
+      if (encodedId) {
+        this.id$ = this.decodeId(encodedId);
+      } else {
+        console.warn('ID parameter is missing');
+      }
+    });
+
+    this.items = [
+      { label: 'Ressources Humaines' },
+      { label: 'Personnels' },
+      { label: 'Details', active: true },
+    ];
+
+    this.chargerIdPersonnel(this.id$);
+    this.chargerListePiecesPersonnel();
+  }
+
+  decodeId(encodedId: string) {
+    const [id] = this.hashids.decode(encodedId);
+    return id;
+  }
+
+  onNext(stepper: MatStepper): void {
+    stepper.next();
+  }
+
+   formulaireDossier = new FormGroup({
     id: new FormControl(),
 
     identitePersonnelGroupe: this.formBuilder.group({
@@ -224,95 +307,27 @@ export class DetailpersonnelComponent implements OnInit {
     }),
   })
 
-  totalDossier: number = 0;
-  totalPieces: number = 0;
-  totalPresence: number = 0;
-  totalInterims: number = 0;
-  totalAffectation: number = 0;
-  totalContrat: number = 0;
-  totalAvenant: number = 0;
-  totalMission: number = 0;
-  totalConge: number = 0;
-  totalDemande: number = 0;
-  currentPage: number = 0;
-  dossierPerPage: number = 8;
-  nombrePerPage: number = 5;
-  breadCrumbItems: Array<{ label: string; active?: boolean }> = [];
-  sort: string = "desc";
-  public pages: number[] = [];
-  totalPages: number = 0;
-  hashids: any
-  private id$: any;
-  devisSbj = new BehaviorSubject(0);
-
-  constructor(
-    private personnelService: PersonnelService,
-    private posteService: PosteService,
-    private router: Router,
-    private activatedRoute: ActivatedRoute,
-    private toastService: ToastrService,
-    private banqueService: BanquesService,
-    private avenantService: AvenantService,
-    private typedecontratService: TypeDeContratService,
-    private entiteService: EntitesService,
-    private typedepieceService: TypeDePieceService,
-    private dossierService: DossierService,
-    private demandeService: DemandeService,
-    private presenceService: PresenceService,
-    private contratService: ContratService,
-    private interimesService: InterimesService,
-    private affectationService: AffectationService,
-    private piecesService: PiecesService,
-    private indiceService: IndiceService,
-    private formBuilder: FormBuilder,
-    private modeDePaiementService: ModeDePaiementService,
-    private statutPersonnelService: StatutPersonnelService,
-    private modalService: NgbModal
-  ) { }
-
-  ngOnInit(): void {
-    registerLocaleData(localeFr, 'fr');
-    this.breadCrumbItems = [{ label: 'Forms' }, { label: 'Form Wizard', active: true }];
-    this.hashids = new Hashids('mysecretkey');
-    this.activatedRoute.paramMap.subscribe((params) => {
-      const encodedId = params.get('id');
-      if (encodedId) {
-        this.id$ = this.decodeId(encodedId);
-      } else {
-        console.warn('ID parameter is missing');
-      }
-    });
-    this.items = [
-      { label: 'Ressources Humaines' },
-      { label: 'Personnels' },
-      { label: 'Details', active: true },
-    ];
-    this.chargerIdPersonnel(this.id$);
-    this.chargerListePiecesPersonnel();
-  }
-
-  decodeId(encodedId: string) {
-    const [id] = this.hashids.decode(encodedId);
-    return id;
-  }
-
-  onNext(stepper: MatStepper): void {
-    stepper.next();
-  }
-
   onSearchPoste(designation: string) {
     if (designation.length >= 3) {
       this.posteService.recherchePoste(designation).subscribe(
-        (response: any) => { this.listePoste = response.body.content },
+        (response: any) => {
+          this.listePoste = response.body.content;
+        },
         () => {}
       );
     }
   }
 
+  isPresent(p: Presence): boolean {
+    return (p?.nbreJourAbsent ?? 0) === 0;
+  }
+
   onSearchBanque(sigle: string) {
     if (sigle.length >= 1) {
       this.banqueService.rechercheBanque(sigle).subscribe(
-        (response: any) => { this.listeBanque = response.body.content },
+        (response: any) => {
+          this.listeBanque = response.body.content;
+        },
         () => {}
       );
     }
@@ -321,7 +336,9 @@ export class DetailpersonnelComponent implements OnInit {
   onSearchDossier(designation: string) {
     if (designation.length >= 3) {
       this.dossierService.rechercheDossier(designation).subscribe(
-        (response: any) => { this.listeTypeDossier = response.body.content },
+        (response: any) => {
+          this.listeTypeDossier = response.body.content;
+        },
         () => {}
       );
     }
@@ -330,7 +347,9 @@ export class DetailpersonnelComponent implements OnInit {
   onSearchTypeDePieces(nom: string) {
     if (nom.length >= 2) {
       this.typedepieceService.rechercheTypeDePiece(nom).subscribe(
-        (response: any) => { this.listeTypePieces = response.body.content },
+        (response: any) => {
+          this.listeTypePieces = response.body.content;
+        },
         () => {}
       );
     }
@@ -339,7 +358,9 @@ export class DetailpersonnelComponent implements OnInit {
   onSearchTypeContrat(sigle: string) {
     if (sigle.length >= 1) {
       this.typedecontratService.rechercheTypeDeContrat(sigle).subscribe(
-        (response: any) => { this.listeTypeContrat = response.body.content },
+        (response: any) => {
+          this.listeTypeContrat = response.body.content;
+        },
         () => {}
       );
     }
@@ -348,7 +369,9 @@ export class DetailpersonnelComponent implements OnInit {
   onSearchEntite(designation: string) {
     if (designation.length >= 3) {
       this.entiteService.rechercheEntite(designation).subscribe(
-        (response: any) => { this.listeEntite = response.body.content },
+        (response: any) => {
+          this.listeEntite = response.body.content;
+        },
         () => {}
       );
     }
@@ -357,7 +380,9 @@ export class DetailpersonnelComponent implements OnInit {
   onSearchIndice(nom: string) {
     if (nom.length >= 3) {
       this.indiceService.rechercheIndice(nom).subscribe(
-        (response: any) => { this.listeIndice = response.body.content },
+        (response: any) => {
+          this.listeIndice = response.body.content;
+        },
         () => {}
       );
     }
@@ -366,7 +391,9 @@ export class DetailpersonnelComponent implements OnInit {
   onSearchModeDePaiement(designation: string) {
     if (designation.length >= 3) {
       this.modeDePaiementService.rechercheModeDePaiement(designation).subscribe(
-        (response: any) => { this.listeModeDePaiement = response.body.content },
+        (response: any) => {
+          this.listeModeDePaiement = response.body.content;
+        },
         () => {}
       );
     }
@@ -375,7 +402,9 @@ export class DetailpersonnelComponent implements OnInit {
   onSearchStatutPersonnel(designation: string) {
     if (designation.length >= 3) {
       this.statutPersonnelService.rechercheStatutPersonnel(designation).subscribe(
-        (response: any) => { this.listeStatutPersonnel = response.body.content },
+        (response: any) => {
+          this.listeStatutPersonnel = response.body.content;
+        },
         () => {}
       );
     }
@@ -395,25 +424,27 @@ export class DetailpersonnelComponent implements OnInit {
   }
 
   chargeInformationPersonnel(id: number) {
-    this.personnel$ = this.personnelService.voirPersonnel(id)
-      .pipe(
-        map((response: any) => {
-          this.personnel = response;
+    this.personnel$ = this.personnelService.voirPersonnel(id).pipe(
+      map((response: any) => {
+        const flat = this.flattenPersonnel(response);
+        this.personnel = flat;
+
+        const dobRaw = flat.dateDeNaissance;
+        const dateDeNaissance = dobRaw ? new Date(dobRaw) : null;
+
+        if (dateDeNaissance) {
           const today = new Date();
-          const dateDeNaissance = new Date(response.dateDeNaissance);
-          if (this.personnel) {
-            this.personnel.isSameDayAndMonth =
-              dateDeNaissance.getMonth() === today.getMonth() &&
-              dateDeNaissance.getDate() === today.getDate();
-            this.personnel.age = this.calculateAge(dateDeNaissance);
-          }
-          return { dataState: DataStateEnum.CHARGE, data: { ...response } };
-        }),
-        startWith({ dataState: DataStateEnum.CHARGEMENT })
-      )
-      .pipe(
-        catchError(() => of({ dataState: this.dataStateEnum.CHARGE, data: undefined }))
-      );
+          flat.isSameDayAndMonth =
+            dateDeNaissance.getMonth() === today.getMonth() &&
+            dateDeNaissance.getDate() === today.getDate();
+          flat.age = this.calculateAge(dateDeNaissance);
+        }
+
+        return { dataState: DataStateEnum.CHARGE, data: { ...flat } };
+      }),
+      startWith({ dataState: DataStateEnum.CHARGEMENT }),
+      catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: undefined }))
+    );
   }
 
   calculateAge(dateOfBirth: Date): number {
@@ -429,40 +460,47 @@ export class DetailpersonnelComponent implements OnInit {
 
   isSameDayAndMonth(date: Date): boolean {
     const today = new Date();
-    return (date.getMonth() === today.getMonth() && date.getDate() === today.getDate());
+    return date.getMonth() === today.getMonth() && date.getDate() === today.getDate();
   }
 
-  goBack(): void { this.router.navigate(['rh/personnels']); }
+  goBack(): void {
+    this.router.navigate(['rh/personnels']);
+  }
 
-  openModal(content: any, _personnel: Personnel) { this.modalService.open(content) }
-  openModalEmbaucher(content: any, _personnel: Personnel) { this.modalService.open(content) }
+  openModal(content: any, _personnel: Personnel) {
+    this.modalService.open(content);
+  }
+  openModalEmbaucher(content: any, _personnel: Personnel) {
+    this.modalService.open(content);
+  }
 
   ajouterSignature() {
     const formData = new FormData();
     formData.append('file', this.file as File);
-    this.personnelService.ajouterSignaturePersonnel(this.id$, formData)
-      .subscribe(
-        () => {
-          this.modalService.dismissAll()
-          this.chargerIdPersonnel(this.id$)
-          if (this.personnel?.signature == null) {
-            this.successmsg("Signature ajouté", "La signature a été ajouté avec succès")
-          } else {
-            this.successmsg("Signature modifiée", "La signature a été modifiée avec succès")
-          }
-        },
-        (error) => {
-          const errors = error.error.errors;
-          for (let i = 0; i < errors.length; i++) {
-            const currentError = errors[i];
-            this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
-          }
+    this.personnelService.ajouterSignaturePersonnel(this.id$, formData).subscribe(
+      () => {
+        this.modalService.dismissAll();
+        this.chargerIdPersonnel(this.id$);
+        if (this.personnel?.signature == null) {
+          this.successmsg('Signature ajouté', 'La signature a été ajouté avec succès');
+        } else {
+          this.successmsg('Signature modifiée', 'La signature a été modifiée avec succès');
         }
-      )
+      },
+      (error) => {
+        const errors = error.error.errors;
+        for (let i = 0; i < errors.length; i++) {
+          const currentError = errors[i];
+          this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
+        }
+      }
+    );
   }
 
   uploaderFicher($event: any) {
-    if ($event.target.files.length > 0) { this.file = $event.target.files[0]; }
+    if ($event.target.files.length > 0) {
+      this.file = $event.target.files[0];
+    }
   }
 
   telechargerSignature(personnel: Personnel) {
@@ -470,71 +508,82 @@ export class DetailpersonnelComponent implements OnInit {
   }
 
   showPopOnDownloadSignature() {
-    this.successmsg('Signature telechargée', "La signature a été bien téléchargée avec succès");
+    this.successmsg('Signature telechargée', 'La signature a été bien téléchargée avec succès');
   }
 
-  closeModal() { this.modalService.dismissAll() }
+  closeModal() {
+    this.modalService.dismissAll();
+  }
 
-  successmsg(title = 'Poste ajouté !', message = 'Vous venez d\'ajoutez avec succès un nouveau Poste !') {
+  successmsg(title = 'Poste ajouté !', message = "Vous venez d'ajoutez avec succès un nouveau Poste !") {
     Swal.fire(title, message, 'success');
   }
 
-  errormsg(title = 'Erreur !', message: string) { Swal.fire(title, message, 'error'); }
+  errormsg(title = 'Erreur !', message: string) {
+    Swal.fire(title, message, 'error');
+  }
 
-  get formPersonnel() { return this.formulaireDossier.controls; }
+  get formPersonnel() {
+    return this.formulaireDossier.controls;
+  }
 
   openModalPersonnel(content: any, dossier: Personnel | undefined = undefined) {
     if (dossier) {
-      this.formulaireDossier.patchValue(dossier as any)
-      this.formulaireDossier.get('id')?.setValue(dossier?.id)
-      this.formPersonnel.identitePersonnelGroupe['controls'].matricule.setValue(dossier?.matricule?.toString())
-      this.formPersonnel.identitePersonnelGroupe['controls'].nom.setValue(dossier?.nom?.toString())
-      this.formPersonnel.identitePersonnelGroupe['controls'].prenom.setValue(dossier?.prenom?.toString())
-      this.formPersonnel.identitePersonnelGroupe['controls'].civilite.setValue(dossier?.civilite?.toString())
-      this.formPersonnel.identitePersonnelGroupe['controls'].dateDeNaissance.setValue(dossier?.dateDeNaissance?.toString())
-      this.formPersonnel.identitePersonnelGroupe['controls'].referenceComptable.setValue(dossier?.referenceComptable?.toString())
-      this.formPersonnel.identitePersonnelGroupe['controls'].situationMatrimoniale.setValue(dossier?.situationMatrimoniale?.toString())
-      this.formPersonnel.identitePersonnelGroupe['controls'].statutPersonnel.setValue(dossier?.statutPersonnel?.designation?.toString())
-      this.formPersonnel.identitePersonnelGroupe['controls'].nombreEnfant.setValue(dossier?.nombreEnfant?.toString())
-      this.formPersonnel.identitePersonnelGroupe['controls'].pieceIdentite.setValue(dossier?.pieceIdentite?.toString())
-      this.formPersonnel.identitePersonnelGroupe['controls'].numeroCnss.setValue(dossier?.numeroCnss?.toString())
-      this.formPersonnel.identitePersonnelGroupe['controls'].telephone.setValue(dossier?.telephone?.toString())
-      this.formPersonnel.identitePersonnelGroupe['controls'].dateEmbauchage.setValue(dossier?.dateEmbauchage?.toString())
-      this.formPersonnel.identitePersonnelGroupe['controls'].adresse.setValue(dossier?.adresse?.toString())
+      this.formulaireDossier.patchValue(dossier as any);
+      this.formulaireDossier.get('id')?.setValue(dossier?.id);
+      this.formPersonnel.identitePersonnelGroupe['controls'].matricule.setValue(dossier?.matricule?.toString());
+      this.formPersonnel.identitePersonnelGroupe['controls'].nom.setValue(dossier?.nom?.toString());
+      this.formPersonnel.identitePersonnelGroupe['controls'].prenom.setValue(dossier?.prenom?.toString());
+      this.formPersonnel.identitePersonnelGroupe['controls'].civilite.setValue(dossier?.civilite?.toString());
+      this.formPersonnel.identitePersonnelGroupe['controls'].dateDeNaissance.setValue(dossier?.dateDeNaissance?.toString());
+      this.formPersonnel.identitePersonnelGroupe['controls'].referenceComptable.setValue(dossier?.referenceComptable?.toString());
+      this.formPersonnel.identitePersonnelGroupe['controls'].situationMatrimoniale.setValue(
+        dossier?.situationMatrimoniale?.toString()
+      );
+      this.formPersonnel.identitePersonnelGroupe['controls'].statutPersonnel.setValue(
+        dossier?.statutPersonnel?.designation?.toString()
+      );
+      this.formPersonnel.identitePersonnelGroupe['controls'].nombreEnfant.setValue(dossier?.nombreEnfant?.toString());
+      this.formPersonnel.identitePersonnelGroupe['controls'].pieceIdentite.setValue(dossier?.pieceIdentite?.toString());
+      this.formPersonnel.identitePersonnelGroupe['controls'].numeroCnss.setValue(dossier?.numeroCnss?.toString());
+      this.formPersonnel.identitePersonnelGroupe['controls'].telephone.setValue(dossier?.telephone?.toString());
+      this.formPersonnel.identitePersonnelGroupe['controls'].dateEmbauchage.setValue(dossier?.dateEmbauchage?.toString());
+      this.formPersonnel.identitePersonnelGroupe['controls'].adresse.setValue(dossier?.adresse?.toString());
 
-      this.formPersonnel.personneContacterGroupe['controls'].telephoneContact.setValue(dossier?.telephoneContact?.toString())
-      this.formPersonnel.personneContacterGroupe['controls'].prenomContact.setValue(dossier?.prenomContact?.toString())
-      this.formPersonnel.personneContacterGroupe['controls'].nomContact.setValue(dossier?.nomContact?.toString())
+      this.formPersonnel.personneContacterGroupe['controls'].telephoneContact.setValue(
+        dossier?.telephoneContact?.toString()
+      );
+      this.formPersonnel.personneContacterGroupe['controls'].prenomContact.setValue(dossier?.prenomContact?.toString());
+      this.formPersonnel.personneContacterGroupe['controls'].nomContact.setValue(dossier?.nomContact?.toString());
 
-      // 🧹 SUPPRIMÉ : lecture banque/modePaiement/RIB depuis `dossier`
-      // (c’est ce qui causait l’erreur, car le type `Personnel` ne les expose pas)
-      this.formPersonnel.identiteBanquePersonneGroupe['controls'].banque.setValue(null)
-      this.formPersonnel.identiteBanquePersonneGroupe['controls'].cleRib.setValue('')
-      this.formPersonnel.identiteBanquePersonneGroupe['controls'].codeBanque.setValue('')
-      this.formPersonnel.identiteBanquePersonneGroupe['controls'].codeGuichet.setValue('')
-      this.formPersonnel.identiteBanquePersonneGroupe['controls'].numeroCompte.setValue('')
-      this.formPersonnel.identiteBanquePersonneGroupe['controls'].modePaiement.setValue(null)
+      // champs banque/modePaiement: remis à vide/local (évite les erreurs de typage)
+      this.formPersonnel.identiteBanquePersonneGroupe['controls'].banque.setValue(null);
+      this.formPersonnel.identiteBanquePersonneGroupe['controls'].cleRib.setValue('');
+      this.formPersonnel.identiteBanquePersonneGroupe['controls'].codeBanque.setValue('');
+      this.formPersonnel.identiteBanquePersonneGroupe['controls'].codeGuichet.setValue('');
+      this.formPersonnel.identiteBanquePersonneGroupe['controls'].numeroCompte.setValue('');
+      this.formPersonnel.identiteBanquePersonneGroupe['controls'].modePaiement.setValue(null);
 
-      this.formPersonnel.autrePersonnelGroupe['controls'].poste.setValue(dossier?.poste?.designation?.toString())
-      this.formPersonnel.autrePersonnelGroupe['controls'].entite.setValue(dossier?.entite?.designation?.toString())
-      this.formPersonnel.autrePersonnelGroupe['controls'].indice.setValue(dossier?.indice?.nom?.toString())
+      this.formPersonnel.autrePersonnelGroupe['controls'].poste.setValue(dossier?.poste?.designation?.toString());
+      this.formPersonnel.autrePersonnelGroupe['controls'].entite.setValue(dossier?.entite?.designation?.toString());
+      this.formPersonnel.autrePersonnelGroupe['controls'].indice.setValue(dossier?.indice?.nom?.toString());
     } else {
-      this.formulaireDossier.reset()
-      this.formPersonnel.id.reset()
-      this.formPersonnel.identitePersonnelGroupe.reset()
-      this.formPersonnel.personneContacterGroupe.reset()
-      this.formPersonnel.identiteBanquePersonneGroupe.reset()
-      this.formPersonnel.autrePersonnelGroupe.reset()
+      this.formulaireDossier.reset();
+      this.formPersonnel.id.reset();
+      this.formPersonnel.identitePersonnelGroupe.reset();
+      this.formPersonnel.personneContacterGroupe.reset();
+      this.formPersonnel.identiteBanquePersonneGroupe.reset();
+      this.formPersonnel.autrePersonnelGroupe.reset();
 
-      this.formPersonnel.identitePersonnelGroupe['controls'].civilite.setValue(null)
-      this.formPersonnel.identitePersonnelGroupe['controls'].situationMatrimoniale.setValue(null)
-      this.formPersonnel.identitePersonnelGroupe['controls'].statutPersonnel.setValue(null)
+      this.formPersonnel.identitePersonnelGroupe['controls'].civilite.setValue(null);
+      this.formPersonnel.identitePersonnelGroupe['controls'].situationMatrimoniale.setValue(null);
+      this.formPersonnel.identitePersonnelGroupe['controls'].statutPersonnel.setValue(null);
 
-      this.formPersonnel.identiteBanquePersonneGroupe['controls'].banque.setValue(null)
+      this.formPersonnel.identiteBanquePersonneGroupe['controls'].banque.setValue(null);
 
-      this.formPersonnel.autrePersonnelGroupe['controls'].poste.setValue(null)
-      this.formPersonnel.autrePersonnelGroupe['controls'].entite.setValue(null)
-      this.formPersonnel.autrePersonnelGroupe['controls'].indice.setValue(null)
+      this.formPersonnel.autrePersonnelGroupe['controls'].poste.setValue(null);
+      this.formPersonnel.autrePersonnelGroupe['controls'].entite.setValue(null);
+      this.formPersonnel.autrePersonnelGroupe['controls'].indice.setValue(null);
     }
     this.modalService.open(content, { size: 'lg', centered: true });
   }
@@ -543,13 +592,15 @@ export class DetailpersonnelComponent implements OnInit {
     let formDataPersonnel: any = null;
     if (this.formulaireDossier.valid) {
       const statutPersonnelValue = this.formPersonnel.identitePersonnelGroupe['controls'].statutPersonnel.value;
-      const isStatutPersonnelNumber = statutPersonnelValue != null && !isNaN(Number(statutPersonnelValue)) && isFinite(Number(statutPersonnelValue));
+      const isStatutPersonnelNumber =
+        statutPersonnelValue != null && !isNaN(Number(statutPersonnelValue)) && isFinite(Number(statutPersonnelValue));
 
       const banqueValue = this.formPersonnel.identiteBanquePersonneGroupe['controls'].banque.value;
       const isBanqueValid = banqueValue != null && !isNaN(Number(banqueValue)) && isFinite(Number(banqueValue));
 
       const modePaiementValue = this.formPersonnel.identiteBanquePersonneGroupe['controls'].modePaiement.value;
-      const isModePaiementValid = modePaiementValue != null && !isNaN(Number(modePaiementValue)) && isFinite(Number(modePaiementValue));
+      const isModePaiementValid =
+        modePaiementValue != null && !isNaN(Number(modePaiementValue)) && isFinite(Number(modePaiementValue));
 
       const posteValue = this.formPersonnel.autrePersonnelGroupe['controls'].poste.value;
       const isPosteValid = posteValue != null && !isNaN(Number(posteValue)) && isFinite(Number(posteValue));
@@ -561,81 +612,80 @@ export class DetailpersonnelComponent implements OnInit {
       const isIndiceValid = indiceValue != null && !isNaN(Number(indiceValue)) && isFinite(Number(indiceValue));
 
       formDataPersonnel = {
-        "matricule": this.formPersonnel.identitePersonnelGroupe['controls'].matricule.value || null,
-        "nom": this.formPersonnel.identitePersonnelGroupe['controls'].nom.value || null,
-        "prenom": this.formPersonnel.identitePersonnelGroupe['controls'].prenom.value || null,
-        "civilite": this.formPersonnel.identitePersonnelGroupe['controls'].civilite.value || null,
-        "dateDeNaissance": this.formPersonnel.identitePersonnelGroupe['controls'].dateDeNaissance.value || null,
-        "referenceComptable": this.formPersonnel.identitePersonnelGroupe['controls'].referenceComptable.value || null,
-        "situationMatrimoniale": this.formPersonnel.identitePersonnelGroupe['controls'].situationMatrimoniale.value || null,
-        "statutPersonnel": isStatutPersonnelNumber ? statutPersonnelValue : null,
-        "nombreEnfant": this.formPersonnel.identitePersonnelGroupe['controls'].nombreEnfant.value || null,
-        "pieceIdentite": this.formPersonnel.identitePersonnelGroupe['controls'].pieceIdentite.value || null,
-        "numeroCnss": this.formPersonnel.identitePersonnelGroupe['controls'].numeroCnss.value || null,
-        "telephone": this.formPersonnel.identitePersonnelGroupe['controls'].telephone.value || null,
-        "dateEmbauchage": this.formPersonnel.identitePersonnelGroupe['controls'].dateEmbauchage.value,
-        "adresse": this.formPersonnel.identitePersonnelGroupe['controls'].adresse.value || null,
+        matricule: this.formPersonnel.identitePersonnelGroupe['controls'].matricule.value || null,
+        nom: this.formPersonnel.identitePersonnelGroupe['controls'].nom.value || null,
+        prenom: this.formPersonnel.identitePersonnelGroupe['controls'].prenom.value || null,
+        civilite: this.formPersonnel.identitePersonnelGroupe['controls'].civilite.value || null,
+        dateDeNaissance: this.formPersonnel.identitePersonnelGroupe['controls'].dateDeNaissance.value || null,
+        referenceComptable: this.formPersonnel.identitePersonnelGroupe['controls'].referenceComptable.value || null,
+        situationMatrimoniale: this.formPersonnel.identitePersonnelGroupe['controls'].situationMatrimoniale.value || null,
+        statutPersonnel: isStatutPersonnelNumber ? statutPersonnelValue : null,
+        nombreEnfant: this.formPersonnel.identitePersonnelGroupe['controls'].nombreEnfant.value || null,
+        pieceIdentite: this.formPersonnel.identitePersonnelGroupe['controls'].pieceIdentite.value || null,
+        numeroCnss: this.formPersonnel.identitePersonnelGroupe['controls'].numeroCnss.value || null,
+        telephone: this.formPersonnel.identitePersonnelGroupe['controls'].telephone.value || null,
+        dateEmbauchage: this.formPersonnel.identitePersonnelGroupe['controls'].dateEmbauchage.value,
+        adresse: this.formPersonnel.identitePersonnelGroupe['controls'].adresse.value || null,
 
-        "telephoneContact": this.formPersonnel.personneContacterGroupe['controls'].telephoneContact.value || null,
-        "prenomContact": this.formPersonnel.personneContacterGroupe['controls'].prenomContact.value || null,
-        "nomContact": this.formPersonnel.personneContacterGroupe['controls'].nomContact.value || null,
+        telephoneContact: this.formPersonnel.personneContacterGroupe['controls'].telephoneContact.value || null,
+        prenomContact: this.formPersonnel.personneContacterGroupe['controls'].prenomContact.value || null,
+        nomContact: this.formPersonnel.personneContacterGroupe['controls'].nomContact.value || null,
 
-        // ✅ on garde l’envoi éventuel au backend, mais sans le lier à `personnel`
-        "banque": isBanqueValid ? banqueValue : null,
-        "cleRib": this.formPersonnel.identiteBanquePersonneGroupe['controls'].cleRib.value || null,
-        "codeBanque": this.formPersonnel.identiteBanquePersonneGroupe['controls'].codeBanque.value || null,
-        "codeGuichet": this.formPersonnel.identiteBanquePersonneGroupe['controls'].codeGuichet.value || null,
-        "numeroCompte": this.formPersonnel.identiteBanquePersonneGroupe['controls'].numeroCompte.value || null,
-        "modePaiement": isModePaiementValid ? modePaiementValue : null,
+        banque: isBanqueValid ? banqueValue : null,
+        cleRib: this.formPersonnel.identiteBanquePersonneGroupe['controls'].cleRib.value || null,
+        codeBanque: this.formPersonnel.identiteBanquePersonneGroupe['controls'].codeBanque.value || null,
+        codeGuichet: this.formPersonnel.identiteBanquePersonneGroupe['controls'].codeGuichet.value || null,
+        numeroCompte: this.formPersonnel.identiteBanquePersonneGroupe['controls'].numeroCompte.value || null,
+        modePaiement: isModePaiementValid ? modePaiementValue : null,
 
-        "poste": isPosteValid ? posteValue : null,
-        "entite": isEntiteValid ? entiteValue : null,
-        "indice": isIndiceValid ? indiceValue : null,
+        poste: isPosteValid ? posteValue : null,
+        entite: isEntiteValid ? entiteValue : null,
+        indice: isIndiceValid ? indiceValue : null,
       };
     }
 
     if (this.formulaireDossier.get('id')?.value) {
-      this.personnelService.modifierPersonnel(this.formulaireDossier.get('id')?.value, formDataPersonnel)
+      this.personnelService
+        .modifierPersonnel(this.formulaireDossier.get('id')?.value, formDataPersonnel)
         .subscribe(
           (response: any) => {
-            this.listeDossierPage = this.listeDossierPage.map(e => {
-              if (e.id === response["data"].id) {
+            this.listeDossierPage = this.listeDossierPage.map((e) => {
+              if (e.id === response['data'].id) {
                 e = {
                   ...e,
-                  matricule: response["data"].matricule,
-                  nom: response["data"].nom,
-                  prenom: response["data"].prenom,
-                  civilite: response["data"].civilite,
-                  dateDeNaissance: response["data"].dateDeNaissance,
-                  referenceComptable: response["data"].referenceComptable,
-                  situationMatrimoniale: response["data"].situationMatrimoniale,
-                  statutPersonnel: response["data"].statutPersonnel,
-                  nombreEnfant: response["data"].nombreEnfant,
-                  pieceIdentite: response["data"].pieceIdentite,
-                  numeroCnss: response["data"].numeroCnss,
-                  telephone: response["data"].telephone,
-                  dateEmbauchage: response["data"].dateEmbauchage,
-                  adresse: response["data"].adresse,
-                  telephoneContact: response["data"].telephoneContact,
-                  prenomContact: response["data"].prenomContact,
-                  nomContact: response["data"].nomContact,
-                  // 🧹 pas d’accès à e.banque / e.modePaiement / e.cleRib etc.
-                  poste: response["data"].poste,
-                  entite: response["data"].entite,
-                  indice: response["data"].indice
+                  matricule: response['data'].matricule,
+                  nom: response['data'].nom,
+                  prenom: response['data'].prenom,
+                  civilite: response['data'].civilite,
+                  dateDeNaissance: response['data'].dateDeNaissance,
+                  referenceComptable: response['data'].referenceComptable,
+                  situationMatrimoniale: response['data'].situationMatrimoniale,
+                  statutPersonnel: response['data'].statutPersonnel,
+                  nombreEnfant: response['data'].nombreEnfant,
+                  pieceIdentite: response['data'].pieceIdentite,
+                  numeroCnss: response['data'].numeroCnss,
+                  telephone: response['data'].telephone,
+                  dateEmbauchage: response['data'].dateEmbauchage,
+                  adresse: response['data'].adresse,
+                  telephoneContact: response['data'].telephoneContact,
+                  prenomContact: response['data'].prenomContact,
+                  nomContact: response['data'].nomContact,
+                  poste: response['data'].poste,
+                  entite: response['data'].entite,
+                  indice: response['data'].indice,
                 };
               }
               return e;
             });
             this.modalService.dismissAll();
             this.chargerIdPersonnel(this.id$);
-            this.successmsg("Personnel modifié", "Le Personnel a été modifié avec succès");
+            this.successmsg('Personnel modifié', 'Le Personnel a été modifié avec succès');
             this.formulaireDossier.reset();
           },
           (error) => {
             this.errormsg('Erreur', error.error.message);
             for (let erreur in error.error.errors) {
-              this.errormsg('Erreur', erreur + " " + error.error.errors[erreur]);
+              this.errormsg('Erreur', erreur + ' ' + error.error.errors[erreur]);
             }
           }
         );
@@ -646,12 +696,12 @@ export class DetailpersonnelComponent implements OnInit {
           this.formulaireDossier.reset();
           this.modalService.dismissAll();
           this.chargerIdPersonnel(this.id$);
-          this.successmsg("Personnel créé", "Le Personnel a été créé avec succès");
+          this.successmsg('Personnel créé', 'Le Personnel a été créé avec succès');
         },
         (error) => {
           this.errormsg('Erreur', error.error.message);
           for (let erreur in error.error.errors) {
-            this.errormsg('Erreur', erreur + " " + error.error.errors[erreur]);
+            this.errormsg('Erreur', erreur + ' ' + error.error.errors[erreur]);
           }
         }
       );
@@ -674,7 +724,7 @@ export class DetailpersonnelComponent implements OnInit {
           next: () => {
             this.devisSbj.next(0);
             this.listeDossierPage = this.listeDossierPage.filter((i) => i.id !== this.id$);
-            this.goBack()
+            this.goBack();
             this.successmsg('Personnel supprimer', 'Suppression réussie');
           },
           error: (err) => {
@@ -685,8 +735,12 @@ export class DetailpersonnelComponent implements OnInit {
     });
   }
 
-  get activationFormDebaucher() { return this.formulaireDebaucher.controls; }
-  get activationFormEmbaucher() { return this.formulaireEmbaucher.controls; }
+  get activationFormDebaucher() {
+    return this.formulaireDebaucher.controls;
+  }
+  get activationFormEmbaucher() {
+    return this.formulaireEmbaucher.controls;
+  }
 
   debaucherPersonnel() {
     Swal.fire({
@@ -698,11 +752,13 @@ export class DetailpersonnelComponent implements OnInit {
       cancelButtonColor: '#f46a6a',
       confirmButtonText: 'Oui, Débaucher le !',
       cancelButtonText: 'Non, Annuler',
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.debauche();
-      }
-    }).catch(() => {});
+    })
+      .then((result) => {
+        if (result.isConfirmed) {
+          this.debauche();
+        }
+      })
+      .catch(() => {});
   }
 
   embaucherPersonnel() {
@@ -715,9 +771,13 @@ export class DetailpersonnelComponent implements OnInit {
       cancelButtonColor: '#f46a6a',
       confirmButtonText: 'Oui, Re Embaucher le !',
       cancelButtonText: 'Non, Annuler',
-    }).then((result) => {
-      if (result.isConfirmed) { this.embauche(); }
-    }).catch(() => {});
+    })
+      .then((result) => {
+        if (result.isConfirmed) {
+          this.embauche();
+        }
+      })
+      .catch(() => {});
   }
 
   debauche() {
@@ -740,7 +800,9 @@ export class DetailpersonnelComponent implements OnInit {
     });
   }
 
-  get activationFormRetraite() { return this.formulaireRetraiter.controls; }
+  get activationFormRetraite() {
+    return this.formulaireRetraiter.controls;
+  }
 
   retraitePersonnel() {
     Swal.fire({
@@ -752,9 +814,13 @@ export class DetailpersonnelComponent implements OnInit {
       cancelButtonColor: '#f46a6a',
       confirmButtonText: 'Oui, Mettre en retraite !',
       cancelButtonText: 'Non, Annuler',
-    }).then((result) => {
-      if (result.isConfirmed) { this.retraite(); }
-    }).catch(() => {});
+    })
+      .then((result) => {
+        if (result.isConfirmed) {
+          this.retraite();
+        }
+      })
+      .catch(() => {});
   }
 
   retraite() {
@@ -776,78 +842,97 @@ export class DetailpersonnelComponent implements OnInit {
   }
 
   chargerListePiecesPersonnel() {
-    this.pieces = this.personnelService.listerPiecesPersonnel(this.id$, this.currentPage, this.nombrePerPage, this.sort)
+    this.pieces = this.personnelService
+      .listerPiecesPersonnel(this.id$, this.currentPage, this.nombrePerPage, `id,${this.sort}`)
       .pipe(
         map((response: any) => {
-          this.listePiecesPersonnel = response.body.content;
-          this.totalPieces = response.body.totalElements;
-          this.totalPages = response.body.totalPages;
+          this.listePiecesPersonnel = response?.body?.content ?? [];
+          this.totalPieces = response?.body?.totalElements ?? this.listePiecesPersonnel.length;
+          this.totalPages = response?.body?.totalPages ?? 1;
           this.pages = this.getPages();
           return { dataState: this.dataStateEnum.CHARGE, data: this.listePiecesPersonnel };
         }),
-        startWith({ dataState: this.dataStateEnum.CHARGEMENT })
-      )
-      .pipe(catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] })));
+        startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
+        catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] }))
+      );
   }
 
   chargerListePresencePersonnel() {
-    this.presences = this.personnelService.listerPresencePersonnel(this.id$, this.currentPage, this.nombrePerPage, this.sort)
+    this.presences = this.personnelService
+      .listerPresencePersonnel(this.id$, this.currentPage, this.nombrePerPage, `dateValidation,${this.sort}`)
       .pipe(
         map((response: any) => {
-          this.listePresencePersonnel = response.body.content;
-          this.totalPresence = response.body.totalElements;
-          this.totalPages = response.body.totalPages;
+          const content: Presence[] = response?.body?.content ?? [];
+          this.listePresencePersonnel = content.map((p: any) => ({
+            ...p,
+            date: p.date ? new Date(p.date) : null,
+            estPresent: p.estPresent ?? ((p.nbreJourAbsent ?? 0) === 0),
+          }));
+
+          this.totalPresence = response?.body?.totalElements ?? this.listePresencePersonnel.length;
+          this.totalPages = response?.body?.totalPages ?? 1;
           this.pages = this.getPages();
+
           return { dataState: this.dataStateEnum.CHARGE, data: this.listePresencePersonnel };
         }),
-        startWith({ dataState: this.dataStateEnum.CHARGEMENT })
-      )
-      .pipe(catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] })));
+        startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
+        catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] }))
+      );
   }
 
   chargerListeInterimesPersonnel() {
-    this.interims = this.personnelService.listerInterimePersonnel(this.id$, this.currentPage, this.nombrePerPage, this.sort)
+    this.interims = this.personnelService
+      .listerInterimePersonnel(this.id$, this.currentPage, this.nombrePerPage, `id,${this.sort}`)
       .pipe(
         map((response: any) => {
-          this.listeInterimesPersonnel = response.body.content;
-          this.totalInterims = response.body.totalElements;
-          this.totalPages = response.body.totalPages;
+          this.listeInterimesPersonnel = response?.body?.content ?? [];
+          this.totalInterims = response?.body?.totalElements ?? this.listeInterimesPersonnel.length;
+          this.totalPages = response?.body?.totalPages ?? 1;
           this.pages = this.getPages();
           return { dataState: this.dataStateEnum.CHARGE, data: this.listeInterimesPersonnel };
         }),
-        startWith({ dataState: this.dataStateEnum.CHARGEMENT })
-      )
-      .pipe(catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] })));
+        startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
+        catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] }))
+      );
   }
 
   chargerListeAffectationPersonnel() {
-    this.affectations = this.personnelService.listerAffectationPersonnel(this.id$, this.currentPage, this.nombrePerPage, this.sort)
+    this.affectations = this.personnelService
+      .listerAffectationPersonnel(this.id$, this.currentPage, this.nombrePerPage, `dateDebut,${this.sort}`)
       .pipe(
         map((response: any) => {
-          this.listeAffectationPersonnel = response.body.content;
-          this.totalAffectation = response.body.totalElements;
-          this.totalPages = response.body.totalPages;
+          this.listeAffectationPersonnel = response?.body?.content ?? [];
+          this.totalAffectation = response?.body?.totalElements ?? this.listeAffectationPersonnel.length;
+          this.totalPages = response?.body?.totalPages ?? 1;
           this.pages = this.getPages();
           return { dataState: this.dataStateEnum.CHARGE, data: this.listeAffectationPersonnel };
         }),
-        startWith({ dataState: this.dataStateEnum.CHARGEMENT })
-      )
-      .pipe(catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] })));
+        startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
+        catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] }))
+      );
   }
 
   chargerListeContratPersonnel() {
-    this.contrats = this.personnelService.listerContratPersonnel(this.id$, this.currentPage, this.nombrePerPage, this.sort)
+    this.contrats = this.personnelService
+      .listerContratPersonnel(this.id$, this.currentPage, this.nombrePerPage, `id,${this.sort}`)
       .pipe(
         map((response: any) => {
-          this.listeContratsPersonnel = response.body.content;
-          this.totalContrat = response.body.totalElements;
-          this.totalPages = response.body.totalPages;
+          const content: Contrat[] = response?.body?.content ?? [];
+          this.listeContratsPersonnel = content.map((c) => ({
+            ...c,
+            _enCours: this.isTodayBetweenDates(
+              c.dateDebutContrat ? new Date(c.dateDebutContrat) : new Date(0),
+              c.dateFinContrat ? new Date(c.dateFinContrat) : new Date(0)
+            ),
+          }));
+          this.totalContrat = response?.body?.totalElements ?? this.listeContratsPersonnel.length;
+          this.totalPages = response?.body?.totalPages ?? 1;
           this.pages = this.getPages();
           return { dataState: this.dataStateEnum.CHARGE, data: this.listeContratsPersonnel };
         }),
-        startWith({ dataState: this.dataStateEnum.CHARGEMENT })
-      )
-      .pipe(catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] })));
+        startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
+        catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] }))
+      );
   }
 
   isTodayBetweenDates(startDate: Date, endDate: Date): boolean {
@@ -855,72 +940,184 @@ export class DetailpersonnelComponent implements OnInit {
     return startDate <= today && endDate >= today;
   }
 
-  encodeId(id: number) { return this.hashids.encode(id); }
+  encodeId(id: number) {
+    return this.hashids.encode(id);
+  }
 
   chargerListeMissionsPersonnel() {
-    this.missions = this.personnelService.listerMissionsPersonnel(this.id$, this.currentPage, this.nombrePerPage, this.sort)
+    this.missions = this.personnelService
+      .listerMissionsPersonnel(this.id$, this.currentPage, this.nombrePerPage, `dateDebut,${this.sort}`)
       .pipe(
         map((response: any) => {
-          this.listeMissionPersonnel = response.body.content;
+          this.listeMissionPersonnel = response?.body?.content ?? [];
           this.listeMissionPersonnel.forEach((mission: Mission) => {
             const startDate = new Date(mission.dateDebut);
             const endDate = new Date(mission.dateFin);
             mission.isTodayBetweenDates = this.isTodayBetweenDates(startDate, endDate);
           });
-          this.totalMission = response.body.totalElements;
-          this.totalPages = response.body.totalPages;
+          this.totalMission = response?.body?.totalElements ?? this.listeMissionPersonnel.length;
+          this.totalPages = response?.body?.totalPages ?? 1;
           this.pages = this.getPages();
           return { dataState: this.dataStateEnum.CHARGE, data: this.listeMissionPersonnel };
         }),
-        startWith({ dataState: this.dataStateEnum.CHARGEMENT })
-      )
-      .pipe(catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] })));
+        startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
+        catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] }))
+      );
   }
 
+  /** 🔧 Réparation complète */
   chargerListeDemandesPersonnel() {
-    this.demandes = this.personnelService.listerDemandesPersonnel(this.id$, this.currentPage, this.nombrePerPage, this.sort)
+    this.demandes = this.demandeService
+      .listerDemandePersonnel(this.id$, this.currentPage, this.nombrePerPage, `dateDemande,${this.sort}`)
       .pipe(
         map((response: any) => {
-          this.listeDemandePersonnel = response.body.content;
-          this.totalDemande = response.body.totalElements;
-          this.totalPages = response.body.totalPages;
+          const content: any[] = response?.body?.content ?? [];
+
+          this.listeDemandePersonnel = content.map((d: any) => {
+            // type label (accepte string ou objet)
+            const typeLabel =
+              (typeof d?.typeDemande === 'string'
+                ? d?.typeDemande
+                : d?.typeDemande?.nom ?? d?.typeDemande?.libelle ?? d?.typeDemande?.designation) ?? '';
+
+            // statut label — ATTENTION aux parenthèses avec ?? + ||
+            const statutLabel =
+              (d?.statutDemande?.nom ??
+                d?.statutDemande?.libelle ??
+                d?.statut ??
+                d?.statutLibelle ??
+                d?.etat ??
+                null) ??
+              (typeLabel || '—');
+
+            const commentaire = d?.commentaire ?? d?.message ?? d?.motif ?? d?.observations ?? '';
+
+            const statutId = d?.statutDemande?.id ?? d?.statutId ?? d?.etatId ?? null;
+
+            const fichierRaw =
+              d?.fichier ?? d?.pieces ?? d?.attestation ?? d?.document ?? d?.file ?? d?.piece?.fichier ?? null;
+            const fichier = Array.isArray(fichierRaw) ? fichierRaw[0] ?? null : fichierRaw;
+
+            return {
+              ...d,
+              _statutLabel: statutLabel,
+              _commentaire: commentaire,
+              _statutId: statutId,
+              _fichier: fichier,
+              _typeLabel: typeLabel,
+            };
+          });
+
+          this.totalDemande = response?.body?.totalElements ?? this.listeDemandePersonnel.length;
+          this.totalPages = response?.body?.totalPages ?? 1;
           this.pages = this.getPages();
+
           return { dataState: this.dataStateEnum.CHARGE, data: this.listeDemandePersonnel };
         }),
-        startWith({ dataState: this.dataStateEnum.CHARGEMENT })
-      )
-      .pipe(catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] })));
+        startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
+        catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] }))
+      );
+  }
+
+  hasFichier(d: any): boolean {
+    const cand =
+      d?._fichier ??
+      d?.fichier ??
+      d?.pieces ??
+      d?.attestation ??
+      d?.document ??
+      d?.file ??
+      d?.piece?.fichier;
+
+    const v = Array.isArray(cand) ? cand[0] : cand;
+    return !!(v && v !== 'null' && v !== 'undefined' && String(v).trim() !== '');
+  }
+
+  telechargerFicheDemande(d: any) {
+    const raw =
+      d?._fichier ??
+      d?.fichier ??
+      d?.pieces ??
+      d?.attestation ??
+      d?.document ??
+      d?.file ??
+      d?.piece?.fichier ??
+      null;
+
+    const fname = Array.isArray(raw) ? raw[0] : raw;
+    if (!fname) return '#';
+
+    if (/^https?:\/\//i.test(fname)) return fname;
+    if (String(fname).startsWith('/')) return `${this.demandeService.contextPath}${fname}`;
+
+    return `${this.demandeService.contextPath}/telecharger/${fname}`;
+  }
+
+  getDemandeRowClass(d: any): { [klass: string]: boolean } {
+    const id = d?._statutId ?? d?.statutDemande?.id ?? d?.statutId ?? d?.etatId ?? null;
+
+    const label = (
+      d?._statutLabel ??
+      d?.statutDemande?.nom ??
+      d?.statutDemande?.libelle ??
+      d?.statut ??
+      d?.statutLibelle ??
+      d?.etat ??
+      ''
+    )
+      .toString()
+      .toLowerCase();
+
+    const isValide = id === 2 || /valid|approuv|accept/.test(label);
+    const isEnCours = id === 1 || id === 3 || /cours|attent|trait|en\s+validation/.test(label);
+    const isRefuse = id === 4 || id === 5 || /refus|rejett|annul/.test(label);
+
+    return {
+      'table-success': isValide,
+      'table-warning': isEnCours && !isValide,
+      'table-danger': isRefuse,
+    };
   }
 
   chargerListeCongesPersonnel() {
-    this.conges = this.personnelService.listerCongesPersonnel(this.id$, this.currentPage, this.nombrePerPage, this.sort)
+    this.conges = this.personnelService
+      .listerCongesPersonnel(this.id$, this.currentPage, this.nombrePerPage, `dateDebut,${this.sort}`)
       .pipe(
         map((response: any) => {
-          this.listeCongePersonnel = response.body.content;
-          this.totalConge = response.body.totalElements;
-          this.totalPages = response.body.totalPages;
+          this.listeCongePersonnel = response?.body?.content ?? [];
+          this.totalConge = response?.body?.totalElements ?? this.listeCongePersonnel.length;
+          this.totalPages = response?.body?.totalPages ?? 1;
           this.pages = this.getPages();
           return { dataState: this.dataStateEnum.CHARGE, data: this.listeCongePersonnel };
         }),
-        startWith({ dataState: this.dataStateEnum.CHARGEMENT })
-      )
-      .pipe(catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] })));
+        startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
+        catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] }))
+      );
   }
 
   getPages(): number[] {
     const pages: number[] = [];
-    for (let i = 0; i < this.totalPages; i++) { pages.push(i); }
+    for (let i = 0; i < this.totalPages; i++) {
+      pages.push(i);
+    }
     return pages;
   }
 
   openModalPresence(content: any, presence: Presence | undefined = undefined) {
     if (presence) {
-      this.formulairePresence.patchValue(presence as any)
-      this.formulairePresence.get('personnel')?.setValue(presence?.personnel?.prenom.toString() + ' ' + presence?.personnel?.nom.toString())
-      this.formulairePresence.get('estPresent')?.setValue(presence?.estPresent.toString())
+      this.formulairePresence.patchValue({
+        id: presence.id ?? null,
+        mois: presence.mois ?? null,
+        nbreJourAbsent: presence.nbreJourAbsent ?? 0,
+        dateValidation: presence.dateValidation ? new Date(presence.dateValidation) : null,
+      });
     } else {
-      this.formulairePresence.reset()
-      this.formulairePresence.get('personnel')?.setValue(this.id$)
+      this.formulairePresence.reset({
+        id: null,
+        mois: null,
+        nbreJourAbsent: 0,
+        dateValidation: null,
+      });
     }
     this.modalService.open(content, { size: 'lg', backdrop: 'static', keyboard: false });
   }
@@ -935,60 +1132,131 @@ export class DetailpersonnelComponent implements OnInit {
       cancelButtonColor: '#f46a6a',
       confirmButtonText: 'Oui, Marquer !',
       cancelButtonText: 'Non, Annuler',
-    }).then((result) => {
-      if (result.isConfirmed) { this.creeModifierPresence(); }
-    }).catch(() => {});
+    })
+      .then((result) => {
+        if (result.isConfirmed) {
+          this.creeModifierPresence();
+        }
+      })
+      .catch(() => {});
   }
 
   creeModifierPresence() {
-    if (this.formulairePresence.valid)
-      if (this.formulairePresence.get('id')?.value) {
-        this.presenceService.modifierPresence(this.formulairePresence.get("id")?.value, this.nbrJourAbasent)
-          .subscribe(
-            (response: any) => {
-              this.listePresencePersonnel.map(e => {
-                if (e.id == response["data"].id) {
-                  e.date = response["data"].date
-                  e.estPresent = response["data"].estPresent
-                }
-                return e;
-              })
-              this.modalService.dismissAll()
-              this.chargerIdPersonnel(this.id$)
-              this.successmsg("Présence modifiée", "La présence a été modifiée avec succès")
-              this.formulairePresence.reset()
-            },
-            (error) => {
-              const errors = error.error.errors;
-              for (let i = 0; i < errors.length; i++) {
-                const currentError = errors[i];
-                this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
-              }
+    if (!this.formulairePresence.valid) return;
+
+    const id = this.formulairePresence.get('id')?.value;
+    const mois = this.formulairePresence.get('mois')?.value as number;
+    const nbreJourAbsent = (this.formulairePresence.get('nbreJourAbsent')?.value as number) ?? 0;
+
+    if (id) {
+      this.presenceService.modifierPresence(id, nbreJourAbsent).subscribe(
+        (response: any) => {
+          this.listePresencePersonnel = this.listePresencePersonnel.map((e) => {
+            if (e.id === response['data'].id) {
+              return {
+                ...e,
+                nbreJourAbsent: response['data'].nbreJourAbsent,
+                csrhValidation: response['data'].csrhValidation,
+                dateValidation: response['data'].dateValidation,
+              };
             }
-          )
-      } else {
-        this.presenceService.creerPresence(this.personnelId, this.nbrJourAbasent, this.mois).subscribe(
-          (response: any) => {
-            this.listePresencePersonnel.unshift(response['data'])
-            this.formulairePresence.reset()
-            this.modalService.dismissAll()
-            this.chargerIdPersonnel(this.id$)
-            this.successmsg("Présence marquée", "La présence a été marquée avec succès")
-          },
-          (error) => {
-            const errors = error.error.errors;
-            for (let i = 0; i < errors.length; i++) {
-              const currentError = errors[i];
-              this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
-            }
-          }
-        )
-      }
+            return e;
+          });
+          this.modalService.dismissAll();
+          this.chargerIdPersonnel(this.id$);
+          this.successmsg('Présence modifiée', 'La présence a été modifiée avec succès');
+          this.formulairePresence.reset();
+        },
+        (error) => this._toastErrors(error)
+      );
+    } else {
+      this.presenceService.creerPresence(this.id$, nbreJourAbsent, mois).subscribe(
+        (response: any) => {
+          this.listePresencePersonnel.unshift(response['data']);
+          this.formulairePresence.reset();
+          this.modalService.dismissAll();
+          this.chargerIdPersonnel(this.id$);
+          this.successmsg('Présence marquée', 'La présence a été marquée avec succès');
+        },
+        (error) => this._toastErrors(error)
+      );
+    }
   }
 
-  updateDate(event: any): void {
-    const dateValue = event;
-    this.formulairePresence.get('date')?.patchValue(dateValue, { emitEvent: false });
+  // petit helper
+  private _toastErrors(error: any) {
+    const errors = error?.error?.errors ?? [];
+    for (const currentError of errors) {
+      this.toastService.error(`${currentError.champs}: ${currentError.message}`, 'Erreur!');
+    }
+  }
+
+  updateDate(dateValue: Date | null): void {
+    this.formulairePresence.get('dateValidation')?.patchValue(dateValue, { emitEvent: false });
+  }
+
+  /** Aplatis les champs utiles pour le template */
+  private flattenPersonnel(p: any) {
+    const ec = p?.etatCivil ?? {};
+    const co = p?.coordonnee ?? {};
+    const ind = p?.indice ?? {};
+    const pg = p?.posteGeneral ?? {};
+    const ent = p?.entite ?? {};
+    const sp = p?.statutPersonnel ?? {};
+
+    const nomContact =
+      p?.nomContact ?? co?.nomContact ?? co?.contactNom ?? co?.nomUrgence ?? co?.nomPersonneAContacter ?? null;
+
+    const prenomContact =
+      p?.prenomContact ??
+      co?.prenomContact ??
+      co?.contactPrenom ??
+      co?.prenomUrgence ??
+      co?.prenomPersonneAContacter ??
+      null;
+
+    const telephoneContact =
+      p?.telephoneContact ??
+      co?.telephoneContact ??
+      co?.telContact ??
+      co?.telephoneUrgence ??
+      co?.mobileUrgence ??
+      co?.numeroTelephonePrimaire ??
+      null;
+
+    return {
+      ...p,
+
+      // Identité
+      dateDeNaissance: p?.dateDeNaissance ?? ec?.dateDeNaissance ?? null,
+      civilite: p?.civilite ?? ec?.civilite ?? null,
+      situationMatrimoniale: p?.situationMatrimoniale ?? ec?.situationMatrimoniale ?? null,
+      nombreEnfant: p?.nombreEnfant ?? ec?.nombreEnfant ?? null,
+      pieceIdentite: p?.pieceIdentite ?? ec?.pieceIdentite ?? null,
+      matricule: p?.matricule ?? ec?.matricule ?? null,
+
+      // Coordonnées
+      telephone: p?.telephone ?? co?.telephone ?? co?.mobile ?? null,
+      adresse: p?.adresse ?? co?.adresse ?? null,
+
+      // Personne à contacter (aliases)
+      nomContact,
+      prenomContact,
+      telephoneContact,
+
+      // Autres objets
+      statutPersonnel: p?.statutPersonnel ?? sp ?? null,
+      indice: p?.indice ?? ind ?? null,
+      poste: p?.poste ?? pg ?? null,
+      entite: p?.entite ?? ent ?? null,
+
+      // Dates RH
+      dateEmbauchage: p?.dateEmbauchage ?? null,
+      dateDebauchage: p?.dateDebauchage ?? null,
+      dateRetraite: p?.dateRetraite ?? null,
+      debaucher: p?.debaucher ?? false,
+      retraiter: p?.retraiter ?? false,
+    };
   }
 
   supprimerPresence(id: number) {
@@ -1007,7 +1275,7 @@ export class DetailpersonnelComponent implements OnInit {
           next: () => {
             this.devisSbj.next(0);
             this.listePresencePersonnel = this.listePresencePersonnel.filter((i) => i.id !== id);
-            this.chargerIdPersonnel(this.id$)
+            this.chargerIdPersonnel(this.id$);
             this.successmsg('Suppression réussie', 'Présence supprimée');
           },
           error: (err) => {
@@ -1020,15 +1288,51 @@ export class DetailpersonnelComponent implements OnInit {
 
   openModalContrat(content: any, contrat: Contrat | undefined = undefined) {
     if (contrat) {
-      this.formulaireContrat.patchValue(contrat as any)
-      this.formulaireContrat.get('personnel')?.setValue(contrat?.personnel?.prenom.toString() + ' ' + contrat?.personnel?.nom.toString())
-      this.formulaireContrat.get('typeContrat')?.setValue(contrat?.typeContrat?.id.toString())
+      this.formulaireContrat.patchValue(contrat as any);
+      this.formulaireContrat
+        .get('personnel')
+        ?.setValue(contrat?.personnel?.prenom.toString() + ' ' + contrat?.personnel?.nom.toString());
+      this.formulaireContrat.get('typeContrat')?.setValue(contrat?.typeContrat?.id.toString());
     } else {
-      this.formulaireContrat.reset()
-      this.formulaireContrat.get('typeContrat')?.setValue(null)
-      this.formulaireContrat.get('status')?.setValue(null)
+      this.formulaireContrat.reset();
+      this.formulaireContrat.get('typeContrat')?.setValue(null);
+      this.formulaireContrat.get('status')?.setValue(null);
     }
-    this.modalService.open(content)
+    this.modalService.open(content);
+  }
+
+  /** Normalise une date (string | Date | null) -> Date | null */
+  private toDate(v: any): Date | null {
+    if (!v) return null;
+    const d = v instanceof Date ? v : new Date(v);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  /** Prend dateDebutContrat sinon dateDebut */
+  getContratDebut(c: any): Date | null {
+    return this.toDate(c?.dateDebutContrat ?? c?.dateDebut ?? null);
+  }
+
+  /** Prend dateFinContrat sinon dateFin */
+  getContratFin(c: any): Date | null {
+    return this.toDate(c?.dateFinContrat ?? c?.dateFin ?? null);
+  }
+
+  /** Prend natureContrat sinon typeContrat.designation */
+  getContratNature(c: any): string {
+    return c?.natureContrat ?? c?.typeContrat?.designation ?? '—';
+  }
+
+  /** En cours si aujourd’hui ∈ [début, fin] */
+  isContratEnCours(c: any): boolean {
+    const start = this.getContratDebut(c);
+    const end = this.getContratFin(c);
+    if (!start || !end) return false;
+    const today = new Date();
+    const s = new Date(start.getFullYear(), start.getMonth(), start.getDate());
+    const e = new Date(end.getFullYear(), end.getMonth(), end.getDate());
+    const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    return s <= t && t <= e;
   }
 
   creeModifierContrat() {
@@ -1038,52 +1342,55 @@ export class DetailpersonnelComponent implements OnInit {
     formData.append('dateFin', this.formulaireContrat.get('dateFin')?.value?.toString() || '');
     formData.append('typeContrat', this.formulaireContrat.get('typeContrat')?.value || '');
     formData.append('status', this.formulaireContrat.get('status')?.value || '');
+    // @ts-ignore (backend peut accepter number)
     formData.append('personnel', this.id$);
-    if (this.formulaireContrat.valid)
+
+    if (this.formulaireContrat.valid) {
       if (this.formulaireContrat.get('id')?.value) {
-        this.contratService.modifierContrat(this.formulaireContrat.get("id")?.value, formData)
-          .subscribe(
-            (response: any) => {
-              this.listeContratsPersonnel.map(e => {
-                if (e.id == response.id) {
-                  e.dateDebut = response.dateDebut
-                  e.dateFin = response.dateFin
-                  e.typeContrat = response.typeContrat
-                  e.status = response.status
-                }
-                return e;
-              })
-              this.modalService.dismissAll()
-              this.chargerIdPersonnel(this.id$)
-              this.successmsg("Contrat modifié", "Le contrat a été modifié avec succès")
-              this.formulaireContrat.reset()
-            },
-            (error) => {
-              const errors = error.error.errors;
-              for (let i = 0; i < errors.length; i++) {
-                const currentError = errors[i];
-                this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
-              }
-            }
-          )
-      } else {
-        this.contratService.creerContrat(this.personnelId, formData).subscribe(
+        this.contratService.modifierContrat(this.formulaireContrat.get('id')?.value, formData).subscribe(
           (response: any) => {
-            this.listeContratsPersonnel.unshift(response['data'])
-            this.formulaireContrat.reset()
-            this.modalService.dismissAll()
-            this.chargerIdPersonnel(this.id$)
-            this.successmsg("Contrat créé", "Le contrat a été créé avec succès")
+            this.listeContratsPersonnel.map((e) => {
+              if (e.id == response['data']?.id || e.id == response?.id) {
+                const src = response['data'] ?? response;
+                e.dateDebut = src.dateDebut;
+                e.dateFin = src.dateFin;
+                e.typeContrat = src.typeContrat;
+                e.status = src.status;
+              }
+              return e;
+            });
+            this.modalService.dismissAll();
+            this.chargerIdPersonnel(this.id$);
+            this.successmsg('Contrat modifié', 'Le contrat a été modifié avec succès');
+            this.formulaireContrat.reset();
           },
           (error) => {
             const errors = error.error.errors;
             for (let i = 0; i < errors.length; i++) {
               const currentError = errors[i];
-              this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
+              this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
             }
           }
-        )
+        );
+      } else {
+        this.contratService.creerContrat(this.personnelId, formData).subscribe(
+          (response: any) => {
+            this.listeContratsPersonnel.unshift(response['data'] ?? response);
+            this.formulaireContrat.reset();
+            this.modalService.dismissAll();
+            this.chargerIdPersonnel(this.id$);
+            this.successmsg('Contrat créé', 'Le contrat a été créé avec succès');
+          },
+          (error) => {
+            const errors = error.error.errors;
+            for (let i = 0; i < errors.length; i++) {
+              const currentError = errors[i];
+              this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
+            }
+          }
+        );
       }
+    }
   }
 
   supprimerContrat(id: number) {
@@ -1102,7 +1409,7 @@ export class DetailpersonnelComponent implements OnInit {
           next: () => {
             this.devisSbj.next(0);
             this.listeContratsPersonnel = this.listeContratsPersonnel.filter((i) => i.id !== id);
-            this.chargerIdPersonnel(this.id$)
+            this.chargerIdPersonnel(this.id$);
             this.successmsg('Suppression réussie', 'Contrat supprimé');
           },
           error: (err) => {
@@ -1114,37 +1421,42 @@ export class DetailpersonnelComponent implements OnInit {
   }
 
   telechargerFicheContrat(contrat: Contrat) {
-    return `${this.contratService.contextPath}/telecharger/` + contrat?.fichier;
+    return `${this.contratService.contextPath}/contrat/${contrat.id}/telecharger`;
   }
+
   showPopOnDownloadFicheContrat() {
-    this.successmsg('Ficher Contrat telechargé', "Le Ficher du contrat a été bien téléchargé avec succès");
+    this.successmsg('Ficher Contrat telechargé', 'Le Ficher du contrat a été bien téléchargé avec succès');
   }
 
   telechargerRapportMission(mission: Mission) {
     return `${this.contratService.contextPath}/telecharger/` + mission?.rapport;
   }
   showPopOnDownloadRapportMission() {
-    this.successmsg('Rapport de Mission telechargé', "Le Rapport de la Mission a été bien téléchargé avec succès");
+    this.successmsg('Rapport de Mission telechargé', 'Le Rapport de la Mission a été bien téléchargé avec succès');
   }
 
   openModalDetails(content: any, missionnaireexternes?: MissionnaireExterne[]) {
     this.modalService.open(content);
-    this.listeMissionnaireExterne = []
-    if (missionnaireexternes) { this.listeMissionnaireExterne = missionnaireexternes }
+    this.listeMissionnaireExterne = [];
+    if (missionnaireexternes) {
+      this.listeMissionnaireExterne = missionnaireexternes;
+    }
   }
 
   openModalPiece(content: any, pieces: Pieces | undefined = undefined) {
     if (pieces) {
-      this.formulairePieces.patchValue(pieces as any)
-      this.formulairePieces.get('personnel')?.setValue(pieces?.personnel?.prenom.toString() + ' ' + pieces?.personnel?.nom.toString())
-      this.formulairePieces.get('typeDossier')?.setValue(pieces?.typeDossier?.designation.toString())
-      this.formulairePieces.get('typePiece')?.setValue(pieces?.typePiece?.nom.toString())
+      this.formulairePieces.patchValue(pieces as any);
+      this.formulairePieces
+        .get('personnel')
+        ?.setValue(pieces?.personnel?.prenom.toString() + ' ' + pieces?.personnel?.nom.toString());
+      this.formulairePieces.get('typeDossier')?.setValue(pieces?.typeDossier?.designation.toString());
+      this.formulairePieces.get('typePiece')?.setValue(pieces?.typePiece?.nom.toString());
     } else {
-      this.formulairePieces.reset()
-      this.formulairePieces.get('typeDossier')?.setValue(null)
-      this.formulairePieces.get('typePiece')?.setValue(null)
+      this.formulairePieces.reset();
+      this.formulairePieces.get('typeDossier')?.setValue(null);
+      this.formulairePieces.get('typePiece')?.setValue(null);
     }
-    this.modalService.open(content)
+    this.modalService.open(content);
   }
 
   creeModifierPiece() {
@@ -1153,51 +1465,53 @@ export class DetailpersonnelComponent implements OnInit {
     formData.append('commentaire', this.formulairePieces.get('commentaire')?.value || '');
     formData.append('typeDossier', this.formulairePieces.get('typeDossier')?.value || '');
     formData.append('typePiece', this.formulairePieces.get('typePiece')?.value || '');
+    // @ts-ignore
     formData.append('personnel', this.id$);
-    if (this.formulairePieces.valid)
+
+    if (this.formulairePieces.valid) {
       if (this.formulairePieces.get('id')?.value) {
-        this.piecesService.modifierPieces(this.formulairePieces.get("id")?.value, formData)
-          .subscribe(
-            (response: any) => {
-              this.listePiecesPersonnel.map(e => {
-                if (e.id == response["data"].id) {
-                  e.commentaire = response["data"].commentaire
-                  e.typeDossier = response["data"].typeDossier
-                  e.typePiece = response["data"].typePiece
-                }
-                return e;
-              })
-              this.modalService.dismissAll()
-              this.chargerIdPersonnel(this.id$)
-              this.successmsg("Pièce modifiée", "La pièce a été modifiée avec succès")
-              this.formulairePieces.reset()
-            },
-            (error) => {
-              const errors = error.error.errors;
-              for (let i = 0; i < errors.length; i++) {
-                const currentError = errors[i];
-                this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
-              }
-            }
-          )
-      } else {
-        this.piecesService.creerPieces(formData).subscribe(
+        this.piecesService.modifierPieces(this.formulairePieces.get('id')?.value, formData).subscribe(
           (response: any) => {
-            this.listePiecesPersonnel.unshift(response['data'])
-            this.formulairePieces.reset()
-            this.modalService.dismissAll()
-            this.chargerIdPersonnel(this.id$)
-            this.successmsg("Pièce créée", "La Pièce a été créée avec succès")
+            this.listePiecesPersonnel.map((e) => {
+              if (e.id == response['data'].id) {
+                e.commentaire = response['data'].commentaire;
+                e.typeDossier = response['data'].typeDossier;
+                e.typePiece = response['data'].typePiece;
+              }
+              return e;
+            });
+            this.modalService.dismissAll();
+            this.chargerIdPersonnel(this.id$);
+            this.successmsg('Pièce modifiée', 'La pièce a été modifiée avec succès');
+            this.formulairePieces.reset();
           },
           (error) => {
             const errors = error.error.errors;
             for (let i = 0; i < errors.length; i++) {
               const currentError = errors[i];
-              this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
+              this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
             }
           }
-        )
+        );
+      } else {
+        this.piecesService.creerPieces(formData).subscribe(
+          (response: any) => {
+            this.listePiecesPersonnel.unshift(response['data']);
+            this.formulairePieces.reset();
+            this.modalService.dismissAll();
+            this.chargerIdPersonnel(this.id$);
+            this.successmsg('Pièce créée', 'La Pièce a été créée avec succès');
+          },
+          (error) => {
+            const errors = error.error.errors;
+            for (let i = 0; i < errors.length; i++) {
+              const currentError = errors[i];
+              this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
+            }
+          }
+        );
       }
+    }
   }
 
   supprimerPieces(id: number) {
@@ -1216,10 +1530,12 @@ export class DetailpersonnelComponent implements OnInit {
           next: () => {
             this.devisSbj.next(0);
             this.listePiecesPersonnel = this.listePiecesPersonnel.filter((i) => i.id !== id);
-            this.chargerIdPersonnel(this.id$)
+            this.chargerIdPersonnel(this.id$);
             this.successmsg('Suppression réussie', 'Pièce supprimée');
           },
-          error: (err) => { this.errormsg('Pièce non supprimée', err.error.message); },
+          error: (err) => {
+            this.errormsg('Pièce non supprimée', err.error.message);
+          },
         });
       }
     });
@@ -1229,7 +1545,7 @@ export class DetailpersonnelComponent implements OnInit {
     return `${this.piecesService.contextPath}/telecharger/` + pieces?.fichier;
   }
   showPopOnDownloadFichePiece() {
-    this.successmsg('Ficher Pièce telechargé', "Le Ficher de la pièce a été bien téléchargé avec succès");
+    this.successmsg('Ficher Pièce telechargé', 'Le Ficher de la pièce a été bien téléchargé avec succès');
   }
 
   openModalPieceDetail(pieces: Pieces, content: any) {
@@ -1239,68 +1555,72 @@ export class DetailpersonnelComponent implements OnInit {
   }
 
   chargerPieceId() {
-    this.piecesService.voirPieces(this.idPiece).subscribe((response) => { this.piece = response; });
+    this.piecesService.voirPieces(this.idPiece).subscribe((response) => {
+      this.piece = response;
+    });
   }
 
   openModalInterim(content: any, interimes: Interimes | undefined = undefined) {
     if (interimes) {
-      this.formulaireInterim.patchValue(interimes as any)
-      this.formulaireInterim.get('personnel')?.setValue(interimes?.personnel?.prenom.toString() + ' ' + interimes?.personnel?.nom.toString())
-      this.formulaireInterim.get('poste')?.setValue(interimes?.poste?.designation.toString())
+      this.formulaireInterim.patchValue(interimes as any);
+      this.formulaireInterim
+        .get('personnel')
+        ?.setValue(interimes?.personnel?.prenom.toString() + ' ' + interimes?.personnel?.nom.toString());
+      this.formulaireInterim.get('poste')?.setValue(interimes?.poste?.designation.toString());
     } else {
-      this.formulaireInterim.reset()
-      this.formulaireInterim.get('poste')?.setValue(null)
-      this.formulaireInterim.get('personnel')?.setValue(this.id$)
+      this.formulaireInterim.reset();
+      this.formulaireInterim.get('poste')?.setValue(null);
+      this.formulaireInterim.get('personnel')?.setValue(this.id$);
     }
-    this.modalService.open(content)
+    this.modalService.open(content);
   }
 
   creeModifierInterim() {
-    if (this.formulaireInterim.valid)
+    if (this.formulaireInterim.valid) {
       if (this.formulaireInterim.get('id')?.value) {
-        this.interimesService.modifierInterimes(this.formulaireInterim.get("id")?.value, this.formulaireInterim.value)
-          .subscribe(
-            (response: any) => {
-              this.listeInterimesPersonnel.map(e => {
-                if (e.id == response["data"].id) {
-                  e.commentaire = response["data"].commentaire
-                  e.poste = response["data"].poste
-                  e.dateDebut = response["data"].dateDebut
-                  e.dateFin = response["data"].dateFin
-                }
-                return e;
-              })
-              this.modalService.dismissAll()
-              this.chargerIdPersonnel(this.id$)
-              this.successmsg("Interime modifié", "L'interime a été modifié avec succès")
-              this.formulaireInterim.reset()
-            },
-            (error) => {
-              const errors = error.error.errors;
-              for (let i = 0; i < errors.length; i++) {
-                const currentError = errors[i];
-                this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
-              }
-            }
-          )
-      } else {
-        this.interimesService.creerInterimes(this.formulaireInterim.value).subscribe(
+        this.interimesService.modifierInterimes(this.formulaireInterim.get('id')?.value, this.formulaireInterim.value).subscribe(
           (response: any) => {
-            this.listeInterimesPersonnel.unshift(response['data'])
-            this.formulaireInterim.reset()
-            this.modalService.dismissAll()
-            this.chargerIdPersonnel(this.id$)
-            this.successmsg("Interime créé", "L'interime a été créé avec succès")
+            this.listeInterimesPersonnel.map((e) => {
+              if (e.id == response['data'].id) {
+                e.commentaire = response['data'].commentaire;
+                e.poste = response['data'].poste;
+                e.dateDebut = response['data'].dateDebut;
+                e.dateFin = response['data'].dateFin;
+              }
+              return e;
+            });
+            this.modalService.dismissAll();
+            this.chargerIdPersonnel(this.id$);
+            this.successmsg("Interime modifié", "L'interime a été modifié avec succès");
+            this.formulaireInterim.reset();
           },
           (error) => {
             const errors = error.error.errors;
             for (let i = 0; i < errors.length; i++) {
               const currentError = errors[i];
-              this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
+              this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
             }
           }
-        )
+        );
+      } else {
+        this.interimesService.creerInterimes(this.formulaireInterim.value).subscribe(
+          (response: any) => {
+            this.listeInterimesPersonnel.unshift(response['data']);
+            this.formulaireInterim.reset();
+            this.modalService.dismissAll();
+            this.chargerIdPersonnel(this.id$);
+            this.successmsg("Interime créé", "L'interime a été créé avec succès");
+          },
+          (error) => {
+            const errors = error.error.errors;
+            for (let i = 0; i < errors.length; i++) {
+              const currentError = errors[i];
+              this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
+            }
+          }
+        );
       }
+    }
   }
 
   supprimerInterime(id: number) {
@@ -1319,7 +1639,7 @@ export class DetailpersonnelComponent implements OnInit {
           next: () => {
             this.devisSbj.next(0);
             this.listeInterimesPersonnel = this.listeInterimesPersonnel.filter((i) => i.id !== id);
-            this.chargerIdPersonnel(this.id$)
+            this.chargerIdPersonnel(this.id$);
             this.successmsg('Suppression réussie', 'Interime supprimé');
           },
           error: (err) => {
@@ -1337,7 +1657,9 @@ export class DetailpersonnelComponent implements OnInit {
   }
 
   chargerInterimeId() {
-    this.interimesService.voirInterimes(this.idIterime).subscribe((response: any) => { this.interime = response; });
+    this.interimesService.voirInterimes(this.idIterime).subscribe((response: any) => {
+      this.interime = response;
+    });
   }
 
   openModalAfectation(content: any, affectation: Affectation | undefined = undefined) {
@@ -1376,27 +1698,26 @@ export class DetailpersonnelComponent implements OnInit {
     };
 
     if (this.formulaireAffectation.get('id')?.value) {
-      this.affectationService.modifier(Number(this.formulaireAffectation.get('id')?.value), dto)
-        .subscribe(
-          (response: any) => {
-            this.listeAffectationPersonnel = this.listeAffectationPersonnel.map(e => {
-              if (e.id === response.id) {
-                return { ...e, poste: response.poste, dateDebut: response.dateDebut };
-              }
-              return e;
-            });
-            this.modalService.dismissAll();
-            this.chargerIdPersonnel(this.id$);
-            this.successmsg("Affectation modifiée", "L'affectation a été modifiée avec succès");
-            this.formulaireAffectation.reset();
-          },
-          (error: any) => {
-            const errors = error?.error?.errors ?? [];
-            for (const currentError of errors) {
-              this.toastService.error(`${currentError.champs}: ${currentError.message}`, 'Erreur!');
+      this.affectationService.modifier(Number(this.formulaireAffectation.get('id')?.value), dto).subscribe(
+        (response: any) => {
+          this.listeAffectationPersonnel = this.listeAffectationPersonnel.map((e) => {
+            if (e.id === response.id) {
+              return { ...e, poste: response.poste, dateDebut: response.dateDebut };
             }
+            return e;
+          });
+          this.modalService.dismissAll();
+          this.chargerIdPersonnel(this.id$);
+          this.successmsg('Affectation modifiée', "L'affectation a été modifiée avec succès");
+          this.formulaireAffectation.reset();
+        },
+        (error: any) => {
+          const errors = error?.error?.errors ?? [];
+          for (const currentError of errors) {
+            this.toastService.error(`${currentError.champs}: ${currentError.message}`, 'Erreur!');
           }
-        );
+        }
+      );
     } else {
       this.affectationService.creer(dto).subscribe(
         (response: any) => {
@@ -1404,7 +1725,7 @@ export class DetailpersonnelComponent implements OnInit {
           this.formulaireAffectation.reset();
           this.modalService.dismissAll();
           this.chargerIdPersonnel(this.id$);
-          this.successmsg("Affectation créée", "L'affectation a été créée avec succès");
+          this.successmsg('Affectation créée', "L'affectation a été créée avec succès");
         },
         (error: any) => {
           const errors = error?.error?.errors ?? [];
@@ -1431,7 +1752,7 @@ export class DetailpersonnelComponent implements OnInit {
         this.affectationService.supprimer(id).subscribe({
           next: () => {
             this.devisSbj.next(0);
-            this.listeAffectationPersonnel = this.listeAffectationPersonnel.filter(i => i.id !== id);
+            this.listeAffectationPersonnel = this.listeAffectationPersonnel.filter((i) => i.id !== id);
             this.chargerIdPersonnel(this.id$);
             this.successmsg('Suppression réussie', 'Affectation supprimée');
           },
@@ -1452,27 +1773,32 @@ export class DetailpersonnelComponent implements OnInit {
 
   chargerContratId() {
     this.contratService.voirUnContratPersonnel(this.idContrat).subscribe((response: any) => {
-      this.contrat = response
+      this.contrat = response;
       const startDate = new Date(this.contrat?.dateDebut || new Date());
       const endDate = new Date(this.contrat?.dateFin || new Date());
-      if (this.contrat) { this.contrat.duree = this.calculerDureeMission(startDate, endDate); }
+      if (this.contrat) {
+        this.contrat.duree = this.calculerDureeMission(startDate, endDate);
+      }
     });
   }
 
   chargerListeAvenantContrat() {
-    this.contratService.listerAvenantContrat(this.idContrat, this.currentPage, this.nombrePerPage, this.sort).subscribe(
-      (response: any) => {
-        this.listeAvenantContratPersonnel = response.body.content;
-        this.totalAvenant = response.body.totalElements;
-        this.totalPages = response.body.totalPages;
-      }
-    )
+    this.contratService
+      .listerAvenantContrat(this.idContrat, this.currentPage, this.nombrePerPage, this.sort)
+      .subscribe((response: any) => {
+        this.listeAvenantContratPersonnel = response?.body?.content ?? [];
+        this.totalAvenant = response?.body?.totalElements ?? this.listeAvenantContratPersonnel.length;
+        this.totalPages = response?.body?.totalPages ?? 1;
+      });
   }
 
   openModalAvenant(content: any, avenant: Avenant | undefined = undefined) {
-    if (avenant) { this.formulaireAvenantContrat.patchValue(avenant as any) }
-    else { this.formulaireAvenantContrat.reset() }
-    this.modalService.open(content)
+    if (avenant) {
+      this.formulaireAvenantContrat.patchValue(avenant as any);
+    } else {
+      this.formulaireAvenantContrat.reset();
+    }
+    this.modalService.open(content);
   }
 
   creeModifierAvenant() {
@@ -1482,49 +1808,50 @@ export class DetailpersonnelComponent implements OnInit {
     formData.append('estActif', this.formulaireAvenantContrat.get('estActif')?.value?.toString() || 'false');
     // @ts-ignore
     formData.append('contrat', this.idContrat);
-    if (this.formulaireAvenantContrat.valid)
+
+    if (this.formulaireAvenantContrat.valid) {
       if (this.formulaireAvenantContrat.get('id')?.value) {
-        this.avenantService.modifierAvenant(this.formulaireAvenantContrat.get("id")?.value, formData)
-          .subscribe(
-            (response: any) => {
-              this.listeAvenantContratPersonnel.map(e => {
-                if (e.id == response["data"].id) {
-                  e.date = response["data"].date
-                  e.estActif = response["data"].estActif
-                }
-                return e;
-              })
-              this.modalService.dismissAll()
-              this.chargerIdPersonnel(this.id$)
-              this.successmsg("Avenant modifié", "L'avenant a été modifié avec succès")
-              this.formulaireAvenantContrat.reset()
-            },
-            (error) => {
-              const errors = error.error.errors;
-              for (let i = 0; i < errors.length; i++) {
-                const currentError = errors[i];
-                this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
-              }
-            }
-          )
-      } else {
-        this.avenantService.creerAvenant(formData).subscribe(
+        this.avenantService.modifierAvenant(this.formulaireAvenantContrat.get('id')?.value, formData).subscribe(
           (response: any) => {
-            this.listeAvenantContratPersonnel.unshift(response['data'])
-            this.formulaireAvenantContrat.reset()
-            this.modalService.dismissAll()
-            this.chargerIdPersonnel(this.id$)
-            this.successmsg("Avenant créé", "L'avenant a été ajouté au contrat avec succès")
+            this.listeAvenantContratPersonnel.map((e) => {
+              if (e.id == response['data'].id) {
+                e.date = response['data'].date;
+                e.estActif = response['data'].estActif;
+              }
+              return e;
+            });
+            this.modalService.dismissAll();
+            this.chargerIdPersonnel(this.id$);
+            this.successmsg('Avenant modifié', "L'avenant a été modifié avec succès");
+            this.formulaireAvenantContrat.reset();
           },
           (error) => {
             const errors = error.error.errors;
             for (let i = 0; i < errors.length; i++) {
               const currentError = errors[i];
-              this.toastService.error(currentError.champs + ": " + currentError.message, 'Erreur!');
+              this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
             }
           }
-        )
+        );
+      } else {
+        this.avenantService.creerAvenant(formData).subscribe(
+          (response: any) => {
+            this.listeAvenantContratPersonnel.unshift(response['data']);
+            this.formulaireAvenantContrat.reset();
+            this.modalService.dismissAll();
+            this.chargerIdPersonnel(this.id$);
+            this.successmsg('Avenant créé', "L'avenant a été ajouté au contrat avec succès");
+          },
+          (error) => {
+            const errors = error.error.errors;
+            for (let i = 0; i < errors.length; i++) {
+              const currentError = errors[i];
+              this.toastService.error(currentError.champs + ': ' + currentError.message, 'Erreur!');
+            }
+          }
+        );
       }
+    }
   }
 
   supprimerAvenant(id: number) {
@@ -1543,7 +1870,7 @@ export class DetailpersonnelComponent implements OnInit {
           next: () => {
             this.devisSbj.next(0);
             this.listeAvenantContratPersonnel = this.listeAvenantContratPersonnel.filter((i) => i.id !== id);
-            this.chargerIdPersonnel(this.id$)
+            this.chargerIdPersonnel(this.id$);
             this.successmsg('Suppression réussie', 'Avenant supprimé');
           },
           error: (err) => {
@@ -1561,11 +1888,8 @@ export class DetailpersonnelComponent implements OnInit {
     this.successmsg('Ficher Avenant telechargé', "Le Ficher de l'Avenant a été bien téléchargé avec succès");
   }
 
-  telechargerFicheDemande(demande: Demande) {
-    return `${this.demandeService.contextPath}/telecharger/` + demande?.fichier;
-  }
   showPopOnDownloadFicheDemande() {
-    this.successmsg('Ficher Demande telechargé', "Le Ficher de la Demande a été bien téléchargé avec succès");
+    this.successmsg('Ficher Demande telechargé', 'Le Ficher de la Demande a été bien téléchargé avec succès');
   }
 
   calculerDureeMission(startDate: Date, endDate: Date): string {
@@ -1575,9 +1899,15 @@ export class DetailpersonnelComponent implements OnInit {
     const years = Math.floor(months / 12);
 
     let duration = '';
-    if (years > 0) { duration += years + ' an' + (years > 1 ? 's' : '') + ' '; }
-    if (months > 0) { duration += months + ' mois '; }
-    if (days > 0) { duration += days + ' jour' + (days > 1 ? 's' : ''); }
+    if (years > 0) {
+      duration += years + ' an' + (years > 1 ? 's' : '') + ' ';
+    }
+    if (months > 0) {
+      duration += months + ' mois ';
+    }
+    if (days > 0) {
+      duration += days + ' jour' + (days > 1 ? 's' : '');
+    }
 
     return duration.trim();
   }
@@ -1585,7 +1915,7 @@ export class DetailpersonnelComponent implements OnInit {
   activerAvenant(id: number) {
     Swal.fire({
       title: 'Êtes vous sûr ?',
-      text: 'Êtes vous sûr de vouloir l\'activé. Il vous sera impossible de revenir en arrière !',
+      text: "Êtes vous sûr de vouloir l'activé. Il vous sera impossible de revenir en arrière !",
       icon: 'warning',
       showCancelButton: true,
       confirmButtonColor: '#34c38f',
@@ -1596,7 +1926,7 @@ export class DetailpersonnelComponent implements OnInit {
       if (result.value) {
         this.avenantService.activerAvenant(id).subscribe({
           next: () => {
-            this.chargerListeAvenantContrat()
+            this.chargerListeAvenantContrat();
             this.successmsg('Activation réussie', 'Avenant activé');
           },
           error: (err) => {

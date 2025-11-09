@@ -1,0 +1,121 @@
+<div class="container-fluid px-3 page-with-bg">
+  <!-- Si ton composant titre est dispo en standalone, garde la ligne ci-dessous.
+       Sinon, supprime-la sans impact. -->
+  <app-titredepage
+    title="Mes congés"
+    [items]="[{label:'RH'}, {label:'Mes congés', active:true}]">
+  </app-titredepage>
+
+  <div class="card">
+    <div class="card-body">
+
+      <div *ngIf="loading" class="alert alert-info py-2 mb-3">Chargement…</div>
+      <div *ngIf="error" class="alert alert-danger py-2 mb-3">Erreur de chargement</div>
+
+      <div *ngIf="!loading && !error" class="table-responsive">
+        <table class="table table-striped align-middle">
+          <thead>
+          <tr>
+            <th>#</th>
+            <th>Type</th>
+            <th>Date début</th>
+            <th>Date fin</th>
+            <th>Jours</th>
+            <th>Statut</th>
+            <th class="text-nowrap">Actions</th>
+          </tr>
+          </thead>
+
+          <tbody>
+          <tr *ngFor="let c of list; index as i">
+            <td>{{ i + 1 + (page * size) }}</td>
+
+            <td>
+              <span class="badge" [ngClass]="typeClass(c?.typeConge)">
+                {{ c?.typeConge || '—' }}
+              </span>
+            </td>
+
+            <td>{{ c?.dateDebut | date:'dd/MM/yyyy' }}</td>
+            <td>{{ c?.dateFin   | date:'dd/MM/yyyy' }}</td>
+            <td>{{ c?.nbreJour }}</td>
+
+            <!-- Statut global -->
+            <td>
+              <span class="badge" [ngClass]="badgeGlobal(c)">{{ labelGlobal(c) }}</span>
+            </td>
+
+            <td class="text-nowrap">
+              <button class="btn btn-sm btn-outline-secondary"
+                      (click)="openDetail(c, detailTpl)">
+                Détails
+              </button>
+            </td>
+          </tr>
+
+          <tr *ngIf="!list.length">
+            <td colspan="7" class="text-center">Aucun congé</td>
+          </tr>
+          </tbody>
+        </table>
+
+        <!-- pagination -->
+        <div class="d-flex justify-content-end align-items-center" *ngIf="pages.length > 1">
+          <button class="btn btn-outline-primary btn-sm me-2" [disabled]="page===0" (click)="goto(page-1)">Précédent</button>
+          <ng-container *ngFor="let p of pages">
+            <button class="btn btn-sm mx-1"
+                    [class.btn-primary]="p===page"
+                    [class.btn-outline-primary]="p!==page"
+                    (click)="goto(p)">{{ p+1 }}</button>
+          </ng-container>
+          <button class="btn btn-outline-primary btn-sm ms-2"
+                  [disabled]="page===pages.length-1"
+                  (click)="goto(page+1)">Suivant</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Modal DÉTAILS -->
+<ng-template #detailTpl let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Détails des validations</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+  <div class="modal-body">
+    <div class="row gy-2">
+      <div class="col-6">Chef</div>
+      <div class="col-6">
+        <span class="badge" [ngClass]="badgeClass(detail?.chefValidation)">
+          {{ labelStatut(detail?.chefValidation) }}
+        </span>
+      </div>
+
+      <div class="col-6">CSRH</div>
+      <div class="col-6">
+        <span class="badge" [ngClass]="badgeClass(detail?.csrhValidation)">
+          {{ labelStatut(detail?.csrhValidation) }}
+        </span>
+      </div>
+
+      <div class="col-6">SG</div>
+      <div class="col-6">
+        <span class="badge" [ngClass]="badgeClass(detail?.sgValidation)">
+          {{ labelStatut(detail?.sgValidation) }}
+        </span>
+      </div>
+
+      <div class="col-6">DG</div>
+      <div class="col-6">
+        <span class="badge" [ngClass]="badgeClass(detail?.dgValidation)">
+          {{ labelStatut(detail?.dgValidation) }}
+        </span>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button class="btn btn-secondary btn-sm" (click)="modal.close()">Fermer</button>
+  </div>
+</ng-template>

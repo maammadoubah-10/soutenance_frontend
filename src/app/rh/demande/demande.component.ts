@@ -27,7 +27,24 @@ import localeFr from "@angular/common/locales/fr";
   styleUrls: ['./demande.component.scss']
 })
 export class DemandeComponent implements OnInit {
-
+  private mapPersonnel = (p: any) => ({
+  ...p,
+  // Essayons toutes les structures possibles
+  prenom:
+    p?.prenom ??
+    p?.user?.prenom ??
+    p?.user?.firstName ??
+    p?.etatCivil?.prenom ??
+    p?.etatCivil?.firstName ??
+    null,
+  nom:
+    p?.nom ??
+    p?.user?.nom ??
+    p?.user?.lastName ??
+    p?.etatCivil?.nom ??
+    p?.etatCivil?.lastName ??
+    null,
+});
   items: any[]=[];
   dataStateEnum = DataStateEnum
   state?: DataStateEnum
@@ -78,10 +95,31 @@ export class DemandeComponent implements OnInit {
     this.chargerListeDemandePage();
 
       this.utilisateurService.personnelNonUtilisateur().subscribe(x => {
-      this.listePersonnel = x;
-    });
+  this.listePersonnel = (x ?? []).map(this.mapPersonnel);
+});
   }
 
+// DemandeComponent.ts
+
+// helper pour l’affichage dans le select
+getPersonnelLabel(p: any): string {
+  const first =
+    p?.prenom ??
+    p?.user?.prenom ??
+    p?.user?.firstName ??
+    p?.etatCivil?.prenom ??
+    p?.etatCivil?.firstName ??
+    '';
+  const last =
+    p?.nom ??
+    p?.user?.nom ??
+    p?.user?.lastName ??
+    p?.etatCivil?.nom ??
+    p?.etatCivil?.lastName ??
+    '';
+  const full = [first, last].filter(Boolean).join(' ').trim();
+  return full || p?.matricule || p?.email || p?.etatCivil?.email || '—';
+}
 
   chargerListeDemandePage(): void {
     this.dossiers = this.dossierService
@@ -116,12 +154,12 @@ export class DemandeComponent implements OnInit {
 
   onSearchPersonnel(nom: string){
     if(nom.length >= 3){
-      this.personnelService.recherchePersonnel(nom).subscribe(
-        (response : any) => {
-          this.listePersonnel = response.body.content
-        },(error)=>{
-        }
-      );
+     this.personnelService.recherchePersonnel(nom).subscribe(
+  (response: any) => {
+    const content = response?.body?.content ?? [];
+    this.listePersonnel = content.map(this.mapPersonnel);
+  }
+);
     }
   }
 
@@ -159,22 +197,19 @@ export class DemandeComponent implements OnInit {
     return this.hashids.encode(id);
   }
 
-  openModal(content:any, dossier:Demande | undefined = undefined){
-    if (dossier){
-       this.formulaireDossier.patchValue(dossier as any)
-      // this.formulaireDossier.get('personnelI').setValue(dossier?.personnel?.prenom.toString() + ' '+ dossier?.personnel?.nom.toString())
-      // this.formulaireDossier.get('statutDemande').setValue(dossier?.statutDemande?.nom?.toString())
-      // this.formulaireDossier.get('typeDemande').setValue(dossier?.typeDemande?.nom?.toString())
-    }else{
-      this.formulaireDossier.reset()
-    }
-     this.modalService.open(content, {
-      size: 'lg',
-      backdrop: 'static',
-      keyboard: false
-    });
-
+  openModal(content:any, dossier: Demande | undefined = undefined){
+  if (dossier){
+    this.formulaireDossier.patchValue({
+      ...dossier,
+      personnelId: dossier.personnel?.id ?? null,   // 👈 important
+      typeDemande: dossier.typeDemande ?? null
+    } as any);
+  } else {
+    this.formulaireDossier.reset();
   }
+  this.modalService.open(content, { size: 'lg', backdrop: 'static', keyboard: false });
+}
+
 
 
 creeModifierDemande() {

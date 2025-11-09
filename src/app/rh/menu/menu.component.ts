@@ -11,7 +11,7 @@ import { HttpClient } from '@angular/common/http';
 import { TranslateService } from '@ngx-translate/core';
 import { EventService } from '../../commun/services/event.service';
 import { Router, NavigationEnd } from '@angular/router';
-
+import { AuthentificationService } from '../../authentification/services/authentication.service';
 import { MENU } from './menu';
 import { MenuItem } from './menu.model';
 import MetisMenu from 'metismenujs';
@@ -35,7 +35,8 @@ export class MenuComponent implements OnInit, AfterViewInit, OnChanges {
     private eventService: EventService,
     private router: Router,
     public translate: TranslateService,
-    private http: HttpClient
+    private http: HttpClient,
+    private auth: AuthentificationService,
   ) {
     router.events.forEach((event) => {
       if (event instanceof NavigationEnd) {
@@ -45,23 +46,127 @@ export class MenuComponent implements OnInit, AfterViewInit, OnChanges {
     });
   }
 
-  ngOnInit() {
-    this.initialize();
-    this._scrollElement();
+  // ✅ REQUIRED by OnInit
+  ngOnInit(): void {
+    this.initialize();      // initialise le menu
+    this._scrollElement();  // conserve ton comportement existant
   }
 
-  ngAfterViewInit() {
+  ngAfterViewInit(): void {
     if (this.sideMenu?.nativeElement) {
       this.menu = new MetisMenu(this.sideMenu.nativeElement);
       this._activateMenuDropdown();
     }
   }
 
+  // ✅ SINGLE initialize() — version “améliorée” (flag + check backend)
+  private initialize(): void {
+    // 1) Lecture rapide depuis le stockage
+    let isAdmin = this.auth.isAdmin();
+
+    // 2) Réglage initial du menu
+    const apply = (admin: boolean) => {
+      this.menuItems = admin ? MENU : this.buildPersonnelMenu(MENU);
+      setTimeout(() => {
+        if (this.sideMenu?.nativeElement) {
+          this.menu = new MetisMenu(this.sideMenu.nativeElement);
+          this._activateMenuDropdown();
+        }
+      });
+    };
+
+    apply(isAdmin);
+
+    // 3) Vérif backend (plus fiable) pour confirmer le rôle
+    const email = (sessionStorage.getItem('email') || '').trim();
+    if (email) {
+      this.auth.obtenirUnUtilisateurParEmail(email).subscribe({
+        next: (user: any) => {
+          const fromFlag   = !!(user?.est_admin ?? user?.estAdmin);
+          const rolesArray = (user?.roles ?? user?.roleList ?? [])
+            .map((r:any)=> (r?.nom || r).toString().toUpperCase());
+          const fromRoles  = rolesArray.some((r:string)=> r.includes('ADMIN'));
+          const finalIsAdmin = isAdmin || fromFlag || fromRoles;
+
+          if (finalIsAdmin !== isAdmin) {
+            isAdmin = finalIsAdmin;
+            apply(isAdmin);
+            sessionStorage.setItem('isAdmin', String(isAdmin));
+          }
+        },
+        error: _ => {
+          // on garde l’affichage courant si l’API tombe
+        }
+      });
+    }
+  }
+
+private buildPersonnelMenu(source: MenuItem[]): MenuItem[] {
+  // Index par link pour réutiliser icônes/links existants
+  const byLink = new Map<string, MenuItem>();
+  const collect = (items: MenuItem[]) => {
+    for (const it of items) {
+      if (it.link) byLink.set(String(it.link).trim(), it);
+      if (it.subItems?.length) collect(it.subItems);
+    }
+  };
+  collect(source);
+
+  // Récupérer quelques items utiles
+  const titreFonct1 = source.find(i => i.isTitle && (i.label ?? '').toLowerCase() === 'les fonctionalites');
+  const titreFonct2 = source.find(i => i.isTitle && (i.label ?? '').toLowerCase() === 'les fonctionnalités');
+  const portail = source.find(i => (i.label ?? '').trim() === 'Portail')
+              ?? byLink.get('/espacedetravail')
+              ?? byLink.get('espacedetravail');
+
+  // Construit le menu pour le PERSONNEL
+  const out: MenuItem[] = [];
+
+  if (titreFonct1) out.push({ ...titreFonct1, subItems: undefined });
+  if (portail) out.push({ ...portail, subItems: undefined });
+  if (titreFonct2) out.push({ ...titreFonct2, subItems: undefined });
+
+  // ➕ AJOUT EXPLICITE du dashboard personnel (NE TOUCHE PAS à tableaudebord)
+  out.push({
+    id: 9001,
+    label: 'Mon tableau de bord',
+    icon: 'bx-bar-chart-square',
+    link: 'mon-dashboard'
+  });
+
+  // Liens personnels (on remappe vers “mes-*” quand tu veux)
+  const wanted: Array<{ link: string; newLabel: string; newLink?: string }> = [
+    { link: 'presences',     newLabel: 'Mes présences',     newLink: 'mes-presences' },
+    { link: 'demandes',      newLabel: 'Mes demandes',      newLink: 'mes-demandes' },
+    { link: 'conges',        newLabel: 'Mes congés',        newLink: 'mes-conges' },
+    { link: 'affectations',  newLabel: 'Mes affectations',  newLink: 'mes-affectations' },
+    { link: 'missions',      newLabel: 'Mes missions',      newLink: 'mes-missions' },
+    { link: 'frais',         newLabel: 'Mes frais' },
+    { link: 'contrats',      newLabel: 'Mes contrats',      newLink: 'mes-contrats' },
+  ];
+
+  for (const w of wanted) {
+    const src = byLink.get(w.link);
+    if (!src) continue;
+    out.push({
+      ...src,
+      label: w.newLabel,
+      link: w.newLink ?? src.link,
+      subItems: undefined
+    });
+  }
+
+  return out;
+}
+
+
+
+
   toggleMenu(event: any) {
     event.currentTarget.nextElementSibling.classList.toggle('mm-show');
   }
 
-  ngOnChanges() {
+  ngOnChanges(): void {
     if ((!this.isCondensed && this.sideMenu) || this.isCondensed) {
       setTimeout(() => {
         if (this.sideMenu?.nativeElement) {
@@ -73,7 +178,7 @@ export class MenuComponent implements OnInit, AfterViewInit, OnChanges {
     }
   }
 
-  private _scrollElement() {
+  private _scrollElement(): void {
     setTimeout(() => {
       const activeEls = document.getElementsByClassName('mm-active');
       if (activeEls.length > 0) {
@@ -86,9 +191,6 @@ export class MenuComponent implements OnInit, AfterViewInit, OnChanges {
     }, 300);
   }
 
-  /**
-   * remove active and mm-active class
-   */
   private _removeAllClass(className: string) {
     const els = document.getElementsByClassName(className);
     while (els.length > 0) {
@@ -96,12 +198,10 @@ export class MenuComponent implements OnInit, AfterViewInit, OnChanges {
     }
   }
 
-  /**
-   * Activate the parent dropdown
-   */
-  private _activateMenuDropdown() {
+  private _activateMenuDropdown(): void {
     this._removeAllClass('mm-active');
     this._removeAllClass('mm-show');
+
     const links = document.getElementsByClassName(
       'side-nav-link-ref'
     ) as HTMLCollectionOf<HTMLAnchorElement>;
@@ -134,16 +234,6 @@ export class MenuComponent implements OnInit, AfterViewInit, OnChanges {
     }
   }
 
-  /**
-   * Initialize
-   */
-  private initialize(): void {
-    this.menuItems = MENU;
-  }
-
-  /**
-   * Returns true or false if given menu item has child or not
-   */
   hasItems(item: MenuItem): boolean {
     return item.subItems !== undefined && item.subItems.length > 0;
   }

@@ -1,4 +1,3 @@
-// src/app/authentification/services/authentication.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Observable, of } from 'rxjs';
@@ -22,31 +21,70 @@ export class AuthentificationService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-  connexion(email: string, motdepasse: string) {
-    return this.http.post<LoginResponse>(
-      host + 'utilisateurs/connexion/',
-      { email, motdepasse },
-      httpOptionsJson
-    ).pipe(
-      tap((res: any) => {
-        const token: string = res?.token ?? res?.accessToken ?? '';
-        const perms: string[] = Array.isArray(res?.permissions) ? res.permissions : [];
-        // centralise ici le stockage propre
-        this.sauvegarderDansLaSession(token, email, perms, !!res?.isAdmin || perms.includes('admin'));
-      })
-    );
+ connexion(email: string, motdepasse: string) {
+  return this.http.post<LoginResponse>(
+    host + 'utilisateurs/connexion/',
+    { email, motdepasse },
+    httpOptionsJson
+  ).pipe(
+    tap((res: any) => {
+      const token: string = res?.token ?? res?.accessToken ?? '';
+      const perms: string[] = Array.isArray(res?.permissions) ? res.permissions : [];
+      const isAdmin = !!res?.isAdmin || perms.map(p => String(p).toLowerCase()).includes('admin');
+      this.sauvegarderDansLaSession(token, email, perms, isAdmin);
+    })
+  );
+}
+
+  /** ====== ADMIN / RÔLES ====== */
+  isAdmin(): boolean {
+    const fromFlag = sessionStorage.getItem('isAdmin') === 'true';
+    const fromPerms = (this.getPermissions().map(p => p.toLowerCase())).includes('admin');
+    return fromFlag || fromPerms;
+  }
+
+  getPermissions(): string[] {
+    try { return JSON.parse(sessionStorage.getItem('permissions') || '[]'); }
+    catch { return []; }
   }
 
   estAdminLocal(utilisateur: any): boolean {
-    return !!utilisateur?.estAdmin;
+    // si backend renvoie est_admin ou estAdmin
+    return !!(utilisateur?.est_admin ?? utilisateur?.estAdmin);
   }
+
+  /** ====== UTILISATEUR COURANT ====== */
+  /** getMe(): par défaut, récupère l’email stocké en session, puis fetch le profil */
+  /** Récupère le profil courant et recalcule isAdmin au besoin */
+getMe(): Observable<any> {
+  const email = (sessionStorage.getItem('email') || '').trim();
+  const req$ = email
+    ? this.obtenirUnUtilisateurParEmail(email)
+    : this.http.get<any>(host + 'utilisateurs/me', httpOptions);
+
+  return req$.pipe(
+    tap(user => {
+      if (user) {
+        const fromFlag = !!(user.est_admin ?? user.estAdmin);
+        const roles = (user.roles ?? user.roleList ?? []).map((r:any)=> (r?.nom||r).toString().toUpperCase());
+        const fromRoles = roles.some((r:string)=> r.includes('ADMIN'));
+        const isAdmin = fromFlag || fromRoles || this.isAdmin(); // garde le plus permissif
+        this.sauvegarderDansLaSession(
+          sessionStorage.getItem('token') || '',
+          sessionStorage.getItem('email') || '',
+          this.getPermissions(),
+          isAdmin
+        );
+      }
+    })
+  );
+}
 
   obtenirUnUtilisateurParEmail(email: string): Observable<any> {
     const safe = encodeURIComponent(String(email).replace(/['"]/g, '').trim());
     return this.http.get<any>(`${host}utilisateurs/${safe}`, httpOptions);
   }
 
-  // >>>>>>>>>> ICI: permissions = string[] (pas string JSON)
   sauvegarderDansLaSession(token: string, email: string, permissions: string[] = [], isAdmin = false) {
     sessionStorage.setItem('token', token ?? '');
     sessionStorage.setItem('email', email ?? '');
@@ -75,6 +113,7 @@ export class AuthentificationService {
     return this.token ?? null;
   }
 
+  /** ====== Password & divers ====== */
   motdepasseoublie(email: string): Observable<any> {
     return this.http.post(host + 'utilisateurs/motdepasseoublie/', email, httpOptions);
   }
@@ -121,7 +160,7 @@ export class AuthentificationService {
       );
     }
     return undefined;
-  }
+    }
 
   verifierLeJeton(token: string): Observable<any> {
     return this.http.get<any>(host + `utilisateurs/verificationdujetondemotdepasse?token=${token}`);
@@ -162,7 +201,7 @@ export class AuthentificationService {
     }
   }
 
-  // ==== Pédagogie (inchangé) ====
+  /** ==== Pédagogie (inchangé) ==== */
   verifierLeJetonPedago(token: string): Observable<any> {
     return this.http.get<any>(hostPedago + `requerant/verificationdujetondemotdepasse?token=${token}`);
   }
@@ -199,10 +238,9 @@ export class AuthentificationService {
   }
 
   setToken(token: string): void {
-  localStorage.setItem('token', token);
-}
-
-setUser(user: any): void {
-  localStorage.setItem('user', JSON.stringify(user));
-}
+    localStorage.setItem('token', token);
+  }
+  setUser(user: any): void {
+    localStorage.setItem('user', JSON.stringify(user));
+  }
 }

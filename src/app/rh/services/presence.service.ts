@@ -1,17 +1,19 @@
 // src/app/rh/services/presence.service.ts
 import { Injectable } from '@angular/core';
-import { environment } from "../../../environments/environment";
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Observable, firstValueFrom } from "rxjs";
+import { environment } from "../../../environments/environment";
 import { Presence } from "../models/presence";
 
 @Injectable({ providedIn: 'root' })
 export class PresenceService {
-  // 👉 environment.hostmicroservicepersonnel DOIT être "http://localhost:9002/rh"
-  public readonly contextPath = `${environment.hostmicroservicepersonnel.replace(/\/$/, '')}/presences`;
+  /** Base attendue : environment.hostmicroservicepersonnel = "http://localhost:9002/rh" */
+  private readonly base = `${environment.hostmicroservicepersonnel}`.replace(/\/$/, '');
+  public readonly contextPath = `${this.base}/presences`;
 
   constructor(private httpClient: HttpClient) {}
 
+  /** Listing global avec recherche/filtre (pagination) */
   listerPresenceALLPage(
     page: number,
     size: number,
@@ -32,6 +34,7 @@ export class PresenceService {
     return this.httpClient.get<any>(`${this.contextPath}/rechercher`, { observe: 'response', params });
   }
 
+  /** Listing des présences validées (pagination) */
   listerPresenceMarqueALLPage(
     page: number,
     size: number,
@@ -52,6 +55,22 @@ export class PresenceService {
     return this.httpClient.get<any>(`${this.contextPath}/rechercher/valider`, { observe: 'response', params });
   }
 
+  /** Listing par personnel (pagination) */
+  listerPresencePersonnel(
+    personnelId: number,
+    page = 0,
+    size = 5,
+    sortDir: 'asc' | 'desc' = 'desc'
+  ) {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sort', `id,${sortDir}`);
+
+    return this.httpClient.get<any>(`${this.contextPath}/personnel/${personnelId}`, { observe: 'response', params });
+  }
+
+  /** Vérifie si une présence existe pour (personnel, mois) et retourne l'id si trouvé. */
   async getPresenceIdIfExists(personnelId: number, mois: number): Promise<number | null> {
     const url = `${this.contextPath}/personnel/${personnelId}/${mois}`;
     try {
@@ -66,6 +85,7 @@ export class PresenceService {
     }
   }
 
+  /** Création */
   creerPresence(personnelId: number, nbreJourAbsent: number, mois: number): Observable<Presence> {
     const params = new HttpParams()
       .set('personnelId', personnelId)
@@ -74,26 +94,69 @@ export class PresenceService {
     return this.httpClient.post<Presence>(`${this.contextPath}`, null, { params });
   }
 
+  /** Modification (nbreJourAbsent) */
   modifierPresence(id: number, nbreJourAbsent: number): Observable<Presence> {
     const params = new HttpParams().set('nbreJourAbsent', nbreJourAbsent ?? 0);
     return this.httpClient.patch<Presence>(`${this.contextPath}/${id}`, null, { params });
   }
 
-  annulerValidationPresence(id: number, _data: any): Observable<Presence> {
+  /** Validation / Invalidation */
+  annulerValidationPresence(id: number): Observable<Presence> {
     return this.httpClient.patch<Presence>(`${this.contextPath}/${id}/invalide`, null);
   }
 
-  validerALLPresence(presenceIds: number[], _data: any): Observable<Presence> {
+  validerALLPresence(presenceIds: number[]): Observable<Presence> {
     const params = new HttpParams().set('presenceIds', presenceIds.join(','));
     return this.httpClient.patch<Presence>(`${this.contextPath}/confirmeAll`, null, { params });
   }
 
-  annulervalidationALLPresence(presenceIds: number[], _data: any): Observable<Presence> {
+  annulervalidationALLPresence(presenceIds: number[]): Observable<Presence> {
     const params = new HttpParams().set('presenceIds', presenceIds.join(','));
     return this.httpClient.patch<Presence>(`${this.contextPath}/invalideAll`, null, { params });
   }
 
+  /** Suppression */
   supprimerPresence(id: number) {
     return this.httpClient.delete<any>(`${this.contextPath}/${id}`);
   }
+
+
+  private getMyPersonnelIdFromToken(): number | null {
+  const raw = sessionStorage.getItem('token') || localStorage.getItem('token') || '';
+  if (!raw) return null;
+  try {
+    const payload = JSON.parse(atob(raw.split('.')[1] || ''));
+    const id = payload?.personnelId ?? payload?.personnel_id ?? payload?.personnelID;
+    const asNum = typeof id === 'number' ? id : Number(id);
+    return Number.isFinite(asNum) ? asNum : null;
+  } catch {
+    return null;
+  }
+}
+
+/** Mes présences (paginated) via /personnels/{id}/presences */
+listerMesPresences(
+  page = 0,
+  size = 10,
+  sortField = 'dateValidation',
+  sortDir: 'asc' | 'desc' = 'desc'
+) {
+  const meId = this.getMyPersonnelIdFromToken();
+  if (meId == null) {
+    // on renvoie un Observable qui échoue proprement
+    return this.httpClient.get<any>('__invalid__/no-token'); // forcera l'erreur catch côté component
+  }
+
+  const params = new HttpParams()
+    .set('page', page)
+    .set('size', size)
+    .set('sort', `${sortField},${sortDir}`);
+
+  // ⚠️ cette route correspond à PersonnelRelationsController.listPresences
+  return this.httpClient.get<any>(
+    `${this.base}/personnels/${meId}/presences`,
+    { observe: 'response', params }
+  );
+}
+
 }

@@ -362,21 +362,22 @@
         <div class="col-md-6">
           <div class="mb-3">
             <label for="personnelId" class="form-label fw-medium">Personnel</label>
-            <ng-select
-              [searchable]="true"
-              (search)="onSearchPersonnel($event.term)"
-              [loading]="loading"
-              formControlName="personnelId"
-              id="personnelId"
-              [ngClass]="{
-                'is-invalid': formulaireDossier.get('personnelId')?.invalid && formulaireDossier.get('personnelId')?.dirty,
-                'is-valid': formulaireDossier.get('personnelId')?.valid
-              }"
-              placeholder="Rechercher un personnel...">
-              <ng-option *ngFor="let personnels of listePersonnel" [value]="personnels.id">
-                {{ personnels?.prenom + ' ' + personnels?.nom }}
-              </ng-option>
-            </ng-select>
+           <ng-select
+  [items]="listePersonnel"
+  bindLabel="_displayName"
+  bindValue="id"
+  [searchable]="true"
+  (search)="onSearchPersonnel($event.term)"
+  [loading]="loading"
+  formControlName="personnelId"
+  id="personnelId"
+  [ngClass]="{
+    'is-invalid': formulaireDossier.get('personnelId')?.invalid && formulaireDossier.get('personnelId')?.dirty,
+    'is-valid': formulaireDossier.get('personnelId')?.valid
+  }"
+  placeholder="Rechercher un personnel...">
+</ng-select>
+
             <div *ngIf="formulaireDossier.get('personnelId')?.invalid && formulaireDossier.get('personnelId')?.dirty" class="invalid-feedback">
               La sélection d'un personnel est obligatoire
             </div>

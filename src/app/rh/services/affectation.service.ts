@@ -1,3 +1,4 @@
+// src/app/rh/services/affectation.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -7,23 +8,36 @@ import { AffectationDto } from '../models/affectation-dto';
 
 @Injectable({ providedIn: 'root' })
 export class AffectationService {
-  // Base = http://localhost:9002/rh/affectations
-  public contextPath: string = environment.hostmicroservicepersonnel + 'affectations';
+  /** Base = http://localhost:9002/rh/affectations */
+  private readonly base = `${environment.hostmicroservicepersonnel}`.replace(/\/$/, '');
+  public contextPath: string = `${this.base}/affectations`;
 
   constructor(private http: HttpClient) {}
 
-  lister(page = 0, size = 10, sort = 'desc'): Observable<any> {
-    const params = new HttpParams().set('page', page).set('size', size).set('sort', sort);
-    // @ts-ignore
+  /** Listing global paginé */
+  lister(page = 0, size = 10, sortDir: 'asc' | 'desc' = 'desc'): Observable<any> {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sort', `dateDebut,${sortDir}`);
     return this.http.get<any>(this.contextPath, { observe: 'response', params });
   }
 
-  listerParPersonnel(personnelId: number, page = 0, size = 10, sort = 'desc'): Observable<any> {
-    const params = new HttpParams().set('page', page).set('size', size).set('sort', sort);
-    // @ts-ignore
+  /** Listing par personnel paginé */
+  listerParPersonnel(personnelId: number, page = 0, size = 10, sortDir: 'asc' | 'desc' = 'desc'): Observable<any> {
+    const params = new HttpParams()
+      .set('page', page)
+      .set('size', size)
+      .set('sort', `dateDebut,${sortDir}`);
     return this.http.get<any>(`${this.contextPath}/personnel/${personnelId}`, { observe: 'response', params });
   }
 
+  /** Alias si ton composant appelle listerAffectationPersonnel */
+  listerAffectationPersonnel(personnelId: number, page = 0, size = 10, sortDir: 'asc' | 'desc' = 'desc') {
+    return this.listerParPersonnel(personnelId, page, size, sortDir);
+  }
+
+  /** CRUD */
   voir(id: number): Observable<Affectation> {
     return this.http.get<Affectation>(`${this.contextPath}/${id}`);
   }
@@ -40,11 +54,23 @@ export class AffectationService {
     return this.http.delete(`${this.contextPath}/${id}`);
   }
 
-  // Optionnel : route alternative existante côté backend
+  /** Route alternative si dispo côté backend */
   affecter(personnelId: number, posteId: number, dateDebut: string): Observable<Affectation> {
     return this.http.post<Affectation>(
       `${this.contextPath}/personnel/${personnelId}/poste/${posteId}`,
       { dateDebut }
     );
+  }
+
+
+  listerMesAffectations(page = 0, size = 10, sort: string = 'id,desc') {
+    const params = new HttpParams()
+      .set('page', String(page))
+      .set('size', String(size))
+      .set('sort', String(sort));
+    return this.http.get<any>(`${this.contextPath}/moi`, {
+      observe: 'response',
+      params
+    });
   }
 }

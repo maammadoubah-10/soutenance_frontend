@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-//import { RhDashboardService, RhDashboardDto } from './services/rh-dashboard.service';
 import {
   ApexAxisChartSeries,
   ApexNonAxisChartSeries,
@@ -17,7 +16,7 @@ import {
   ApexResponsive
 } from 'ng-apexcharts';
 import { RhDashboardDto, RhDashboardService } from './services/rh-dashboard.service';
-//import { RhDashboardService, RhDashboardDto } from './rh-dashboard.service';
+import { AuthentificationService } from '../authentification/services/authentication.service';
 
 /** ===== Types pour ng-apexcharts ===== **/
 export type AreaChartOptions = {
@@ -71,7 +70,10 @@ export type BarChartOptions = {
 })
 export class RhDashboardComponent implements OnInit {
 
-  /** ===== KPI ===== */
+  /** ===== Rôle ===== */
+  isAdmin = false;
+
+  /** ===== KPI ADMIN ===== */
   kpi = {
     totalPersonnel: 0,
     postesOuverts: 0,
@@ -79,27 +81,49 @@ export class RhDashboardComponent implements OnInit {
     tauxTurnover: 0
   };
 
-  /** ===== Charts ===== */
+  /** ===== KPI PERSONNEL ===== */
+  persoKpi = {
+    contratActif: false,
+    soldeConges: 0,
+    presencesMois: 0,
+    missionsEnCours: 0
+  };
+
+  /** ===== Charts ADMIN ===== */
   headcountArea!: AreaChartOptions;
   hiresDeparturesBar!: BarChartOptions;
-  absenceRadial!: RadialChartOptions;
   departmentsDonut!: DonutChartOptions;
+
+  /** ===== Charts COMMUNS / PERSONNEL ===== */
+  presenceArea!: AreaChartOptions;
+  missionsCongesBar!: BarChartOptions;
+  absenceRadial!: RadialChartOptions;
 
   /** ===== UI state ===== */
   loading = false;
   errorMsg = '';
 
-  constructor(private api: RhDashboardService) {}
+  constructor(
+    private api: RhDashboardService,
+    private auth: AuthentificationService
+  ) {}
 
   ngOnInit(): void {
-    this.initChartsWithDefaults();
+    // Détermine le rôle (sans bloquer l’affichage)
+    this.isAdmin = this.auth.isAdmin();
+
+    // Initialise tous les graphs avec des valeurs sûres
+    this.initChartsDefaults();
+
+    // Charge les données (endpoint différent selon rôle)
     this.fetchData();
   }
 
-  /** 1) INIT défauts (sécurise les inputs) */
-  private initChartsWithDefaults(): void {
-    this.headcountArea = {
-      series: [{ name: 'Effectif', data: [] }],
+  /** Initialisation des options par défaut pour TOUTES les cartes */
+  private initChartsDefaults(): void {
+    // Area (admin: headcount, perso: presence)
+    const areaDefault: AreaChartOptions = {
+      series: [{ name: 'Série', data: [] }],
       chart: { type: 'area', height: 320, toolbar: { show: false } },
       dataLabels: { enabled: false },
       stroke: { curve: 'smooth', width: 2 },
@@ -109,12 +133,12 @@ export class RhDashboardComponent implements OnInit {
       tooltip: { theme: 'light' },
       legend: { position: 'top' }
     };
+    this.headcountArea = { ...areaDefault, series: [{ name: 'Effectif', data: [] }] };
+    this.presenceArea  = { ...areaDefault, series: [{ name: 'Présent',  data: [] }] };
 
-    this.hiresDeparturesBar = {
-      series: [
-        { name: 'Entrées', data: [] },
-        { name: 'Sorties', data: [] }
-      ],
+    // Bar (admin: hires/departures, perso: missions/congés)
+    const barDefault: BarChartOptions = {
+      series: [{ name: 'Série', data: [] }],
       chart: { type: 'bar', height: 320, stacked: false, toolbar: { show: false } },
       plotOptions: { bar: { columnWidth: '45%', borderRadius: 6 } },
       dataLabels: { enabled: false },
@@ -124,20 +148,26 @@ export class RhDashboardComponent implements OnInit {
       tooltip: { theme: 'light' },
       legend: { position: 'top' }
     };
+    this.hiresDeparturesBar = { ...barDefault, series: [
+      { name: 'Entrées', data: [] },
+      { name: 'Sorties', data: [] }
+    ]};
+    this.missionsCongesBar = { ...barDefault, series: [
+      { name: 'Missions', data: [] },
+      { name: 'Congés',   data: [] }
+    ]};
 
+    // Radial (commun)
     this.absenceRadial = {
       series: [0],
       chart: { type: 'radialBar', height: 320 },
-      labels: ['Taux d’absence'],
+      labels: [ this.isAdmin ? 'Taux d’absence' : 'Absence (mois)' ],
       plotOptions: {
         radialBar: {
           hollow: { size: '60%' },
           dataLabels: {
             name: { fontSize: '14px' },
-            value: {
-              fontSize: '24px',
-              formatter: (v: any) => `${v}%`
-            }
+            value: { fontSize: '24px', formatter: (v: any) => `${v}%` }
           }
         }
       },
@@ -145,6 +175,7 @@ export class RhDashboardComponent implements OnInit {
       tooltip: { enabled: true }
     };
 
+    // Donut (admin – répartition par service)
     this.departmentsDonut = {
       series: [],
       chart: { type: 'donut', height: 320 },
@@ -155,50 +186,86 @@ export class RhDashboardComponent implements OnInit {
     };
   }
 
-  /** 2) Chargement réel depuis le backend */
+  /** Appel API selon rôle et mapping */
   private fetchData(): void {
     this.loading = true;
     this.errorMsg = '';
 
-    this.api.getDashboard().subscribe({
+    const obs = this.isAdmin ? this.api.getDashboard() : this.api.getMyDashboard();
+
+    obs.subscribe({
       next: (res: RhDashboardDto) => {
-        // KPI
-        this.kpi = {
-          totalPersonnel: res?.kpi?.totalPersonnel ?? 0,
-          postesOuverts:  res?.kpi?.postesOuverts  ?? 0,
-          enAbsence:      res?.kpi?.enAbsence      ?? 0,
-          tauxTurnover:   Math.round((res?.kpi?.tauxTurnover ?? 0) * 10) / 10
-        };
+        if (this.isAdmin) {
+          // ====== ADMIN ======
+          this.kpi = {
+            totalPersonnel: res?.kpi?.totalPersonnel ?? 0,
+            postesOuverts:  res?.kpi?.postesOuverts  ?? 0,
+            enAbsence:      res?.kpi?.enAbsence      ?? 0,
+            tauxTurnover:   Math.round((res?.kpi?.tauxTurnover ?? 0) * 10) / 10
+          };
 
-        // Effectif (area)
-        this.headcountArea = {
-          ...this.headcountArea,
-          xaxis: { categories: res?.headcount?.labels ?? [] },
-          series: [{ name: 'Effectif', data: res?.headcount?.data ?? [] }]
-        };
+          this.headcountArea = {
+            ...this.headcountArea,
+            xaxis: { categories: res?.headcount?.labels ?? [] },
+            series: [{ name: 'Effectif', data: (res?.headcount?.data ?? []).map(Number) }]
+          };
 
-        // Entrées / Sorties (bar)
-        this.hiresDeparturesBar = {
-          ...this.hiresDeparturesBar,
-          xaxis: { categories: res?.hiresDepartures?.labels ?? [] },
-          series: [
-            { name: 'Entrées',   data: res?.hiresDepartures?.hires ?? [] },
-            { name: 'Sorties',   data: res?.hiresDepartures?.departures ?? [] }
-          ]
-        };
+          this.hiresDeparturesBar = {
+            ...this.hiresDeparturesBar,
+            xaxis: { categories: res?.hiresDepartures?.labels ?? [] },
+            series: [
+              { name: 'Entrées',   data: (res?.hiresDepartures?.hires ?? []).map(Number) },
+              { name: 'Sorties',   data: (res?.hiresDepartures?.departures ?? []).map(Number) }
+            ]
+          };
 
-        // Absence (radial)
-        this.absenceRadial = {
-          ...this.absenceRadial,
-          series: [Math.round((res?.absence?.rate ?? 0) * 10) / 10]
-        };
+          this.absenceRadial = {
+            ...this.absenceRadial,
+            labels: ['Taux d’absence'],
+            series: [Math.round((res?.absence?.rate ?? 0) * 10) / 10]
+          };
 
-        // Répartition par service (donut)
-        this.departmentsDonut = {
-          ...this.departmentsDonut,
-          labels: res?.departments?.labels ?? [],
-          series: res?.departments?.values ?? []
-        };
+          this.departmentsDonut = {
+            ...this.departmentsDonut,
+            labels: res?.departments?.labels ?? [],
+            series: (res?.departments?.values ?? []).map(Number)
+          };
+        } else {
+          // ====== PERSONNEL ======
+          this.persoKpi = {
+            contratActif:    (res?.kpi?.totalPersonnel ?? 0) > 0,
+            soldeConges:     res?.kpi?.postesOuverts  ?? 0,
+            presencesMois:   res?.kpi?.enAbsence      ?? 0,
+            missionsEnCours: Math.round(res?.kpi?.tauxTurnover ?? 0)
+          };
+
+          this.presenceArea = {
+            ...this.presenceArea,
+            xaxis: { categories: res?.headcount?.labels ?? [] },
+            series: [{ name: 'Présent', data: (res?.headcount?.data ?? []).map(Number) }]
+          };
+
+          this.missionsCongesBar = {
+            ...this.missionsCongesBar,
+            xaxis: { categories: res?.hiresDepartures?.labels ?? [] },
+            series: [
+              { name: 'Missions', data: (res?.hiresDepartures?.hires ?? []).map(Number) },
+              { name: 'Congés',   data: (res?.hiresDepartures?.departures ?? []).map(Number) }
+            ]
+          };
+
+          this.absenceRadial = {
+            ...this.absenceRadial,
+            labels: ['Absence (mois)'],
+            series: [Math.round((res?.absence?.rate ?? 0) * 10) / 10]
+          };
+          // Le donut personnel réutilise departments comme "types de congés"
+          this.departmentsDonut = {
+            ...this.departmentsDonut,
+            labels: res?.departments?.labels ?? [],
+            series: (res?.departments?.values ?? []).map(Number)
+          };
+        }
       },
       error: (err: HttpErrorResponse) => {
         this.errorMsg = err?.error?.message || 'Erreur lors du chargement du tableau de bord.';

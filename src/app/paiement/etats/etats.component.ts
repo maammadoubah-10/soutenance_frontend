@@ -185,7 +185,7 @@ export class EtatsComponent implements OnInit {
   }
 
   show(etat:Etat) {
-    this.router.navigate(['/paie/etats/'+etat.id])
+    this.router.navigate(['/paie/etat/'+etat.id])
   }
 
   @ViewChild('pdfTable') pdfTable?: ElementRef;

@@ -7,6 +7,7 @@ import {TranslateService} from "@ngx-translate/core";
 import {Router} from "@angular/router";
 import {AsyncPipe, DatePipe, DOCUMENT, NgIf, NgSwitch, NgSwitchCase, registerLocaleData} from "@angular/common";
 import {Observable} from "rxjs";
+import { UtilisateurAuthentifie } from '../../authentification/models/utilisateur-authentifie';
 
 @Component({
   selector: 'app-entetedepagepedagogie',
@@ -267,8 +268,7 @@ export class EntetedepagepedagogieComponent implements OnInit {
     if (notificationCount > 0) {
       this.titleService.setTitle(` (${notificationCount}) Vous avez des notifications`);
     } else {
-      // this.titleService.setTitle('Système intégré de gestion des différentes composantes du Cabinet Jilmonde Consulting de Abomey-Calavi');
-      this.titleService.setTitle('Système intégré de gestion des différentes composantes de l\`EISMV de Dakar');
+      this.titleService.setTitle('Plateforme intégré de gestion des ressources humaines et de la formation de l\`ISI');
     }
   }
 

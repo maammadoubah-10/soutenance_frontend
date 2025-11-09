@@ -1,3 +1,4 @@
+// src/app/rh-dashboard/services/rh-dashboard.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -5,36 +6,31 @@ import { environment } from "../../../environments/environment";
 
 export interface RhDashboardDto {
   kpi: {
-    totalPersonnel: number;
-    postesOuverts: number;
-    enAbsence: number;
-    tauxTurnover: number;
+    totalPersonnel: number;   // → Contrat actif (1/0)
+    postesOuverts: number;    // → Solde congés
+    enAbsence: number;        // → Jours pointés (mois)
+    tauxTurnover: number;     // → Missions en cours
   };
-  headcount: {
-    labels: string[];
-    data: number[];
-  };
-  hiresDepartures: {
-    labels: string[];
-    hires: number[];
-    departures: number[];
-  };
-  absence: { rate: number };
-  departments: { labels: string[]; values: number[] };
+  headcount: { labels: string[]; data: number[] }; // Présence 6 mois (jours pointés)
+  hiresDepartures: { labels: string[]; hires: number[]; departures: number[] }; // Missions vs Congés
+  absence: { rate: number }; // Taux d’absence du mois
+  departments: { labels: string[]; values: number[] }; // Types de congés
 }
 
 @Injectable({ providedIn: 'root' })
 export class RhDashboardService {
-  // base déjà suffixée par /rh/
   private baseUrl = environment.hostmicroservicepersonnel; // ex: http://localhost:9002/rh/
-  // si ton contrôleur expose GET /rh/dashboard :
-  private url = `${this.baseUrl}dashboard`;
-  // si c'est /api/rh/dashboard, mets plutôt :
-  // private url = `${this.baseUrl}api/rh/dashboard`;
+  private urlAdmin = `${this.baseUrl}dashboard`;
+  private urlMe    = `${this.baseUrl}dashboard/moi`;
 
   constructor(private http: HttpClient) {}
 
   getDashboard(): Observable<RhDashboardDto> {
-    return this.http.get<RhDashboardDto>(this.url);
+    return this.http.get<RhDashboardDto>(this.urlAdmin);
+  }
+
+  /** Nouveau: dashboard pour le personnel connecté */
+  getMyDashboard(): Observable<RhDashboardDto> {
+    return this.http.get<RhDashboardDto>(this.urlMe);
   }
 }

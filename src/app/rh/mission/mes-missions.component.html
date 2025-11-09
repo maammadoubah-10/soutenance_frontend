@@ -1,0 +1,96 @@
+<div class="container-fluid px-3 page-with-bg">
+  <app-titredepage title="Mes Missions" [items]="items"></app-titredepage>
+
+  <!-- États -->
+  <div *ngIf="loading" class="alert alert-info d-flex align-items-center mt-4">
+    <i class="bx bx-loader-circle bx-spin me-2 fs-5"></i> Chargement...
+  </div>
+  <div *ngIf="error" class="alert alert-danger d-flex align-items-center mt-4">
+    <i class="bx bx-error-circle me-2 fs-5"></i> Erreur lors du chargement
+  </div>
+
+  <!-- Liste (design admin, mais lecture seule) -->
+  <div class="card border-0 shadow-sm mt-4" *ngIf="!loading && !error && liste.length">
+    <div class="card-body p-0">
+      <ul class="list-group list-group-flush mission-list">
+        <li class="list-group-item border-0 py-3 px-4 mission-item" *ngFor="let m of liste; let i = index"
+            [style.animationDelay]="i * 0.05 + 's'">
+
+          <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex align-items-center">
+              <!-- Statut -->
+              <span [ngClass]="statutBadge(m).cls" class="fs-6 py-2 px-3 rounded-pill me-3">
+                <i class="bx bx-time-five me-1"></i> {{ statutBadge(m).txt }}
+              </span>
+
+              <!-- Date -->
+              <span class="fw-semibold text-primary fs-5 me-3">
+                {{ m.dateDebut | date:'dd MMMM yyyy':'':'fr-FR' }}
+              </span>
+
+              <!-- Référence / jours -->
+              <span class="badge bg-primary-subtle text-primary rounded-pill me-3" *ngIf="m.reference">
+                Ref: {{ m.reference }}
+              </span>
+              <span class="text-muted me-3" *ngIf="m.nbreJour">Jours: {{ m.nbreJour }}</span>
+
+              <!-- Moyen de déplacement -->
+              <span class="text-muted me-3" *ngIf="m.moyenDeplacement">
+                Transport: {{ m.moyenDeplacement }}
+              </span>
+
+              <!-- Pièce jointe -->
+              <button *ngIf="m.pieces" (click)="dlPieces(m)" class="btn btn-outline-dark btn-sm rounded-pill">
+                <i class="bx bx-download me-1"></i> Pièce jointe
+              </button>
+            </div>
+
+            <!-- Motif + période -->
+            <div class="text-end">
+              <div class="fw-medium">{{ m.motif }}</div>
+              <div class="text-muted small">
+                {{ m.dateDebut | date:'dd MMMM yyyy':'':'fr-FR' }}
+                <span *ngIf="m.dateFin"> → {{ m.dateFin | date:'dd MMMM yyyy':'':'fr-FR' }}</span>
+              </div>
+            </div>
+          </div>
+
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Vide -->
+  <div class="row mt-5" *ngIf="!loading && !error && !liste.length">
+    <div class="col-12 text-center py-5">
+      <i class="bx bxs-data text-muted" style="font-size: 5rem;"></i>
+      <h4 class="mt-3 text-muted">Aucune mission à afficher</h4>
+      <p class="text-muted">Vos missions ajoutées par l’administration apparaîtront ici.</p>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div class="row mt-4" *ngIf="total > size">
+    <div class="col-12">
+      <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+          <li class="page-item" [class.disabled]="page === 0">
+            <button class="page-link" (click)="prev()">
+              <i class="bx bx-chevron-left"></i> Précédent
+            </button>
+          </li>
+
+          <li class="page-item" *ngFor="let p of pages" [class.active]="p===page">
+            <button class="page-link" (click)="goto(p)">{{ p + 1 }}</button>
+          </li>
+
+          <li class="page-item" [class.disabled]="page + 1 === totalPages">
+            <button class="page-link" (click)="next()">
+              Suivant <i class="bx bx-chevron-right"></i>
+            </button>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>

@@ -5,7 +5,6 @@ import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
 import { of, Observable } from 'rxjs';
 import { catchError, map, startWith } from 'rxjs/operators';
-
 import { PresenceService } from '../services/presence.service';
 import { PersonnelService } from '../services/personnel.service';
 import { Presence } from '../models/presence';
@@ -76,10 +75,25 @@ export class PresenceComponent implements OnInit {
   }
 
   // --- dropdown data ---
-  chargerPersonnels(): void {
-    this.personnelService.listerPersonnelPage(0, 1000, 'asc')
-      .subscribe((resp: any) => this.listePersonnel = resp.body?.content ?? []);
-  }
+ chargerPersonnels(): void {
+  // On suppose que l’URL attend ?page=&size=&sort=id,asc
+  this.personnelService.listerPersonnelPage(0, 1000, 'id,asc').subscribe({
+    next: (resp: any) => {
+      const content = resp?.body?.content ?? resp?.content ?? resp ?? [];
+      this.listePersonnel = (content || []).map((p: any) => ({
+        ...p,
+        // optionnel : pré-calcul pour le template si tu préfères
+        _displayName: this.buildDisplayNamePersonnel(p)
+      }));
+    },
+    error: (e) => {
+      this.toastr.error(e?.error?.message || 'Impossible de charger les personnels');
+      this.listePersonnel = [];
+    }
+  });
+}
+trackById = (_: number, it: {id: number}) => it?.id;
+
 
   chargerServices(): void {
     try {
@@ -92,6 +106,13 @@ export class PresenceComponent implements OnInit {
       }).catch(() => {});
     } catch {}
   }
+
+buildDisplayNamePersonnel(p: any): string {
+  const prenom = p?.etatCivil?.prenom ?? p?.prenom ?? '';
+  const nom    = p?.etatCivil?.nom    ?? p?.nom    ?? '';
+  const full   = `${prenom} ${nom}`.trim();
+  return full || p?.matricule || 'Inconnu';
+}
 
   // --- listing ---
   chargerPage(): void {
@@ -198,7 +219,7 @@ export class PresenceComponent implements OnInit {
 
   invalider(p: Presence): void {
     if (!p || p.id == null) return;
-    this.presenceService.annulerValidationPresence(p.id, '').subscribe({
+    this.presenceService.annulerValidationPresence(p.id).subscribe({
       next: () => { this.toastr.info('Présence invalidée'); this.chargerPage(); },
       error: (e) => this.toastr.error(e?.error?.message ?? 'Erreur serveur', 'Erreur')
     });
@@ -218,7 +239,7 @@ export class PresenceComponent implements OnInit {
   validerSelection(): void {
     if (!this.selectedIds.size) return;
     const ids = Array.from(this.selectedIds);
-    this.presenceService.validerALLPresence(ids as any, '').subscribe({
+    this.presenceService.validerALLPresence(ids as any).subscribe({
       next: () => { this.toastr.success('Présences validées'); this.chargerPage(); },
       error: (e) => this.toastr.error(e?.error?.message ?? 'Erreur serveur', 'Erreur')
     });
@@ -227,7 +248,7 @@ export class PresenceComponent implements OnInit {
   invaliderSelection(): void {
     if (!this.selectedIds.size) return;
     const ids = Array.from(this.selectedIds);
-    this.presenceService.annulervalidationALLPresence(ids as any, '').subscribe({
+    this.presenceService.annulervalidationALLPresence(ids as any, ).subscribe({
       next: () => { this.toastr.info('Présences invalidées'); this.chargerPage(); },
       error: (e) => this.toastr.error(e?.error?.message ?? 'Erreur serveur', 'Erreur')
     });

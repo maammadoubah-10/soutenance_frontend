@@ -124,7 +124,9 @@
           <select class="form-select" formControlName="personnelId"
                   [ngClass]="{'is-invalid': form.get('personnelId')?.invalid && form.get('personnelId')?.touched}">
             <option [ngValue]="null">-- Sélectionner --</option>
-            <option *ngFor="let p of listePersonnel" [ngValue]="p.id">{{ afficherNomPersonnel(p) }}</option>
+<option *ngFor="let p of listePersonnel; trackBy: trackById" [ngValue]="p.id">
+  {{ buildDisplayNamePersonnel(p) }}
+</option>
           </select>
           <div class="text-danger" *ngIf="form.get('personnelId')?.invalid && form.get('personnelId')?.touched">
             Le personnel est obligatoire

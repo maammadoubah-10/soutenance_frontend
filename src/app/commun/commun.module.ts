@@ -1,41 +1,41 @@
 import { CommonModule } from '@angular/common';
 import { NgModule } from '@angular/core';
-import { NgbDropdownModule, NgbModalModule, NgbNavModule, NgbPaginationModule } from '@ng-bootstrap/ng-bootstrap';
+import {
+  NgbDropdownModule, NgbModalModule, NgbNavModule, NgbPaginationModule
+} from '@ng-bootstrap/ng-bootstrap';
 import { TranslateModule } from '@ngx-translate/core';
 import { ClickOutsideModule } from 'ng-click-outside';
 import { SimplebarAngularModule } from 'simplebar-angular';
-import { CommunRoutingModule } from './commun-routing.module';
+
 import { EntetedepageComponent } from './entetedepage/entetedepage.component';
 import { PieddepageComponent } from './pieddepage/pieddepage.component';
-import { TitredepageComponent } from './titredepage/titredepage.component';
-import { MenuComponent } from '../espacedetravail/menu/menu.component';
 
+// ⬇️ IMPORTER (pas déclarer) le standalone
+import { TitredepageComponent } from './titredepage/titredepage.component';
 
 @NgModule({
   declarations: [
-  PieddepageComponent,
-  TitredepageComponent,
-  EntetedepageComponent,
+    EntetedepageComponent,
+    PieddepageComponent,
   ],
   imports: [
     CommonModule,
-    CommunRoutingModule,
     TranslateModule,
     NgbDropdownModule,
+    NgbNavModule,
+    NgbModalModule,
+    NgbPaginationModule,
     ClickOutsideModule,
     SimplebarAngularModule,
 
-    NgbNavModule,
-    NgbModalModule,
-    NgbPaginationModule
-
-  ],
- 
-    exports: [
-    PieddepageComponent,
-    EntetedepageComponent, 
+    // ⬅️ standalone importé ici
     TitredepageComponent,
-     // ✅ exporté pour que les autres modules puissent l’utiliser
+  ],
+  exports: [
+    EntetedepageComponent,
+    PieddepageComponent,
+    // ⬅️ on le ré-exporte pour qu’il soit utilisable partout
+    TitredepageComponent,
   ]
 })
-export class CommunModule { }
+export class CommunModule {}

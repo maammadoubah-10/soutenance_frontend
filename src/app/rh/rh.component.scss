@@ -12,6 +12,7 @@
   overflow-y: auto;
 }
 
+/* ⚠️ on ajoute un padding-bottom pour ne pas être caché par le footer fixe */
 .content-scrollable {
   flex: 1;
   min-width: 0;
@@ -19,4 +20,5 @@
   background: #f6f9ff;
   overflow-y: auto;
   height: calc(100vh - 70px);
+  padding-bottom: calc(var(--footer-h) + 16px); /* espace de sécurité */
 }
