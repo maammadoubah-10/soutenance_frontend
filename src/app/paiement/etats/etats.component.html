@@ -1,4 +1,4 @@
-<app-breadcrumb section="Définition" pageName="Liste des etats"></app-breadcrumb>
+<app-titredepage title="Etats" [items]="items"></app-titredepage>
 
 <div class="bg-white p-3 mt-2 overflow-auto">
 
@@ -223,7 +223,7 @@
         <button type="button" class="btn-close" aria-hidden="true" (click)="modal.dismiss('Cross click')"></button>
     </div>
     <div class="modal-body">
-        <p *ngIf="!loading">Voulez-vous vraiment supprimer l'etat {{ dateDebut.value }}-{{ dateFin.value }} ?</p>
+        <p *ngIf="!loading">Voulez-vous vraiment supprimer l'etat {{ dateDebut?.value }}-{{ dateFin?.value }} ?</p>
         <div *ngIf="loading" class="text-center mt-3">
             <div class="spinner-border text-primary" role="status">
                 <span class="sr-only">Loading...</span>

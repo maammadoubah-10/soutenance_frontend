@@ -1,4 +1,5 @@
-import { TypeImpact } from "src/app/state/state"
+import { TypeImpact } from "../../state/state"
+
 
 export interface TypeImpactSalarial {
     id:number,

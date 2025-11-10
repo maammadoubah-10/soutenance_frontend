@@ -18,6 +18,9 @@ import { SingleTypeAutorisationComponent } from './type-autorisations/single-typ
 import { PrimesComponent } from './primes/primes.component';
 import { TypeEtatsComponent } from './type-etats/type-etats.component';
 import { SingleTypeEtatComponent } from './type-etats/single-type-etat/single-type-etat.component';
+import { EtatsComponent } from './etats/etats.component';
+import { TypeImpactSalarialComponent } from './type-impact-salarial/type-impact-salarial.component';
+import { ImpactSalarialComponent } from './impact-salarial/impact-salarial.component';
 
 const routes: Routes = [
   {
@@ -57,11 +60,16 @@ const routes: Routes = [
         ]
       },
       { path: "primes", component: PrimesComponent },
-        // { path: "etats", component: EtatsComponent },
+      { path: "etats", component: EtatsComponent },
       { path: 'type-etats', children: [
         { path: "", component: TypeEtatsComponent },
         { path: ":id", component: SingleTypeEtatComponent }
       ] },
+
+      { path: "type-impact-salarial", component: TypeImpactSalarialComponent },
+      
+      { path: "impact-salarial", component: ImpactSalarialComponent },
+
     ]
   }
 ];

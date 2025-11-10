@@ -9,17 +9,17 @@
     <div class="row g-3 ">
         <div class="col-md-1">
             <select name="perPage" [(ngModel)]="perPage" id="" class="form-control text-center">
-          <option value="10">10</option>
-          <option value="25">25</option>
-          <option value="50">50</option>
-          <option value="100">100</option>
-        </select>
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+            </select>
         </div>
         <div class="col-md-3 offset-md-8">
             <button class="btn btn-primary rounded-pill float-end" (click)="initAction(null, '', content)">
-            <i class="bx bx-plus"></i>
-            Ajouter un nouveau
-          </button>
+                <i class="bx bx-plus"></i>
+                Ajouter un nouveau
+            </button>
         </div>
     </div>
 
@@ -33,13 +33,16 @@
             </tr>
         </thead>
         <tbody>
-            <ng-container *ngFor="let typeEtat of typeEtats | paginate: { itemsPerPage: perPage, currentPage: p }; let i=index">
+            <ng-container
+                *ngFor="let typeEtat of typeEtats | paginate: { itemsPerPage: perPage, currentPage: p }; let i=index">
                 <tr (click)="show(typeEtat)">
                     <th scope="row">{{ i + 1 + (perPage * (p - 1)) }}</th>
                     <td>{{ typeEtat.designation }}</td>
                     <td (click)="$event.stopPropagation()">
-                        <i class="bx bx-edit ms-3 fs-5 btn btn-success" type="button" (click)="initAction(typeEtat, 'edit', edit)"></i>
-                        <i class="bx bx-trash ms-3 fs-5 btn btn-danger" type="button" (click)="initAction(typeEtat, 'delete', delete)"></i>
+                        <i class="bx bx-edit ms-3 fs-5 btn btn-success" type="button"
+                            (click)="initAction(typeEtat, 'edit', edit)"></i>
+                        <i class="bx bx-trash ms-3 fs-5 btn btn-danger" type="button"
+                            (click)="initAction(typeEtat, 'delete', delete)"></i>
                     </td>
                 </tr>
             </ng-container>
@@ -62,10 +65,12 @@
     <div class="modal-body">
         <form [formGroup]="typeEtatForm" (ngSubmit)="createTypeEtat()">
             <div>
-              <label for="">Designation</label>
-              <input type="text" formControlName="designation" name="designation" class="form-control" name="" id="">
-              <span class="error">{{ designation?.getError("unique") }}</span>
-              <span *ngIf="designation && designation.invalid && designation.touched && designation.getError('unique') == ''" class="error">Vérifier ce champs</span>
+                <label for="">Designation</label>
+                <input type="text" formControlName="designation" name="designation" class="form-control" name="" id="">
+                <span class="error">{{ designation?.getError("unique") }}</span>
+                <span
+                    *ngIf="designation && designation.invalid && designation.touched && designation.getError('unique') == ''"
+                    class="error">Vérifier ce champs</span>
             </div>
             <ng-container *ngIf="!loading; else elseTemplate">
                 <div class="mt-3 hstack">
@@ -93,10 +98,12 @@
     <div class="modal-body">
         <form [formGroup]="typeEtatForm" (ngSubmit)="updateTypeEtat()">
             <div>
-              <label for="">Designation</label>
-              <input type="text" formControlName="designation" name="designation" class="form-control" name="" id="">
-              <span class="error">{{ designation?.getError("unique") }}</span>
-              <span *ngIf="designation && designation.invalid && designation.touched && designation.getError('unique') == ''" class="error">Vérifier ce champs</span>
+                <label for="">Designation</label>
+                <input type="text" formControlName="designation" name="designation" class="form-control" name="" id="">
+                <span class="error">{{ designation?.getError("unique") }}</span>
+                <span
+                    *ngIf="designation && designation.invalid && designation.touched && designation.getError('unique') == ''"
+                    class="error">Vérifier ce champs</span>
             </div>
             <ng-container *ngIf="!loading; else elseTemplate">
                 <div class="mt-3 hstack">

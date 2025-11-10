@@ -32,6 +32,9 @@ import { SingleTypeAutorisationComponent } from './type-autorisations/single-typ
 import { PrimesComponent } from './primes/primes.component';
 import { TypeEtatsComponent } from './type-etats/type-etats.component';
 import { SingleTypeEtatComponent } from './type-etats/single-type-etat/single-type-etat.component';
+import { EtatsComponent } from './etats/etats.component';
+import { TypeImpactSalarialComponent } from './type-impact-salarial/type-impact-salarial.component';
+import { ImpactSalarialComponent } from './impact-salarial/impact-salarial.component';
 @NgModule({
   declarations: [
     PaiementComponent,
@@ -52,7 +55,10 @@ import { SingleTypeEtatComponent } from './type-etats/single-type-etat/single-ty
     SingleTypeAutorisationComponent,
     PrimesComponent,
     TypeEtatsComponent,
-    SingleTypeEtatComponent
+    SingleTypeEtatComponent,
+    EtatsComponent,
+    TypeImpactSalarialComponent,
+    ImpactSalarialComponent
   ],
   imports: [
     CommonModule,
@@ -75,11 +81,11 @@ import { SingleTypeEtatComponent } from './type-etats/single-type-etat/single-ty
     NgbNavModule,
     NgbModalModule,
     NgbPaginationModule,
-    // Ng2SearchPipeModule,
+    //Ng2SearchPipeModule,
     NgbModule,
     NgxPaginationModule,
     NgSelectModule,
-    CommunModule
+    CommunModule,
 ]
 })
 export class PaiementModule { }

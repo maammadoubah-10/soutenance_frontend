@@ -9,7 +9,7 @@ import { environment } from '../../../environments/environment';
 })
 export class PosteService {
 
-  private _url:string = environment.hostmicroservicepaie+"poste"
+  private _url:string = environment.hostmicroservicepersonnel+"postes"
 
   constructor(private http: HttpClient) {
   }
@@ -19,9 +19,8 @@ export class PosteService {
   }
 
   getToutPostes(search?: string):Observable<Poste[]> {
-    let params = new HttpParams();
-    params = params.append('search', search ? search : "")
-    return this.http.get<Poste[]>(this._url+"/filtrer", {params})
+  
+    return this.http.get<Poste[]>(this._url+"/listes", environment.httpOptions)
   }
 
 }

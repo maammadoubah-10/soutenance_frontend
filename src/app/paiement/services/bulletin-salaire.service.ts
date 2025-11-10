@@ -27,7 +27,7 @@ export class BulletinSalaireService {
     return this.http.get<BulletinSalaire>(this._url + "/" + id, environment.httpOptions)
   }
 
-  creeBulletinSalaire(bulletinSalaireDto){
+  creeBulletinSalaire(bulletinSalaireDto:any){
     return this.http.post<BulletinSalaire>(this._url, bulletinSalaireDto ,environment.httpOptions)
   }
   createBulletinSalaire(data:any):Observable<BulletinSalaire> {

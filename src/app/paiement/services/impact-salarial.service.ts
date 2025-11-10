@@ -1,8 +1,8 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
 import { ImpactSalarial } from '../models/impact-salarial';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -26,7 +26,7 @@ export class ImpactSalarialService {
     let params = new HttpParams();
     params = params.append('page', page)
     params = params.append('size', size)
-    return this.http.get<any[]>(this._url+"/", {params})
+    return this.http.get<any[]>(this._url, {params})
   }
 
 }

@@ -3,18 +3,14 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
-import jsPDF from 'jspdf';
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
-import htmlToPdfmake from 'html-to-pdfmake';
-import * as html2pdf from "html2pdf.js"
+import jsPDF from 'jspdf'
+import html2pdf from "html2pdf.js";
 import { TypeEtat } from '../models/type-etat';
 import { Etat } from '../models/etat';
 import { Entite } from '../models/entite';
 import { EtatService } from '../services/etat.service';
 import { BulletinSalaireService } from '../services/bulletin-salaire.service';
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
+import pdfMake from 'pdfmake/build/pdfmake';
 
 @Component({
   selector: 'app-etats',
@@ -27,7 +23,7 @@ export class EtatsComponent implements OnInit {
   public entites:Entite[] = [];
   public typeEtats:TypeEtat[] = [];
   public etatForm!: FormGroup;
-  public bulletinsSalaire = []
+  public bulletinsSalaire :any[]= []
   public perPage:number = 10;
   public p: number = 1;
   public loading:boolean = false;
@@ -190,44 +186,84 @@ export class EtatsComponent implements OnInit {
 
   @ViewChild('pdfTable') pdfTable?: ElementRef;
 
-  public downloadAsPDF() {
-    const doc = new jsPDF();
-
+public downloadAsPDF() {
+  try {
     const pdfTable = this.pdfTable?.nativeElement;
+    if (!pdfTable) {
+      console.error('Element pdfTable non trouvé');
+      return;
+    }
 
-    var html = htmlToPdfmake(pdfTable.innerHTML);
+    const htmlContent = htmlToPdfmake(pdfTable.innerHTML);
 
-    const documentDefinition = { content: [html], styles:{
-        red :{
-          color:'red !important'
-        }
+    const documentDefinition = { 
+      content: [htmlContent], 
+      styles: {
+        red: { color: 'red' }
       }
     };
-    pdfMake.createPdf(documentDefinition).open();
 
+    (window as any).pdfMake.createPdf(documentDefinition).open();
+
+  } catch (error) {
+    console.error('Erreur PDF:', error);
   }
+}
 
-  downloadAsPDF1() {
-    var element = document.getElementById('pdfTable');
-    var opt = {
-      margin: [20, 10], // reduce top and bottom margins
+ async downloadAsPDF1() {
+  try {
+    const element = document.getElementById('pdfTable');
+    
+    // Vérifier que l'élément existe
+    if (!element) {
+      console.error('Element avec ID pdfTable non trouvé');
+      return;
+    }
+
+    // Définir les options avec les types corrects
+    const opt = {
+      margin: [20, 10], // [top-bottom, left-right] ou [top, right, bottom, left]
       filename: `Fiche de salaire.pdf`,
-      image: { type: 'jpeg', quality: 1 },
+      image: { 
+        type: 'jpeg', 
+        quality: 1 
+      },
       html2canvas: {
         dpi: 192,
-        scale: 1, // set scale to 1 to fit entire content
+        scale: 1,
         letterRendering: true,
-        useCORS: true
+        useCORS: true,
+        logging: false // Désactiver les logs pour meilleures performances
       },
       jsPDF: {
-        unit: 'mm', // set unit to millimeter
-        format: [594, 420], // set page size to A4 landscape
-        orientation: 'landscape' // set orientation to landscape
+        unit: 'mm',
+        format: [594, 420], // A2 landscape - très grand format
+        orientation: 'landscape' as const // Type littéral
+      },
+      pagebreak: {
+        mode: ['avoid-all', 'css', 'legacy']
       }
     };
 
-    // New Promise-based usage:
-    html2pdf().set(opt).from(element).save();
+    // Vérifier que html2pdf est disponible
+    if (typeof (window as any).html2pdf !== 'function') {
+      console.error('html2pdf non chargé');
+      return;
+    }
+
+    // Nouvelle utilisation avec await
+    await (window as any).html2pdf()
+      .set(opt)
+      .from(element)
+      .save();
+
+  } catch (error) {
+    console.error('Erreur lors de la génération du PDF:', error);
   }
+}
 
 }
+function htmlToPdfmake(innerHTML: any) {
+  throw new Error('Function not implemented.');
+}
+
