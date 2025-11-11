@@ -7,7 +7,8 @@ import {NgbAlertModule, NgbCarouselModule} from "@ng-bootstrap/ng-bootstrap";
 import {CommunModule} from "../commun/commun.module";
 import {HttpClientModule} from "@angular/common/http";
 import { ResetPasswordComponent } from './pages/reset-password/reset-password.component';
-import { NgxSimplebarModule } from 'ngx-simplebar';
+import { SimplebarAngularModule } from 'simplebar-angular';
+//import { NgxSimplebarModule } from 'ngx-simplebar';
 @NgModule({
   declarations: [
     AuthentificationComponent,
@@ -21,7 +22,7 @@ import { NgxSimplebarModule } from 'ngx-simplebar';
     HttpClientModule,
     CommunModule,
     NgbAlertModule,
-    NgxSimplebarModule,
+SimplebarAngularModule,
     NgbCarouselModule,
   //  PdfViewerModule,
   //  PdfViewerModule

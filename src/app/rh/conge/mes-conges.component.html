@@ -1,76 +1,118 @@
 <div class="container-fluid px-3 page-with-bg">
-  <!-- Si ton composant titre est dispo en standalone, garde la ligne ci-dessous.
-       Sinon, supprime-la sans impact. -->
+  <!-- En-tête de page (optionnel, si standalone dispo) -->
   <app-titredepage
     title="Mes congés"
     [items]="[{label:'RH'}, {label:'Mes congés', active:true}]">
   </app-titredepage>
 
-  <div class="card">
+  <div class="card shadow-sm">
     <div class="card-body">
 
+      <!-- Toolbar actions en haut à droite -->
+      <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
+        <div class="small text-muted">
+          <ng-container *ngIf="loading">Chargement…</ng-container>
+          <ng-container *ngIf="!loading && !error">Total: {{ total }}</ng-container>
+        </div>
+        <div class="d-flex gap-2">
+          <!-- Place pour filtres si besoin plus tard -->
+          <button class="btn btn-primary btn-sm" (click)="openCreate(createTpl)">
+            <i class="mdi mdi-plus align-middle me-1"></i> Demander un congé
+          </button>
+        </div>
+      </div>
+
+      <!-- Alerts -->
       <div *ngIf="loading" class="alert alert-info py-2 mb-3">Chargement…</div>
       <div *ngIf="error" class="alert alert-danger py-2 mb-3">Erreur de chargement</div>
 
+      <!-- Table -->
       <div *ngIf="!loading && !error" class="table-responsive">
-        <table class="table table-striped align-middle">
-          <thead>
-          <tr>
-            <th>#</th>
-            <th>Type</th>
-            <th>Date début</th>
-            <th>Date fin</th>
-            <th>Jours</th>
-            <th>Statut</th>
-            <th class="text-nowrap">Actions</th>
-          </tr>
+        <table class="table table-striped table-sm align-middle table-hover mb-2">
+          <thead class="table-light sticky-top shadow-0">
+            <tr>
+              <th class="col-id">#</th>
+              <th class="col-type">Type</th>
+              <th class="d-none d-md-table-cell">Date début</th>
+              <th class="d-none d-md-table-cell">Date fin</th>
+              <th class="d-none d-lg-table-cell text-center col-j">Jours</th>
+              <th class="col-statut">Statut</th>
+              <th class="text-end col-actions">Actions</th>
+            </tr>
           </thead>
 
           <tbody>
-          <tr *ngFor="let c of list; index as i">
-            <td>{{ i + 1 + (page * size) }}</td>
+            <tr *ngFor="let c of list; index as i" class="row-hover">
+              <!-- # compact -->
+              <td class="col-id">
+                <span class="fw-semibold">{{ i + 1 + (page * size) }}</span>
+              </td>
 
-            <td>
-              <span class="badge" [ngClass]="typeClass(c?.typeConge)">
-                {{ c?.typeConge || '—' }}
-              </span>
-            </td>
+              <!-- Type : badge compact sans espace superflu -->
+              <td class="col-type">
+                <span class="badge badge-type" [ngClass]="typeClass(c?.typeConge)">
+                  {{ c?.typeConge || '—' }}
+                </span>
+              </td>
 
-            <td>{{ c?.dateDebut | date:'dd/MM/yyyy' }}</td>
-            <td>{{ c?.dateFin   | date:'dd/MM/yyyy' }}</td>
-            <td>{{ c?.nbreJour }}</td>
+              <td class="d-none d-md-table-cell">
+                {{ c?.dateDebut | date:'dd/MM/yyyy' }}
+              </td>
+              <td class="d-none d-md-table-cell">
+                {{ c?.dateFin   | date:'dd/MM/yyyy' }}
+              </td>
 
-            <!-- Statut global -->
-            <td>
-              <span class="badge" [ngClass]="badgeGlobal(c)">{{ labelGlobal(c) }}</span>
-            </td>
+              <td class="d-none d-lg-table-cell text-center col-j">
+                {{ c?.nbreJour }}
+              </td>
 
-            <td class="text-nowrap">
-              <button class="btn btn-sm btn-outline-secondary"
-                      (click)="openDetail(c, detailTpl)">
-                Détails
-              </button>
-            </td>
-          </tr>
+              <!-- Statut global (badge + sous-libellé) -->
+              <td class="col-statut">
+                <span class="badge" [ngClass]="badgeUnifie(c)">{{ computeStatus(c) }}</span>
+                <small class="text-muted d-block mt-1 lh-1">{{ labelGlobal(c) }}</small>
+              </td>
 
-          <tr *ngIf="!list.length">
-            <td colspan="7" class="text-center">Aucun congé</td>
-          </tr>
+              <!-- Actions alignées à droite -->
+              <td class="text-end col-actions">
+                <button class="btn btn-outline-secondary btn-sm btn-ghost"
+                        (click)="openDetail(c, detailTpl)"
+                        ngbTooltip="Voir le détail des validations">
+                  Détails
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="!list.length">
+              <td colspan="7" class="text-center py-4">
+                <i class="bx bxs-data" style="font-size: 2rem;"></i><br />
+                Aucun congé
+              </td>
+            </tr>
           </tbody>
         </table>
 
-        <!-- pagination -->
-        <div class="d-flex justify-content-end align-items-center" *ngIf="pages.length > 1">
-          <button class="btn btn-outline-primary btn-sm me-2" [disabled]="page===0" (click)="goto(page-1)">Précédent</button>
+        <!-- Pagination -->
+        <div class="d-flex justify-content-end align-items-center gap-1 mt-2" *ngIf="pages.length > 1">
+          <button class="btn btn-outline-primary btn-sm"
+                  [disabled]="page===0"
+                  (click)="goto(page-1)">
+            Précédent
+          </button>
+
           <ng-container *ngFor="let p of pages">
-            <button class="btn btn-sm mx-1"
+            <button class="btn btn-sm page-btn"
                     [class.btn-primary]="p===page"
                     [class.btn-outline-primary]="p!==page"
-                    (click)="goto(p)">{{ p+1 }}</button>
+                    (click)="goto(p)">
+              {{ p+1 }}
+            </button>
           </ng-container>
-          <button class="btn btn-outline-primary btn-sm ms-2"
+
+          <button class="btn btn-outline-primary btn-sm"
                   [disabled]="page===pages.length-1"
-                  (click)="goto(page+1)">Suivant</button>
+                  (click)="goto(page+1)">
+            Suivant
+          </button>
         </div>
       </div>
 
@@ -85,7 +127,7 @@
     <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
   </div>
   <div class="modal-body">
-    <div class="row gy-2">
+    <div class="row gy-2 small">
       <div class="col-6">Chef</div>
       <div class="col-6">
         <span class="badge" [ngClass]="badgeClass(detail?.chefValidation)">
@@ -118,4 +160,51 @@
   <div class="modal-footer">
     <button class="btn btn-secondary btn-sm" (click)="modal.close()">Fermer</button>
   </div>
+</ng-template>
+
+<!-- Modal CRÉATION -->
+<ng-template #createTpl let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">Demander un congé</h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="submit(modal)">
+    <div class="modal-body">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Date de début</label>
+          <input type="date" class="form-control" formControlName="dateDebut">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Nombre de jours</label>
+          <input type="number" min="1" class="form-control" formControlName="nbreJour">
+        </div>
+        <div class="col-md-6">
+          <label class="form-label">Type de congé</label>
+          <select class="form-select" formControlName="typeConge">
+            <option value="Conge Annuel">Congé Annuel</option>
+            <option value="Conge Fractionnee">Congé Fractionné</option>
+            <option value="Conge Legal">Congé Légal</option>
+          </select>
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Motif</label>
+          <textarea rows="3" class="form-control" formControlName="motif" placeholder="Raison du congé"></textarea>
+        </div>
+        <div class="col-md-12">
+          <label class="form-label">Pièce jointe (optionnel)</label>
+          <input type="file" class="form-control" (change)="onFile($event)" accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
+          <small *ngIf="pieceName" class="text-muted">Fichier: {{ pieceName }}</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn btn-secondary" type="button" (click)="modal.dismiss()">Annuler</button>
+      <button class="btn btn-primary" type="submit" [disabled]="form.invalid || submitting">
+        {{ submitting ? 'Envoi…' : 'Envoyer' }}
+      </button>
+    </div>
+  </form>
 </ng-template>

@@ -31,12 +31,14 @@ const routes: Routes = [
       { path: "type-retenus", component: TypeRetenusComponent },
       { path: "retenus", component: RetenusComponent },
       { path: "mode-paiement", component: ModepaiementComponent },
-      { path: "unite", component: UniteComponent },
       {
         path: 'type-retenus', children: [
           { path: ":id", component: SingleTypeRetenuComponent }
         ]
       },
+
+      { path: 'unites', loadComponent: () => import('./unite/unite.component').then(m => m.UniteComponent) },
+
       {
         path: "echelons", children: [
           { path: "", component: EchelonsComponent },

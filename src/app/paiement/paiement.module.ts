@@ -12,7 +12,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { LayoutModule } from '../commun/layout.module';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { MenuComponent } from './menu/menu.component';
-import { CommunModule } from "../commun/commun.module";
+import { CommunModule } from '../commun/commun.module';
 import { BanquesComponent } from './banques/banques.component';
 import { MatStepperModule } from '@angular/material/stepper';
 import { NgxPaginationModule } from 'ngx-pagination';
@@ -35,6 +35,7 @@ import { SingleTypeEtatComponent } from './type-etats/single-type-etat/single-ty
 import { EtatsComponent } from './etats/etats.component';
 import { TypeImpactSalarialComponent } from './type-impact-salarial/type-impact-salarial.component';
 import { ImpactSalarialComponent } from './impact-salarial/impact-salarial.component';
+
 @NgModule({
   declarations: [
     PaiementComponent,
@@ -44,7 +45,7 @@ import { ImpactSalarialComponent } from './impact-salarial/impact-salarial.compo
     SingleTypeRetenuComponent,
     RetenusComponent,
     ModepaiementComponent,
-    UniteComponent,
+    // UniteComponent,
     EchelonsComponent,
     SingleEchelonComponent,
     CategoriesComponent,
@@ -58,18 +59,18 @@ import { ImpactSalarialComponent } from './impact-salarial/impact-salarial.compo
     SingleTypeEtatComponent,
     EtatsComponent,
     TypeImpactSalarialComponent,
-    ImpactSalarialComponent
+    ImpactSalarialComponent,
   ],
   imports: [
     CommonModule,
     PaiementRoutingModule,
-    //Importaion
+    // Importation
     TranslateModule,
     NgbDropdownModule,
     ClickOutsideModule,
     SimplebarAngularModule,
     FormsModule,
-    MatStepperModule ,
+    MatStepperModule,
     NgbModalModule,
     NgApexchartsModule,
     ReactiveFormsModule,
@@ -81,11 +82,11 @@ import { ImpactSalarialComponent } from './impact-salarial/impact-salarial.compo
     NgbNavModule,
     NgbModalModule,
     NgbPaginationModule,
-    //Ng2SearchPipeModule,
+    // Ng2SearchPipeModule,
     NgbModule,
     NgxPaginationModule,
     NgSelectModule,
     CommunModule,
-]
+  ],
 })
-export class PaiementModule { }
+export class PaiementModule {}

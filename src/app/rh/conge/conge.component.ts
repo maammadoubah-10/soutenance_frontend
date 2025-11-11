@@ -17,6 +17,7 @@ import localeFr from "@angular/common/locales/fr";
 import {Demande} from "../models/demande";
 import { UtilisateurService } from '../../utilisateur/services/utilisateur.service';
 import { SafeResourceUrl } from '@angular/platform-browser';
+import { computeEffectiveStatus, statusBadgeClass, CongeStatut } from "../models/conge";
 
 @Component({
   selector: 'app-conge',
@@ -405,6 +406,57 @@ supprimerDossier(id: number | undefined) {
     }
   });
 }
+
+// --- AJOUT NON DESTRUCTIF ---
+
+computeStatus(c: Conge): CongeStatut {
+  return computeEffectiveStatus(c);
+}
+badgeUnifie(c: Conge): string {
+  return statusBadgeClass(c);
+}
+
+// Actions employé (si tu veux les boutons unifiés ici)
+soumettre(c: Conge) {
+  if (!c?.id) return;
+  this.dossierService.soumettre(c.id).subscribe({
+    next: _ => { this.successmsg('Soumis', 'Demande soumise'); this.chargerListeCongePage(); },
+    error: e => this.errormsg('Erreur', e?.error?.message || 'Soumission impossible')
+  });
+}
+marquerPris(c: Conge) {
+  if (!c?.id) return;
+  this.dossierService.marquerPris(c.id).subscribe({
+    next: _ => { this.successmsg('Marqué pris', 'Congé marqué comme pris'); this.chargerListeCongePage(); },
+    error: e => this.errormsg('Erreur', e?.error?.message || 'Action impossible')
+  });
+}
+cloturer(c: Conge) {
+  if (!c?.id) return;
+  this.dossierService.cloturer(c.id).subscribe({
+    next: _ => { this.successmsg('Clôturé', 'Congé clôturé'); this.chargerListeCongePage(); },
+    error: e => this.errormsg('Erreur', e?.error?.message || 'Action impossible')
+  });
+}
+
+approuverRh(c: Conge) {
+  if (!c?.id) return;
+  this.dossierService.approuverRh(c.id).subscribe({
+    next: _ => { this.successmsg('Approuvé', 'Demande approuvée'); this.chargerListeCongePage(); },
+    error: e => this.errormsg('Erreur', e?.error?.message || 'Action impossible')
+  });
+}
+
+rejeterRh(c: Conge) {
+  if (!c?.id) return;
+  // petite prompt SweetAlert pour saisir un motif
+  // (ou fais un modal dédié)
+  this.dossierService.rejeterRh(c.id, 'Motif de rejet').subscribe({
+    next: _ => { this.successmsg('Rejeté', 'Demande rejetée'); this.chargerListeCongePage(); },
+    error: e => this.errormsg('Erreur', e?.error?.message || 'Action impossible')
+  });
+}
+
 
 
   telechargerTitreConge(conge:Conge) {

@@ -10,12 +10,12 @@
       <!-- En-tête de la carte -->
       <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-          <h4 class="card-title mb-1">Liste des unites</h4>
+          <h4 class="card-title mb-1">Liste des unités</h4>
           <p class="card-title-desc text-muted mb-0">
-            Gestion des différents unites disponibles dans le système
+            Gestion des différentes unités disponibles dans le système
           </p>
         </div>
-        <button class="btn btn-primary rounded-pill" 
+        <button class="btn btn-primary rounded-pill"
                 (click)="initAction(null, 'create', formModal)">
           <i class="bx bx-plus me-1"></i>
           Ajouter
@@ -25,17 +25,17 @@
       <!-- Contrôles de pagination -->
       <div class="row g-3 align-items-center mb-3">
         <div class="col-md-2">
-          <select [(ngModel)]="perPage" 
-                  (change)="loadModesPaiement()" 
+          <select [(ngModel)]="perPage"
+                  (ngModelChange)="currentPage = 1; loadModesPaiement()"
                   class="form-select">
-            <option value="10">10 / page</option>
-            <option value="25">25 / page</option>
-            <option value="50">50 / page</option>
-            <option value="100">100 / page</option>
+            <option [ngValue]="10">10 / page</option>
+            <option [ngValue]="25">25 / page</option>
+            <option [ngValue]="50">50 / page</option>
+            <option [ngValue]="100">100 / page</option>
           </select>
         </div>
         <div class="col-md-10 text-end text-muted">
-          {{ totalItems }} unites trouvés
+          {{ totalItems }} unités trouvées
         </div>
       </div>
 
@@ -70,13 +70,13 @@
                 <td>{{ mode.designation }}</td>
                 <td class="text-center">
                   <div class="btn-group btn-group-sm" role="group">
-                    <button type="button" 
+                    <button type="button"
                             class="btn btn-outline-success"
                             (click)="initAction(mode, 'edit', formModal)"
                             title="Modifier">
                       <i class="bx bx-edit"></i>
                     </button>
-                    <button type="button" 
+                    <button type="button"
                             class="btn btn-outline-danger"
                             (click)="initAction(mode, 'delete', deleteModal)"
                             title="Supprimer">
@@ -90,7 +90,7 @@
               <tr *ngIf="modesPaiement.length === 0">
                 <td colspan="3" class="text-center py-4">
                   <i class="bx bx-data display-4 text-muted d-block mb-2"></i>
-                  <p class="text-muted mb-0">Aucun mode de paiement trouvé</p>
+                  <p class="text-muted mb-0">Aucune unité trouvée</p>
                 </td>
               </tr>
             </ng-container>
@@ -99,13 +99,14 @@
       </div>
 
       <!-- Pagination -->
-      <div class="d-flex justify-content-between align-items-center mt-3" 
+      <div class="d-flex justify-content-between align-items-center mt-3"
            *ngIf="modesPaiement.length > 0 && !loading">
         <div class="text-muted">
-          Page {{ currentPage }} sur {{(totalItems / perPage) }}
+          Page {{ currentPage }} sur {{ totalPages }}
         </div>
-        <pagination-controls 
-          (pageChange)="currentPage = $event; loadModesPaiement()"
+
+        <pagination-controls
+          (pageChange)="onPageChange($event)"
           previousLabel="Précédent"
           nextLabel="Suivant"
           screenReaderPaginationLabel="Pagination"
@@ -121,13 +122,13 @@
 <ng-template #formModal let-modal>
   <div class="modal-header">
     <h5 class="modal-title">
-      {{ action === 'create' ? 'Nouveau Mode de Paiement' : 'Modifier le Mode de Paiement' }}
+      {{ action === 'create' ? 'Nouvelle unité' : 'Modifier l\'unité' }}
     </h5>
-    <button type="button" class="btn-close" 
-            (click)="modal.dismiss()" 
+    <button type="button" class="btn-close"
+            (click)="modal.dismiss()"
             [disabled]="submitting"></button>
   </div>
-  
+
   <div class="modal-body">
     <form [formGroup]="modePaiementForm" (ngSubmit)="action === 'create' ? creerModePaiement() : modifierModePaiement()">
       <!-- Champ Désignation -->
@@ -135,14 +136,13 @@
         <label for="designation" class="form-label">
           Désignation <span class="text-danger">*</span>
         </label>
-        <input type="text" 
+        <input type="text"
                id="designation"
-               class="form-control" 
+               class="form-control"
                formControlName="designation"
-               placeholder="Saisir la désignation du mode de paiement"
+               placeholder="Saisir la désignation"
                [class.is-invalid]="designation?.invalid && designation?.touched">
-        
-        <!-- Messages d'erreur -->
+
         <div class="invalid-feedback" *ngIf="designation?.errors?.['required'] && designation?.touched">
           La désignation est obligatoire
         </div>
@@ -154,15 +154,15 @@
         </div>
       </div>
 
-      <!-- Actions du formulaire -->
+      <!-- Actions -->
       <div class="d-flex justify-content-end gap-2 pt-3">
-        <button type="button" 
-                class="btn btn-secondary" 
+        <button type="button"
+                class="btn btn-secondary"
                 (click)="modal.dismiss()"
                 [disabled]="submitting">
           Annuler
         </button>
-        <button type="submit" 
+        <button type="submit"
                 class="btn btn-primary"
                 [disabled]="modePaiementForm.invalid || submitting">
           <span *ngIf="submitting" class="spinner-border spinner-border-sm me-2"></span>
@@ -180,33 +180,32 @@
       <i class="bx bx-trash me-2"></i>
       Confirmation de suppression
     </h5>
-    <button type="button" class="btn-close" 
+    <button type="button" class="btn-close"
             (click)="modal.dismiss()"
             [disabled]="submitting"></button>
   </div>
-  
+
   <div class="modal-body">
     <div class="text-center mb-3">
       <i class="bx bx-error-circle display-4 text-danger"></i>
     </div>
-    
     <p class="text-center mb-0">
-      Êtes-vous sûr de vouloir supprimer l'unite
+      Êtes-vous sûr de vouloir supprimer l'unité
       <strong>"{{ selectedModePaiement?.designation }}"</strong> ?
     </p>
     <p class="text-center text-muted small mt-2 mb-0">
       Cette action est irréversible.
     </p>
   </div>
-  
+
   <div class="modal-footer justify-content-center">
-    <button type="button" 
-            class="btn btn-secondary" 
+    <button type="button"
+            class="btn btn-secondary"
             (click)="modal.dismiss()"
             [disabled]="submitting">
       Annuler
     </button>
-    <button type="button" 
+    <button type="button"
             class="btn btn-danger"
             (click)="supprimerModePaiement()"
             [disabled]="submitting">

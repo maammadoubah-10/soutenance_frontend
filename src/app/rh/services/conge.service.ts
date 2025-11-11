@@ -30,6 +30,25 @@ export class CongeService {
     return this.httpClient.get<PageConge>(url, { observe: 'response' });
   }
 
+  // --- AJOUT NON DESTRUCTIF (dans CongeService) ---
+
+soumettre(id: number) {
+  return this.httpClient.post<Conge>(`${this.contextPath}/${id}/soumettre`, {});
+}
+approuverRh(id: number) {
+  return this.httpClient.post<Conge>(`${this.contextPath}/${id}/approuver-rh`, {});
+}
+rejeterRh(id: number, motif='Rejeté') {
+  return this.httpClient.post<Conge>(`${this.contextPath}/${id}/rejeter-rh`, { motif });
+}
+marquerPris(id: number) {
+  return this.httpClient.post<Conge>(`${this.contextPath}/${id}/marquer-pris`, {});
+}
+cloturer(id: number) {
+  return this.httpClient.post<Conge>(`${this.contextPath}/${id}/cloturer`, {});
+}
+
+
     listerMesConges(page=0, size=10, sort='id,desc') {
     const params = new HttpParams()
       .set('page', page)

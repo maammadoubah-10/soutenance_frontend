@@ -1,14 +1,152 @@
-
-.main{
-  background-image: url('../../../assets/Groupe 786.png'); /* remplacer image.jpg par l'URL de votre image de fond */
+/* Fond de page (conserve ton style existant si tu veux) */
+.page-with-bg {
+  background-image: url('../../../assets/Groupe 786.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  padding-bottom: 1rem;
 }
 
-.btn-darkblue {
-  background-color: #0d47a1; /* Bleu foncé */
-  color: white;
-  border: none;
+/* Barre d’actions sticky en haut de la card */
+.sticky-actions {
+  position: sticky;
+  top: 0;
+  z-index: 5;
 }
 
-.btn-darkblue:hover {
-  background-color: #08306b; /* Encore plus foncé au survol */
+/* Bouton principal : léger lift on hover */
+.btn-action {
+  transition: transform .12s ease, box-shadow .12s ease;
+  border-radius: .5rem;
+}
+.btn-action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 .6rem 1.2rem rgba(0,0,0,.08);
+}
+
+/* Icone dans les inputs */
+.input-icon {
+  position: relative;
+  .icon-right {
+    position: absolute;
+    right: .75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    font-size: 1.1rem;
+    opacity: .5;
+  }
+}
+
+/* Table compacte & lisible */
+.table {
+  --bs-table-bg: #fff;
+}
+.table thead th {
+  white-space: nowrap;
+}
+.table td,
+.table th {
+  vertical-align: middle;
+}
+.table-hover > tbody > tr:hover {
+  background-color: rgba(13,110,253,.04); /* light primary hover, couleur intacte */
+}
+
+/* Lignes hoverables + effet léger */
+.row-hoverable {
+  transition: background-color .12s ease, transform .06s ease;
+}
+.row-hoverable:hover {
+  transform: translateZ(0);
+}
+
+/* Petits boutons pour la barre d’action */
+.btn-xs {
+  --btn-padding-y: .25rem;
+  --btn-padding-x: .45rem;
+  --btn-font-size: .75rem;
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+  font-size: var(--btn-font-size);
+  line-height: 1.2;
+  border-radius: .35rem;
+}
+
+/* Groupes de boutons très compacts */
+.btn-group-xs .btn,
+.btn-toolbar .btn {
+  --btn-padding-y: .2rem;
+  --btn-padding-x: .45rem;
+  --btn-font-size: .74rem;
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+  font-size: var(--btn-font-size);
+}
+
+/* Liens discrets avec underline au survol */
+.link-underline {
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color .12s ease;
+}
+.link-underline:hover {
+  border-color: currentColor;
+}
+
+/* Colonnes utilitaires */
+.minw-180 { min-width: 180px; }
+.maxw-260 { max-width: 260px; }
+
+/* Icône vide */
+.empty-icon {
+  color: #d9534f;
+  font-size: 2.5rem;
+}
+
+/* Modals */
+.modal-header,
+.modal-footer {
+  background: #fff;
+}
+
+/* Pagination : espacement cohérent */
+.pagination-compact .btn {
+  margin: 0 .125rem;
+}
+
+/* Fix petites résolutions : resserrer les paddings */
+@media (max-width: 576px) {
+  .table td,
+  .table th {
+    padding-top: .5rem !important;
+    padding-bottom: .5rem !important;
+  }
+  .maxw-260 { max-width: 180px; }
+}
+.actions-inline {
+  /* met tout sur une seule ligne, mais autorise le wrap si l'écran est petit */
+  gap: .35rem;
+}
+
+.divider {
+  display: inline-block;
+  width: 1px;
+  height: 22px;
+  background: rgba(0,0,0,.1);
+}
+
+/* boutons compacts déjà posés mais je remets ici pour être sûr */
+.btn-xs {
+  --btn-padding-y: .2rem;
+  --btn-padding-x: .45rem;
+  --btn-font-size: .74rem;
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+  font-size: var(--btn-font-size);
+  line-height: 1.2;
+  border-radius: .35rem;
+}
+
+@media (max-width: 576px) {
+  .actions-inline {
+    gap: .25rem;
+  }
 }

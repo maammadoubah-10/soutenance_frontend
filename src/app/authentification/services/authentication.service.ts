@@ -69,6 +69,14 @@ getMe(): Observable<any> {
         const roles = (user.roles ?? user.roleList ?? []).map((r:any)=> (r?.nom||r).toString().toUpperCase());
         const fromRoles = roles.some((r:string)=> r.includes('ADMIN'));
         const isAdmin = fromFlag || fromRoles || this.isAdmin(); // garde le plus permissif
+        const pid =
+        user?.personnel?.id ??
+        user?.personnelId ??
+        user?.profil?.personnelId ??
+        null;
+         if (pid != null) {
+        sessionStorage.setItem('personnelId', String(pid));
+      }
         this.sauvegarderDansLaSession(
           sessionStorage.getItem('token') || '',
           sessionStorage.getItem('email') || '',
