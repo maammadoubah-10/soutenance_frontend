@@ -1,16 +1,19 @@
+<!-- src/app/commun/entetedepage/entetedepage.component.html -->
 <header id="page-topbar" class="fixed-header">
   <div class="navbar-header">
     <div class="d-flex">
       <!-- LOGO -->
-    <div class="navbar-brand-box">
-  <a routerLink="/espacedetravail" class="brand">
-    <img src="/assets/groupe_isi.png" alt="Groupe ISI" class="brand-logo">
-  </a>
-</div>
+      <div class="navbar-brand-box">
+        <a routerLink="/espacedetravail" class="brand">
+          <img src="/assets/groupe_isi.png" alt="Groupe ISI" class="brand-logo">
+        </a>
+      </div>
 
-
-      <button type="button" class="btn btn-sm px-3 font-size-16 header-item" id="vertical-menu-btn"
-              (click)="toggleMobileMenu($event)">
+      <button
+        type="button"
+        class="btn btn-sm px-3 font-size-16 header-item"
+        id="vertical-menu-btn"
+        (click)="toggleMobileMenu($event)">
         <i class="fa fa-fw fa-bars"></i>
       </button>
 
@@ -24,122 +27,93 @@
     </div>
 
     <div class="d-flex">
-      <div class="dropdown d-inline-block d-lg-none ms-2" ngbDropdown>
-        <button type="button" class="btn header-item noti-icon" id="page-header-search-dropdown" data-toggle="dropdown"
-                aria-haspopup="true" ngbDropdownToggle aria-expanded="false">
-          <i class="mdi mdi-magnify"></i>
-        </button>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" ngbDropdownMenu
-             aria-labelledby="page-header-search-dropdown">
-          <form class="p-3">
-            <div class="m-0">
-              <div class="input-group">
-                <input type="text" class="form-control" placeholder="Search ..." aria-label="Recipient's username">
-                <div class="input-group-append">
-                  <button class="btn btn-primary" type="submit"><i class="mdi mdi-magnify"></i></button>
-                </div>
-              </div>
-            </div>
-          </form>
-        </div>
-      </div>
+      <!-- 🔔 Cloche standalone -->
+      <app-notification-bell></app-notification-bell>
 
+      <!-- Fullscreen button -->
       <div class="dropdown d-none d-lg-inline-block ms-1">
-        <button type="button" class="btn header-item noti-icon" data-toggle="fullscreen" (click)="fullscreen()">
+        <button
+          type="button"
+          class="btn header-item noti-icon"
+          data-toggle="fullscreen"
+          (click)="fullscreen()">
           <i class="bx bx-fullscreen"></i>
         </button>
       </div>
 
+      <!-- Menu utilisateur -->
       <div class="dropdown d-inline-block" ngbDropdown>
-        <button (click)="fetchNotifications(utilisateurAuthentifie?.personnel.rhPersonnel)" type="button" 
-                class="btn header-item noti-icon" id="page-header-notifications-dropdown" ngbDropdownToggle>
-          <i class="bx bx-bell bx-tada"></i>
-          <small class="badge bg-danger">{{ totalNotificationCountUnread }}</small>
-        </button>
-        <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" 
-             aria-labelledby="page-header-notifications-dropdown" ngbDropdownMenu>
-          <div class="p-3">
-            <div class="row align-items-center">
-              <div class="col">
-                <h6 class="m-0">{{'NOTIFICATIONS' }}</h6>
-              </div>
-            </div>
-          </div>
-          <ngx-simplebar style="position: relative; height: 230px;">
-            <a *ngFor="let notification of allNotifications" 
-               [href]="getNotificationLink(notification)" 
-               class="text-reset notification-item">
-              <div class="media">
-                <div class="avatar-xs me-3">
-                  <span class="avatar-title bg-primary rounded-circle font-size-16">
-                    <i class="mdi mdi-bell"></i>
-                  </span>
-                </div>
-                <div class="media-body">
-                  <h6 class="mt-0 mb-1">{{ notification.type }}</h6>
-                  <div class="font-size-12 text-muted">
-                    <p class="mb-1">{{ notification.message }}</p>
-                    <p class="mb-0">
-                      <i class="mdi mdi-clock-outline"></i>
-                      Date: {{ notification.dateEnvoi | date:'dd MMMM yyyy':'':'fr-FR' }}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </a>
-            <div class="text-center" *ngIf="allNotifications.length == 0">
-              <div>
-                <i style="color: #d9534f; font-size: xxx-large" class='bx bxs-data'></i>
-              </div>
-              <div>
-                <p style="font-size: large; padding-left: 2%; padding-right: 2%">
-                  Aucune notification disponible pour le moment!
-                </p>
-              </div>
-            </div>
-          </ngx-simplebar>
-        </div>
-      </div>
+        <button
+          type="button"
+          class="btn header-item"
+          ngbDropdownToggle
+          id="page-header-user-dropdown">
 
-      <div class="dropdown d-inline-block" ngbDropdown>
-        <button type="button" class="btn header-item" ngbDropdownToggle id="page-header-user-dropdown">
-          <img *ngIf="profilSrc" class="rounded-circle font-size-14 avatar-user-profil avatar-sm" 
-               [src]="profilSrc" alt="Avatar">
-          <span *ngIf="!profilSrc" 
-                class="avatar-user-profil-title rounded-circle text-white font-size-14 avatar-user-profil avatar-sm">
+          <img
+            *ngIf="profilSrc"
+            class="rounded-circle font-size-14 avatar-user-profil avatar-sm"
+            [src]="profilSrc"
+            alt="Avatar">
+
+          <span
+            *ngIf="!profilSrc"
+            class="avatar-user-profil-title rounded-circle text-white font-size-14 avatar-user-profil avatar-sm">
             {{ utilisateurAuthentifie?.personnel?.prenom[0] }}
           </span>
-          <span *ngIf="utilisateurAuthentifie" class="d-none d-xl-inline-block ms-1">
-            {{ utilisateurAuthentifie?.personnel?.prenom }} {{ utilisateurAuthentifie?.personnel?.nom }}
+
+          <span
+            *ngIf="utilisateurAuthentifie"
+            class="d-none d-xl-inline-block ms-1">
+            {{ utilisateurAuthentifie?.personnel?.prenom }}
+            {{ utilisateurAuthentifie?.personnel?.nom }}
           </span>
+
           <i class="mdi mdi-chevron-down d-none d-xl-inline-block"></i>
         </button>
+
         <div class="dropdown-menu dropdown-menu-end" ngbDropdownMenu>
-          <a *ngIf="utilisateurAuthentifie" class="dropdown-item" routerLink="/moncompte/profil">
+          <a
+            *ngIf="utilisateurAuthentifie"
+            class="dropdown-item"
+            routerLink="/moncompte/profil">
             <i class="bx bx-user font-size-16 align-middle me-1"></i>
             Profil
           </a>
-          <a *ngIf="utilisateurAuthentifie" class="dropdown-item" routerLink="/motdepasseoublie">
+
+          <a
+            *ngIf="utilisateurAuthentifie"
+            class="dropdown-item"
+            routerLink="/motdepasseoublie">
             <i class="bx bx-key font-size-16 align-middle me-1"></i>
             Changer le Mot de Passe
           </a>
+
           <div class="dropdown-divider"></div>
-          <a class="dropdown-item text-danger" (click)="deconnexion()">
+
+          <a
+            class="dropdown-item text-danger"
+            (click)="deconnexion()">
             <i class="bx bx-power-off font-size-16 align-middle me-1 text-danger"></i>
             Déconnexion
           </a>
         </div>
       </div>
 
-      <ng-container *ngIf="utilisateurAuthentifieState$ | async as reponse" [ngSwitch]="reponse.dataState">
+      <!-- Gestion des états de chargement de l’utilisateur -->
+      <ng-container
+        *ngIf="utilisateurAuthentifieState$ | async as reponse"
+        [ngSwitch]="$any(reponse).dataState">
+
         <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
-          <!-- Ne rien afficher ici pour éviter le message de chargement -->
+          <!-- loading -->
         </ng-container>
+
         <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
-          <!-- Gérer les erreurs ici si nécessaire -->
+          <!-- erreur -->
         </ng-container>
+
         <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
-          <!-- Le contenu que vous souhaitez afficher lorsque l'état est CHARGE -->
+          <!-- ok -->
         </ng-container>
       </ng-container>
     </div>

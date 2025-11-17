@@ -1,0 +1,64 @@
+<!-- src/app/commun/notification-bell/notification-bell.component.html -->
+<div class="dropdown d-inline-block" ngbDropdown (openChange)="openDropdown()">
+  <button
+    type="button"
+    class="btn header-item noti-icon"
+    id="page-header-notifications-dropdown"
+    ngbDropdownToggle>
+    <i class="bx bx-bell bx-tada"></i>
+    <small class="badge bg-danger" *ngIf="unread > 0">{{ unread }}</small>
+  </button>
+
+  <div class="dropdown-menu dropdown-menu-lg dropdown-menu-end p-0" ngbDropdownMenu>
+    <div class="p-3">
+      <div class="row align-items-center">
+        <div class="col">
+          <h6 class="m-0">Notifications</h6>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="loading" class="p-3 text-center">
+      Chargement…
+    </div>
+
+    <ng-container *ngIf="!loading">
+      <div *ngIf="items.length === 0" class="p-3 text-center text-muted">
+        Aucune notification disponible pour le moment !
+      </div>
+
+      <div *ngIf="items.length > 0" style="max-height: 230px; overflow: auto;">
+        <a
+          *ngFor="let n of items"
+          class="dropdown-item notify-item"
+          (click)="onItemClick(n)">
+          <div class="media">
+            <div class="avatar-xs me-3">
+              <span class="avatar-title bg-primary rounded-circle font-size-16">
+                <i class="mdi mdi-bell"></i>
+              </span>
+            </div>
+            <div class="media-body">
+              <h6 class="mt-0 mb-1">{{ n.type }}</h6>
+              <div class="font-size-12 text-muted">
+                <p class="mb-1">{{ n.message }}</p>
+                <p class="mb-0">
+                  <i class="mdi mdi-clock-outline"></i>
+                  {{ n.dateEnvoi | date: 'dd MMMM yyyy HH:mm' : '' : 'fr-FR' }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </a>
+      </div>
+
+      <button
+        *ngIf="hasMore"
+        type="button"
+        class="btn btn-link text-center w-100"
+        (click)="loadMore($event)">
+        Voir plus
+      </button>
+    </ng-container>
+  </div>
+</div>

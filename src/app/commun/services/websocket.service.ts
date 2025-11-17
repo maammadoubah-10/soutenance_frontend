@@ -1,44 +1,77 @@
+// src/app/commun/services/websocket.service.ts
 import { Injectable } from '@angular/core';
-import { WebSocketSubject } from 'rxjs/webSocket';
-import { webSocket } from 'rxjs/webSocket';
+import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
+import { Observable, Subject } from 'rxjs';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class WebsocketService {
+
   private socket$?: WebSocketSubject<any>;
+  private messages$ = new Subject<any>();
+
+  private readonly WS_URL = 'ws://localhost:9002/rh/ws';
 
   constructor() {}
 
-  public connect(): WebSocketSubject<any> {
-    if (this.socket$ && !this.socket$.closed) return this.socket$;
+  /** Connexion + BIND */
+  connect(userId: number | string): void {
+    if (this.socket$ && !this.socket$.closed) {
+      return; // déjà connecté
+    }
 
-    // Utiliser le même schéma et le même host que l’appli (évite l’erreur TLS)
-    const scheme = window.location.protocol === 'https:' ? 'wss' : 'ws';
-    const host   = window.location.host;        // ex: jilms.eismv.org
-    const path   = '/personnel/websocket';      // chemin PROXY côté NGINX
+    console.log('[WS] URL utilisée :', this.WS_URL);
 
-    this.socket = webSocket({
-      url: `${scheme}://${host}${path}`,
-      // Si tu as besoin d'envoyer des headers, pas possible ici -> envoie le token après l'ouverture (comme tu le fais déjà)
+    this.socket$ = webSocket({
+      url: this.WS_URL,
+      deserializer: e => JSON.parse(e.data),
+      openObserver: {
+        next: () => {
+          console.log('[WS] CONNECTED, envoi du BIND pour userId=', userId);
+          this.send({
+            type: 'bind',
+            userId: String(userId)
+          });
+        }
+      },
+      closeObserver: {
+        next: (evt) => {
+          console.log('[WS] CLOSED', evt);
+        }
+      }
     });
 
-    return this.socket;
+    this.socket$.subscribe({
+      next: (msg) => {
+        console.log('[WS] message reçu :', msg);
+        this.messages$.next(msg);
+      },
+      error: (err) => {
+        console.error('[WS] error :', err);
+      },
+      complete: () => {
+        console.log('[WS] complete');
+      }
+    });
   }
 
-  private get socket(): WebSocketSubject<any> {
-    if (!this.socket$) throw new Error('WebSocket non initialisé');
-    return this.socket$;
-  }
-
-  private set socket(s: WebSocketSubject<any>) {
-    this.socket$ = s;
-  }
-
-  public disconnect(): void {
-    try {
-      this.socket$?.complete();
-    } finally {
-      this.socket$ = undefined;
-      // console.log('Websocket déconnecté.');
+  /** Envoi générique */
+  send(payload: any): void {
+    if (this.socket$ && !this.socket$.closed) {
+      this.socket$.next(payload);
+    } else {
+      console.warn('[WS] tentative d’envoi alors que la socket est fermée', payload);
     }
+  }
+
+  /** Observable des messages */
+  onMessage(): Observable<any> {
+    return this.messages$.asObservable();
+  }
+
+  disconnect(): void {
+    this.socket$?.complete();
+    this.socket$ = undefined;
   }
 }

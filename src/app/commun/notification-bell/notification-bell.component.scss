@@ -1,0 +1,35 @@
+.bell-wrapper { position: relative; }
+.icon-btn {
+  position: relative; background: transparent; border: none; cursor: pointer; font-size: 20px;
+}
+.badge {
+  position: absolute; top: -4px; right: -4px;
+  display: inline-block; min-width: 18px; height: 18px; padding: 0 6px;
+  border-radius: 9px; font-size: 12px; line-height: 18px; text-align: center;
+  background: #EF4444; color: #fff;
+}
+.dropdown-menu {
+  position: absolute; right: 0; top: 120%;
+  width: 360px; max-height: 420px; overflow: auto; background: #fff;
+  border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,.08);
+  padding: 8px 0; z-index: 1000;
+}
+.menu-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 8px 12px; font-weight: 600; border-bottom: 1px solid #f3f4f6;
+}
+.menu-loading, .menu-empty { padding: 16px; color: #6b7280; }
+.menu-list { list-style: none; margin: 0; padding: 0; }
+.menu-item {
+  padding: 10px 12px; cursor: pointer;
+  &:hover { background: #f9fafb; }
+  &.unread .title { font-weight: 700; }
+}
+.title { font-size: 13px; color: #111827; }
+.msg { font-size: 13px; color: #374151; margin-top: 2px; }
+.date { font-size: 11px; color: #6b7280; margin-top: 4px; }
+.load-more {
+  width: calc(100% - 16px); margin: 8px; padding: 8px; border: 1px solid #e5e7eb;
+  background: #fff; border-radius: 8px; cursor: pointer;
+  &:hover { background: #f9fafb; }
+}

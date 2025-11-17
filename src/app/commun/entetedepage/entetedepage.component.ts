@@ -1,63 +1,58 @@
-import { Component, OnInit, Inject, Output, EventEmitter } from '@angular/core';
-//import { LanguageService } from '../../core/services/language.service';
+// src/app/commun/entetedepage/entetedepage.component.ts
+import {
+  Component,
+  OnInit,
+  OnDestroy,
+  Inject,
+  Output,
+  EventEmitter
+} from '@angular/core';
 import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { DOCUMENT } from '@angular/common';
-import { map, catchError, startWith, tap, takeUntil } from 'rxjs/operators';
-import { interval, Observable, of, Subject } from 'rxjs';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { map, catchError, startWith, takeUntil } from 'rxjs/operators';
+import { interval, Observable, Subject } from 'rxjs';
 import { DomSanitizer, SafeUrl, Title } from '@angular/platform-browser';
-import { WebSocketSubject } from 'rxjs/webSocket';
 import { ToastrService } from 'ngx-toastr';
+import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+
 import { WebsocketService } from '../services/websocket.service';
-import { NotificationService } from '../services/notification.service';
 import { DataStateEnum, ModelDataState } from '../../state/state';
 import { UtilisateurAuthentifie } from '../../authentification/models/utilisateur-authentifie';
 import { AuthentificationService } from '../../authentification/services/authentication.service';
 import { environment } from '../../../environments/environment';
+
+import { NotificationApiService } from '../../services/notification-api.service';
+import { NotificationModel } from '../../models/notification.dto';
+
+import { CurrentUserStore } from '../../store/current-user.store';
+
 @Component({
   selector: 'app-entetedepage',
   templateUrl: './entetedepage.component.html',
   styleUrls: ['./entetedepage.component.scss']
 })
-export class EntetedepageComponent implements OnInit{
+export class EntetedepageComponent implements OnInit, OnDestroy {
   dataStateEnum = DataStateEnum;
-  websock : any
-  url: any;
-  element:any;
-  private socket$!: WebSocketSubject<any>
-  cookieValue : any;
-  flagvalue : any;
-  countryName : any;
-  valueset:any;
-  requerantId: any
-  requerant: any
-  requerantFonction: any
+
+  element: any;
+  cookieValue: any;
+  flagvalue: any;
+  countryName: any;
+  valueset: any;
 
   profilSrc: SafeUrl | null = null;
-  notifications: any[] = []; // Assurez-vous de définir correctement le type des notifications
+  notifications: NotificationModel[] = [];
   personnelId!: number;
-  //
+
   utilisateurAuthentifie: any;
   utilisateurAuthentifieState$!: Observable<ModelDataState<UtilisateurAuthentifie>>;
 
-  constructor(@Inject(DOCUMENT) private document: any, private router: Router,
-              private titleService: Title,
-              public translate: TranslateService,
-              //public _cookiesService: CookieService,
-              private authenficationSerice: AuthentificationService,
-              private sanitizer: DomSanitizer,
-              private notificationService: NotificationService,
-              private webSocketService: WebsocketService,
-              private toastr: ToastrService,
-              private httClient: HttpClient
-  ) {
-    this.obtenirUnUtilisateurParEmail();
-    // this.onSearchRequerantEmail();
-    this.verificationTokenValidationParMinute()
+  totalNotificationCountUnread = 0;
 
-  }
-
+  private destroy$ = new Subject<void>();
+  private ngUnsubscribe = new Subject<boolean>();
+  private boundUserId: string | null = null;
 
   listLang = [
     { text: 'English', flag: 'assets/images/flags/us.jpg', lang: 'en' },
@@ -66,403 +61,330 @@ export class EntetedepageComponent implements OnInit{
     { text: 'Italian', flag: 'assets/images/flags/italy.jpg', lang: 'it' },
     { text: 'Russian', flag: 'assets/images/flags/russia.jpg', lang: 'ru' },
   ];
-  ngUnsubscribe =  new Subject<boolean>();
 
-
-  openMobileMenu: boolean = false;
-  totalNotificationCount: number = 0;
-  totalNotificationCountUnread: number = 0;
+  openMobileMenu = false;
 
   @Output() settingsButtonClicked = new EventEmitter();
   @Output() mobileMenuButtonClicked = new EventEmitter();
-  allNotifications: any[] = [];
-  private isWebSocketConnected: boolean = false;
-  private tryToConnectWebSocket: boolean = true;
 
-  ngOnInit() {
-    //registerLocaleData(localeFr, 'fr');
+  private tryToConnectWebSocket = true;
+
+  constructor(
+    @Inject(DOCUMENT) private document: any,
+    private router: Router,
+    private titleService: Title,
+    public translate: TranslateService,
+    private notifApi: NotificationApiService,
+    private userStore: CurrentUserStore,
+    private authenficationSerice: AuthentificationService,
+    private sanitizer: DomSanitizer,
+    private webSocketService: WebsocketService,
+    private toastr: ToastrService,
+    private httClient: HttpClient
+  ) {
+    // Charge l’utilisateur dès le constructeur
+    this.obtenirUnUtilisateurParEmail();
+
+    // Vérification périodique du token
+    this.verificationTokenValidationParMinute();
+  }
+
+  ngOnInit(): void {
     this.openMobileMenu = false;
     this.element = document.documentElement;
 
-    //this.cookieValue = this._cookiesService.get('lang');
+    const user = this.userStore.value;
+    if (user) {
+      this.utilisateurAuthentifie = this.utilisateurAuthentifie ?? user;
+    }
+
     const val = this.listLang.filter(x => x.lang === this.cookieValue);
     this.countryName = val.map(element => element.text);
     if (val.length === 0) {
-      if (this.flagvalue === undefined) { this.valueset = 'assets/images/flags/us.jpg'; }
+      if (this.flagvalue === undefined) {
+        this.valueset = 'assets/images/flags/us.jpg';
+      }
     } else {
       this.flagvalue = val.map(element => element.flag);
     }
-    this.connectToWebSocket();
-    // this.updatePageTitle(this.notifications.length);
-    this.updatePageTitle(this.totalNotificationCount);
-    // this.fetchNotifications();
+
+    // init notifs + websocket quand possible
+    this.initNotificationsAndWebSocket();
+
+    this.updatePageTitle(this.totalNotificationCountUnread);
   }
 
-  obtenirLeToken(): string | null {
-    return sessionStorage.getItem("token");
-  }
+  /**
+   * Initialise le compteur de notifications + WebSocket
+   * dès qu'on a un personnelId valide.
+   */
+  private initNotificationsAndWebSocket(): void {
+    const pid = this.getCurrentPersonnelId();
 
+    if (!pid) {
+      console.warn('[ENTETE] initNotificationsAndWebSocket: aucun personnelId → pas de WS pour l’instant.');
+      return;
+    }
 
-  verificationTokenValidationParMinute(): void {
-    // Vérifiez le token toutes les minutes
-    const tokenCheckInterval$ = interval(60000); // 60000 millisecondes = 1 minute
+    if (this.boundUserId === String(pid)) {
+      return;
+    }
+    this.boundUserId = String(pid);
 
-    // Abonnez-vous à l'intervalle et exécutez la vérification du token
-    tokenCheckInterval$.pipe(
-      takeUntil(this.ngUnsubscribe) // Arrêtez l'intervalle lorsque le composant est détruit
-    ).subscribe(() => {
-      this.validateToken();
-    });
-  }
+    console.log('[ENTETE] Initialisation notifications + WS pour personnelId =', pid);
 
-  validateToken(): void {
-  const token = this.obtenirLeToken();
-  if (!token) {
-    this.deconnexion();
-    return;
-  }
+    this.refreshUnreadCount();
 
-  // ✅ Appel relative (même domaine). NGINX proxyfie vers :9002
-  const url = `/personnel/personnels/validateToken/${token}`;
+    interval(30000)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => this.refreshUnreadCount());
 
-  this.httClient.get<any>(url).subscribe({
-    next: (response) => {
-      const isValid = !!response?.valid;
-      if (!isValid) {
-        this.toastr.error("Vous avez été déconnecté : votre session a expiré. Veuillez vous reconnecter.");
-        this.deconnexion();
-      }
-    },
-    error: (err) => {
-      console.error('Erreur lors de la validation du token :', err);
-      // (optionnel) si tu veux déconnecter en cas d’erreur réseau :
-      // this.deconnexion();
-    },
-  });
-}
+    this.webSocketService.connect(pid);
 
+    this.webSocketService
+      .onMessage()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((msg: any) => {
+        console.log('[WS][ENTETE] message reçu :', msg);
 
-  // Méthode pour nettoyer les abonnements lorsque le composant est détruit
-  ngOnDestroy(): void {
-    this.ngUnsubscribe.next(true);
-    this.ngUnsubscribe.complete();
-  }
-
-
-  private connectToWebSocket() {
-    const socket = this.webSocketService.connect(); // Établir la connexion WebSocket
-
-    socket.subscribe(
-      (message: any) => {
-        // Gestion des messages WebSocket
-        this.websock = message;
-        if (this.websock.content === 'Connexion réussie') {
-
-        } else {
-          this.toastr.success(`Message: ${this.websock.content}`, 'Notifications', {
-            timeOut: 10000, // Durée d'affichage de la notification en millisecondes
-            closeButton: true, // Bouton de fermeture
-            progressBar: true // Barre de progression
+        if (msg?.type === 'NOTIF') {
+          this.toastr.success(msg.message, 'Notification', {
+            timeOut: 8000,
+            progressBar: true,
+            closeButton: true
           });
-          this.fetchNotificationsUnread(this.personnelId); // Met à jour les notifications lorsqu'un message est reçu
+
+          this.refreshUnreadCount();
           this.playNotificationSound();
         }
-
-        // Traitez les messages reçus du serveur WebSocket ici
-        console.log('Received message:', message);
-        // Mettez à jour les notifications après avoir reçu un message WebSocket
-        this.fetchNotifications(this.personnelId); // Remplacez 'yourUserId' par l'ID du personnel approprié
-      },
-      (error: any) => {
-        console.error('WebSocket error:', error);
-        // Reconnecter après une déconnexion
-        this.isWebSocketConnected = false;
-        this.scheduleReconnect();
-      },
-      () => {
-        console.log('WebSocket connection closed.');
-        // Reconnecter après une déconnexion
-        this.isWebSocketConnected = false;
-        this.scheduleReconnect();
-      }
-    );
-
-    // Envoyer un message "auth" après l'établissement de la connexion WebSocket
-    const token = sessionStorage.getItem('token');
-    socket.next({ type: 'auth', token: token });
-  }
-
-
-  private scheduleReconnect() {
-    if (!this.isWebSocketConnected && this.tryToConnectWebSocket) { // Vérifier si la connexion WebSocket est fermée
-      setTimeout(() => {
-        console.log('Trying to reconnect...');
-        this.connectToWebSocket(); // Appeler la fonction de connexion au WebSocket pour tenter une reconnexion
-      }, 10000); // Réessayer la connexion toutes les 30 secondes
-    } else {
-    }
-  }
-
-
-  playNotificationSound() {
-    // Créer un nouvel élément audio
-    const audio = new Audio('/assets/son.mp3');
-
-    // Jouer le son
-    audio.play()
-      .then(() => {
-        // La lecture du son a réussi
-        console.log('Notification sound played successfully.');
-      })
-      .catch((error) => {
-        // La lecture du son a échoué
-        console.error('Error playing notification sound:', error);
       });
   }
 
-  fetchNotifications(id: number): void {
-    this.notificationService.listeNotification(id).subscribe(
-      (data) => {
-        // Ajoutez les nouvelles notifications à la variable allNotifications
-        this.allNotifications.unshift(...data.reverse());
-        // Mettez à jour le badge de la cloche et le titre de l'onglet
-        // this.totalNotificationCount += data.length;
-        this.fetchNotificationsUnread(id);
-        this.updatePageTitle(this.totalNotificationCountUnread);
+  // Utilise NotificationApiService (nouveau backend)
+  refreshUnreadCount(): void {
+    const pid = this.getCurrentPersonnelId();
+    if (!pid) return;
+
+    this.notifApi.unreadCount(pid).subscribe({
+      next: (c: number) => {
+        this.totalNotificationCountUnread = c;
+        this.updatePageTitle(c);
       },
-      (error) => {
-        console.error('Une erreur s\'est produite lors de la récupération des notifications : ', error);
-      }
-    );
+      error: () => {}
+    });
   }
 
-  fetchNotificationsUnread(id: number): void {
-    this.notificationService.listeNotificationUnread(id).subscribe(
-      (data) => {
-        this.totalNotificationCountUnread = data;
-        this.updatePageTitle(this.totalNotificationCountUnread);
-
-      },
-      (error) => {
-        console.error('Une erreur s\'est produite lors de la récupération des notifications : ', error);
-      }
-    );
+  private getCurrentUserEmail(): string | null {
+    return this.userStore.value?.email
+      || this.utilisateurAuthentifie?.personnel?.etatCivil?.email
+      || this.utilisateurAuthentifie?.personnel?.email
+      || this.utilisateurAuthentifie?.email
+      || null;
   }
 
-  getNotificationLink(notification: any): string {
-    switch(notification.type) {
-      // INTERIM personnel
-      case 'Intérim':
-        return '/moncompte/mes-interims';
-
-      // AFFECTATION personnel
-      case 'Affectation modifiée':
-        return '/moncompte/mes-affectations';
-
-      // MISSION
-      case 'Demande d\'ordre de mission':
-        return '/moncompte/mes-missions';
-      // Mission chef
-      case 'Mission à valider':
-        return '/moncompte/demandeService';
-      // Autre
-      case 'Mission à approuver':
-        return '/moncompte/missions-a-valider';
-
-      // ABSENCE //demandeur
-      case 'Demande d\'absence':
-        return '/moncompte/demande';
-      // chef
-      case 'Demande d\'absence à valider':
-        return '/moncompte/demandeService';
-      // autre
-      case 'Demande d\'absence à approuver':
-        return '/moncompte/absence-a-valider';
-
-      // CONGE //demandeur
-      case 'Demande de congé':
-        return '/moncompte/demande-conge';
-      // Chef
-      case 'Demande de congé à valider':
-        return '/moncompte/demandeService';
-      // autre
-      case 'Demande de congé à approuver':
-        return '/moncompte/conge-a-valider';
-
-      // ADMINISTRATIF //demandeur
-      case 'Demande d\'acte administratif':
-        return '/moncompte/demande-acte-admin';
-      // autre
-      case 'Demande d\'acte administratif à approuver':
-        return '/moncompte/acte-administratif-a-valider';
-
-      // Ajoutez d'autres cas selon vos besoins
-
-      // Clause par défaut
-      default:
-        return '/moncompte/notifications'; // ou tout autre lien par défaut
+  onNotificationClick(event: MouseEvent, n: NotificationModel): void {
+    event.preventDefault();
+    this.notifApi.markRead(n.id).subscribe({
+      next: () => this.refreshUnreadCount(),
+      error: () => {}
+    });
+    if (n.link) {
+      window.location.href = n.link;
     }
   }
 
+  private getCurrentPersonnelId(): number | null {
+    return this.userStore.value?.personnelId
+      ?? this.utilisateurAuthentifie?.personnel?.id
+      ?? this.utilisateurAuthentifie?.personnel?.rhPersonnel
+      ?? null;
+  }
+
+  getNotificationLink(n: NotificationModel): string {
+    if (n.link && n.link.startsWith('mailto:')) return n.link;
+    const to = this.getCurrentUserEmail() ?? '';
+    const subject = encodeURIComponent(n.title || n.type || 'Notification');
+    const body = encodeURIComponent(
+      `${n.message}\n\nEnvoyée le: ${new Date(n.createdAt).toLocaleString()}`
+    );
+    return `mailto:${to}?subject=${subject}&body=${body}`;
+  }
+
+  obtenirLeToken(): string | null {
+    return sessionStorage.getItem('token');
+  }
+
+  verificationTokenValidationParMinute(): void {
+    const tokenCheckInterval$ = interval(60000);
+    tokenCheckInterval$
+      .pipe(takeUntil(this.ngUnsubscribe))
+      .subscribe(() => {
+        this.validateToken();
+      });
+  }
+
+  validateToken(): void {
+    const token = this.obtenirLeToken();
+    if (!token) {
+      this.deconnexion();
+      return;
+    }
+
+    const base = environment.hostmicroservicepersonnel; // ex : "http://localhost:9002/rh/"
+    const url = `${base}auth/validateToken`;
+
+    const headers = new HttpHeaders({
+      Authorization: `Bearer ${token}`
+    });
+
+    this.httClient.get<any>(url, { headers }).subscribe({
+      next: (response) => {
+        const isValid = !!response?.valid;
+        if (!isValid) {
+          this.toastr.error(
+            'Vous avez été déconnecté : votre session a expiré. Veuillez vous reconnecter.'
+          );
+          this.deconnexion();
+        }
+      },
+      error: (err) => {
+        console.error('Erreur lors de la validation du token :', err);
+        // éventuellement : this.deconnexion();
+      },
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.ngUnsubscribe.next(true);
+    this.ngUnsubscribe.complete();
+
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  playNotificationSound(): void {
+    const audio = new Audio('/assets/son.mp3');
+    audio.play()
+      .then(() => {
+        console.log('Notification sound played successfully.');
+      })
+      .catch((error) => {
+        console.error('Error playing notification sound:', error);
+      });
+  }
 
   updatePageTitle(notificationCount: number): void {
     if (notificationCount > 0) {
       this.titleService.setTitle(` (${notificationCount}) Vous avez des notifications`);
     } else {
-      this.titleService.setTitle('Plateforme intégré de gestion des ressources humaines et de la formation de l\`ISI');
+      this.titleService.setTitle(
+        'Plateforme intégré de gestion des ressources humaines et de la formation de l`ISI'
+      );
     }
   }
 
-
-//test
-  creationImage(image: Blob) {
+  creationImage(image: Blob): void {
     if (image && image.size > 0) {
-      /*
-      let reader = new FileReader();
-      reader.addEventListener("load", () => {
-        this.imageToShow = reader.result;
-        this.showSpinner = false;
-      }, false);
-      reader.readAsDataURL(image);
-      */
-      //this.profilSrc = window.URL.createObjectURL(image);
-      //alert(this.profilSrc.);
-
-      let objectURL = URL.createObjectURL(image);
+      const objectURL = URL.createObjectURL(image);
       this.profilSrc = this.sanitizer.bypassSecurityTrustUrl(objectURL);
-    } else {
-      //this.showSpinner = false;
     }
   }
 
-
-  // afficherImageDeProfil(image_de_profil: string) {
-  //   this.authenficationSerice.recuperationDeImageDeProfil(image_de_profil).subscribe(data => {
-  //       this.creationImage(data);
-  //     }, error => {
-  //       //alert(error);
-  //     }
-  //   );
-  // }
-
-  afficherImageDeProfil(image_de_profil: string): void {
-    // @ts-ignore
-    this.authenficationSerice.recuperationDeImageDeProfil(image_de_profil).subscribe(
-      (data: Blob) => {
-        this.creationImage(data);
-      },
-      (error: any) => {
-        console.error('Erreur lors de la récupération de l\'image de profil :', error);
-      }
-    );
-  }
-
-  obtenirUnUtilisateurParEmail() {
-
-    const email = sessionStorage.getItem("email");
-
+  obtenirUnUtilisateurParEmail(): void {
+    const email = sessionStorage.getItem('email');
     if (!email) {
       console.error('Email not found in session storage');
       return;
     }
-    this.utilisateurAuthentifieState$ = this.authenficationSerice.obtenirUnUtilisateurParEmail(email).pipe(
-      map(data => {
 
-        //console.log(data);
-        this.utilisateurAuthentifie = data;
-        //console.log(this.utilisateurAuthentifie.image_de_profil);
-        this.personnelId = this.utilisateurAuthentifie.personnel.rhPersonnel
-        this.fetchNotificationsUnread(this.personnelId)
-        this.afficherImageDeProfil(this.utilisateurAuthentifie.image_de_profil);
+    this.utilisateurAuthentifieState$ = this.authenficationSerice
+      .obtenirUnUtilisateurParEmail(email)
+      .pipe(
+        map((data) => {
+          this.utilisateurAuthentifie = data;
 
-        return { data: data, dataState: DataStateEnum.CHARGE };
-      }),
-      startWith({ dataState: DataStateEnum.CHARGEMENT }),
-      catchError((error: HttpErrorResponse) => {
-        return this.authenficationSerice.gestionnaireDerreur(error);
-      }),
-      //catchError(error => of({ dataState: DataStateEnum.ERREUR, errorMessage: error.error.message, errorStatus: error.status })),
-    );
+          const pid =
+            data?.personnelId ??
+            data?.personnel?.rhPersonnel ??
+            data?.personnel?.id ??
+            null;
+
+          this.personnelId = pid ?? 0;
+
+          this.userStore.set({
+            id: data.id,
+            email: data.personnel?.etatCivil?.email ?? email,
+            personnelId: pid,
+          });
+
+          this.refreshUnreadCount();
+          this.initNotificationsAndWebSocket();
+
+          return { data: data, dataState: DataStateEnum.CHARGE };
+        }),
+        startWith({ dataState: DataStateEnum.CHARGEMENT }),
+        catchError((error: HttpErrorResponse) => {
+          return this.authenficationSerice.gestionnaireDerreur(error);
+        })
+      );
   }
 
-  onSearchRequerantEmail() {
-    const email = sessionStorage.getItem("email");
-
+  onSearchRequerantEmail(): void {
+    const email = sessionStorage.getItem('email');
     if (!email) {
       console.error('Email not found in session storage');
       return;
     }
+    // à compléter si nécessaire
   }
 
-
-  setLanguage(text: string, lang: string, flag: string) {
+  setLanguage(text: string, lang: string, flag: string): void {
     this.countryName = text;
     this.flagvalue = flag;
     this.cookieValue = lang;
   }
 
-  /**
-   * Toggles the right sidebar
-   */
-  toggleRightSidebar() {
+  toggleRightSidebar(): void {
     this.settingsButtonClicked.emit();
   }
 
-  /**
-   * Toggle the menu bar when having mobile screen
-   */
-  toggleMobileMenu(event: any) {
+  toggleMobileMenu(event: any): void {
     event.preventDefault();
     this.mobileMenuButtonClicked.emit();
   }
 
-  /**
-   * Déconnexion
-   */
-  deconnexion() {
-    this.tryToConnectWebSocket = false
-    this.webSocketService.disconnect(); // A
-    // this.so
-    // Gérer l'événement de fermeture WebSocket
-
+  deconnexion(): void {
+    this.tryToConnectWebSocket = false;
+    this.webSocketService.disconnect();
     this.authenficationSerice.deconnexion();
   }
 
-
-  /**
-   * Fullscreen method
-   */
-  fullscreen() {
+  fullscreen(): void {
     document.body.classList.toggle('fullscreen-enable');
     if (
-      !document.fullscreenElement && !this.element.mozFullScreenElement &&
-      !this.element.webkitFullscreenElement) {
+      !document.fullscreenElement &&
+      !this.element.mozFullScreenElement &&
+      !this.element.webkitFullscreenElement
+    ) {
       if (this.element.requestFullscreen) {
         this.element.requestFullscreen();
       } else if (this.element.mozRequestFullScreen) {
-        /* Firefox */
         this.element.mozRequestFullScreen();
       } else if (this.element.webkitRequestFullscreen) {
-        /* Chrome, Safari and Opera */
         this.element.webkitRequestFullscreen();
       } else if (this.element.msRequestFullscreen) {
-        /* IE/Edge */
         this.element.msRequestFullscreen();
       }
     } else {
       if (this.document.exitFullscreen) {
         this.document.exitFullscreen();
       } else if (this.document.mozCancelFullScreen) {
-        /* Firefox */
         this.document.mozCancelFullScreen();
       } else if (this.document.webkitExitFullscreen) {
-        /* Chrome, Safari and Opera */
         this.document.webkitExitFullscreen();
       } else if (this.document.msExitFullscreen) {
-        /* IE/Edge */
         this.document.msExitFullscreen();
       }
     }
   }
-
 }
