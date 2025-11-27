@@ -40,7 +40,7 @@ export class ContratComponent implements OnInit {
 
   public searchItem: string = "";
   public designation: string = '';
-  public designationPersonnel: string = '';
+  public designationPersonnel: string = ''; // 🔎 recherche front
   public searchValue: string = '';
   public loading: boolean = false;
   public id?: number;
@@ -51,6 +51,9 @@ export class ContratComponent implements OnInit {
   personnelId?: number;
   sort: string = "desc";
   pieces: File | undefined;
+
+  // 🔹 Filtre statut (front only)
+  filterStatut: 'tous' | 'actifs' | 'expires' | 'avenir' = 'tous';
 
   formulaireContrat = new FormGroup({
     id: new FormControl(),
@@ -134,15 +137,13 @@ export class ContratComponent implements OnInit {
     this.contrats = this.contratService.listerContratPage(this.currentPage, this.insertionsPerPage, this.sort)
       .pipe(
         map((data: any) => {
-          this.listeContrat = data.body.content;
-          this.totalInsertions = data.body.totalElements;
-          this.totalPages = data.body.totalPages;
+          this.listeContrat = data.body.content || [];
+          this.totalInsertions = data.body.totalElements ?? this.listeContrat.length;
+          this.totalPages = data.body.totalPages ?? 1;
           this.pages = this.getPages();
           return { dataState: this.dataStateEnum.CHARGE, data: this.listeContrat };
         }),
-        startWith({ dataState: this.dataStateEnum.CHARGEMENT })
-      )
-      .pipe(
+        startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
         catchError(err => {
           console.error('Erreur lors du chargement des contrats:', err);
           return of({ dataState: this.dataStateEnum.ERREUR, data: [] });
@@ -206,23 +207,120 @@ export class ContratComponent implements OnInit {
     return this.formatDate(d);
   }
 
+  /** ---------- UX / Statut contrat & filtrage front ---------- */
+
+  /** Renvoie la liste filtrée pour l'UI (recherche + statut) */
+  get filteredContrats(): Contrat[] {
+    let list = this.listeContrat || [];
+
+    const search = (this.designationPersonnel || '').toLowerCase().trim();
+    if (search) {
+      list = list.filter((c: any) => {
+        const nature = (c?.natureContrat || '').toLowerCase();
+        const nomPers = this.displayName(c?.personnel || {}).toLowerCase();
+        return nature.includes(search) || nomPers.includes(search);
+      });
+    }
+
+    if (this.filterStatut !== 'tous') {
+      list = list.filter(c => this.getStatusKey(c) === this.filterStatut);
+    }
+
+    return list;
+  }
+
+  private parseDate(dateLike: any): Date | null {
+    if (!dateLike) return null;
+    const d = new Date(dateLike);
+    return isNaN(d.getTime()) ? null : d;
+  }
+
+  /** actif | expires | avenir | inconnu */
+  private getStatusKey(c: Contrat): 'actifs' | 'expires' | 'avenir' | 'tous' | 'inconnu' {
+    const debut = this.parseDate((c as any).dateDebutContrat);
+    const fin   = this.parseDate((c as any).dateFinContrat);
+    const today = new Date();
+    today.setHours(0,0,0,0);
+
+    if (!debut && !fin) return 'inconnu';
+
+    if (debut && debut > today) {
+      return 'avenir';
+    }
+
+    if (fin && fin < today) {
+      return 'expires';
+    }
+
+    return 'actifs';
+  }
+
+  statusLabel(c: Contrat): string {
+    switch (this.getStatusKey(c)) {
+      case 'actifs':  return 'Contrat actif';
+      case 'expires': return 'Contrat expiré';
+      case 'avenir':  return 'Contrat à venir';
+      default:        return 'Statut non défini';
+    }
+  }
+
+  statusBadgeClass(c: Contrat): string {
+    switch (this.getStatusKey(c)) {
+      case 'actifs':  return 'bg-success';
+      case 'expires': return 'bg-danger';
+      case 'avenir':  return 'bg-warning text-dark';
+      default:        return 'bg-secondary';
+    }
+  }
+
+  statusHint(c: Contrat): string {
+    const today = new Date();
+    today.setHours(0,0,0,0);
+    const fin = this.parseDate((c as any).dateFinContrat);
+    const debut = this.parseDate((c as any).dateDebutContrat);
+
+    const key = this.getStatusKey(c);
+
+    if (key === 'avenir' && debut) {
+      const diff = Math.round((debut.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      return diff > 0 ? `Commence dans ${diff} jour(s)` : '';
+    }
+
+    if (key === 'actifs' && fin) {
+      const diff = Math.round((fin.getTime() - today.getTime()) / (1000 * 60 * 60 * 24));
+      if (diff > 0) {
+        return `Expire dans ${diff} jour(s)`;
+      } else if (diff === 0) {
+        return `Expire aujourd'hui`;
+      }
+    }
+
+    if (key === 'expires' && fin) {
+      const diff = Math.round((today.getTime() - fin.getTime()) / (1000 * 60 * 60 * 24));
+      return diff > 0 ? `Expiré il y a ${diff} jour(s)` : 'Contrat expiré';
+    }
+
+    return '';
+  }
+
+  /** -------- Création / MAJ -------- */
   openModal(content: any, contrat: Contrat | undefined = undefined) {
     if (contrat) {
       this.formulaireContrat.patchValue({
         id: contrat.id,
         personnelId: contrat.personnel?.id ?? null,
-        dateDebutContrat: this.safeDateToInput(contrat.dateDebutContrat),
-        dateFinContrat: this.safeDateToInput(contrat.dateFinContrat),
+        dateDebutContrat: this.safeDateToInput((contrat as any).dateDebutContrat),
+        dateFinContrat: this.safeDateToInput((contrat as any).dateFinContrat),
         natureContrat: contrat.natureContrat ?? '',
-        dateDebutEssaie: this.safeDateToInput(contrat.dateDebutEssaie),
-        dateFinEssaie: this.safeDateToInput(contrat.dateFinEssaie),
-        dateEmbauche: this.safeDateToInput(contrat.dateEmbauche),
-        dateAncienneteEntreprise: this.safeDateToInput(contrat.dateAncienneteEntreprise),
-        dateAncienneteProfession: this.safeDateToInput(contrat.dateAncienneteProfession),
+        dateDebutEssaie: this.safeDateToInput((contrat as any).dateDebutEssaie),
+        dateFinEssaie: this.safeDateToInput((contrat as any).dateFinEssaie),
+        dateEmbauche: this.safeDateToInput((contrat as any).dateEmbauche),
+        dateAncienneteEntreprise: this.safeDateToInput((contrat as any).dateAncienneteEntreprise),
+        dateAncienneteProfession: this.safeDateToInput((contrat as any).dateAncienneteProfession),
         motifDepart: contrat.motifDepart ?? '',
-        anneeEncours: (contrat.anneeEncours ?? '').toString(),
-        anneePassee: (contrat.anneePassee ?? '').toString(),
-        anneeSurpassee: (contrat.anneeSurpassee ?? '').toString(),
+        anneeEncours: ((contrat as any).anneeEncours ?? '').toString(),
+        anneePassee: ((contrat as any).anneePassee ?? '').toString(),
+        anneeSurpassee: ((contrat as any).anneeSurpassee ?? '').toString(),
       });
     } else {
       this.formulaireContrat.reset({
@@ -271,79 +369,76 @@ export class ContratComponent implements OnInit {
   }
 
   private isEmpty(v: any): boolean {
-  return v === null || v === undefined || (typeof v === 'string' && v.trim() === '');
-}
+    return v === null || v === undefined || (typeof v === 'string' && v.trim() === '');
+  }
 
-private appendIfNotEmpty(fd: FormData, key: string, value: any) {
-  if (this.isEmpty(value)) return;
+  private appendIfNotEmpty(fd: FormData, key: string, value: any) {
+    if (this.isEmpty(value)) return;
 
-  // Normaliser quelques types
-  const numericKeys = ['anneeEncours','anneePassee','anneeSurpassee'];
-  if (numericKeys.includes(key)) {
-    // si 0 est saisi, on l’envoie; sinon on skippe si vide
-    if (!isNaN(Number(value))) {
-      fd.append(key, String(Number(value)));
+    const numericKeys = ['anneeEncours', 'anneePassee', 'anneeSurpassee'];
+    if (numericKeys.includes(key)) {
+      if (!isNaN(Number(value))) {
+        fd.append(key, String(Number(value)));
+      }
+      return;
     }
-    return;
+
+    fd.append(key, String(value));
   }
 
-  fd.append(key, String(value));
-}
-
-  /** -------- Création / MAJ -------- */
- creerContrat() {
-  const personnelId = this.formulaireContrat.get('personnelId')?.value;
-  if (personnelId === null || personnelId === undefined) {
-    this.toastr.error('Veuillez sélectionner un personnel', 'Erreur');
-    return;
-  }
+  creerContrat() {
+    const personnelId = this.formulaireContrat.get('personnelId')?.value;
+    if (personnelId === null || personnelId === undefined) {
+      this.toastr.error('Veuillez sélectionner un personnel', 'Erreur');
+      return;
+    }
 
     const formData = new FormData();
     Object.keys(this.formulaireContrat.controls).forEach(key => {
-    if (key === 'personnelId') return; // envoyé via l'URL
-    const value = this.formulaireContrat.get(key as any)?.value;
-    this.appendIfNotEmpty(formData, key, value);
-  });
+      if (key === 'personnelId') return; // envoyé via l'URL
+      const value = this.formulaireContrat.get(key as any)?.value;
+      this.appendIfNotEmpty(formData, key, value);
+    });
 
-  if (this.pieces) formData.append('pieces', this.pieces);
+    if (this.pieces) formData.append('pieces', this.pieces);
 
-  this.contratService.creerContrat(personnelId, formData).subscribe(
-    () => {
-      this.formulaireContrat.reset();
-      this.modalService.dismissAll();
-      this.toastr.success('Contrat créé avec succès', 'Succès');
-      this.getContrats();
-      this.successmsg("Contrat créé", "Le contrat a été créé avec succès");
-    },
-    (error) => {
-      console.error('Erreur détaillée:', error);
-      this.toastr.error(error.error?.message || 'Erreur lors de la création du contrat', 'Erreur');
-    }
-  );
-}
+    this.contratService.creerContrat(personnelId, formData).subscribe(
+      () => {
+        this.formulaireContrat.reset();
+        this.modalService.dismissAll();
+        this.toastr.success('Contrat créé avec succès', 'Succès');
+        this.getContrats();
+        this.successmsg("Contrat créé", "Le contrat a été créé avec succès");
+      },
+      (error) => {
+        console.error('Erreur détaillée:', error);
+        this.toastr.error(error.error?.message || 'Erreur lors de la création du contrat', 'Erreur');
+      }
+    );
+  }
 
- modifierContrat() {
-  const contratId = this.formulaireContrat.get('id')?.value;
-  const formData = new FormData();
+  modifierContrat() {
+    const contratId = this.formulaireContrat.get('id')?.value;
+    const formData = new FormData();
 
-  Object.keys(this.formulaireContrat.controls).forEach(key => {
-    const value = this.formulaireContrat.get(key as any)?.value;
-    this.appendIfNotEmpty(formData, key, value);
-  });
+    Object.keys(this.formulaireContrat.controls).forEach(key => {
+      const value = this.formulaireContrat.get(key as any)?.value;
+      this.appendIfNotEmpty(formData, key, value);
+    });
 
-  if (this.pieces) formData.append('pieces', this.pieces);
+    if (this.pieces) formData.append('pieces', this.pieces);
 
-  this.contratService.modifierContrat(contratId, formData).subscribe(
-    () => {
-      this.modalService.dismissAll();
-      this.successmsg("Contrat modifié", "Le contrat a été modifié avec succès");
-      this.getContrats();
-    },
-    (error) => {
-      this.toastr.error(error.error?.message || 'Erreur lors de la modification', 'Erreur');
-    }
-  );
-}
+    this.contratService.modifierContrat(contratId, formData).subscribe(
+      () => {
+        this.modalService.dismissAll();
+        this.successmsg("Contrat modifié", "Le contrat a été modifié avec succès");
+        this.getContrats();
+      },
+      (error) => {
+        this.toastr.error(error.error?.message || 'Erreur lors de la modification', 'Erreur');
+      }
+    );
+  }
 
   uploaderFicher($event: any) {
     if ($event.target.files.length > 0) {

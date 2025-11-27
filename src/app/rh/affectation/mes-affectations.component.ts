@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TitredepageComponent } from '../../commun/titredepage/titredepage.component';
 import { AffectationService } from '../services/affectation.service';
+import { Affectation } from '../models/affectation';
 
 @Component({
   standalone: true,
@@ -19,13 +20,38 @@ import { AffectationService } from '../services/affectation.service';
 
         <!-- Barre d’info -->
         <div class="d-flex flex-wrap gap-2 mb-3">
-          <div class="small text-muted">Historique de mes affectations</div>
-          <div class="ms-auto small text-muted">Total: {{ totalElements }}</div>
+          <div class="small text-muted">
+            Historique de mes affectations
+          </div>
+          <div class="ms-auto small text-muted">
+            Total: {{ totalElements }}
+          </div>
+        </div>
+
+        <!-- Poste actuel (si dispo) -->
+        <div *ngIf="posteActuel" class="alert alert-primary d-flex flex-wrap align-items-center mb-3">
+          <div class="me-2 fw-semibold">
+            Poste actuel :
+          </div>
+          <div class="me-2">
+            <span class="badge" [ngClass]="badgePoste(posteActuel?.poste?.designation)">
+              {{ posteActuel?.poste?.designation || '—' }}
+            </span>
+          </div>
+          <div class="me-2 text-muted small">
+            {{ posteActuel?.poste?.service?.designation || '—' }}
+          </div>
+          <div class="ms-auto small">
+            Depuis le {{ posteActuel?.dateDebut | date:'dd/MM/yyyy' }}
+          </div>
         </div>
 
         <!-- Etats -->
         <div *ngIf="loading" class="alert alert-info mb-0">Chargement…</div>
-        <div *ngIf="error" class="alert alert-danger mb-0">Erreur de chargement</div>
+
+        <div *ngIf="error" class="alert alert-danger mb-0">
+          {{ errorMessage }}
+        </div>
 
         <!-- Liste -->
         <div *ngIf="!loading && !error" class="table-responsive">
@@ -36,22 +62,36 @@ import { AffectationService } from '../services/affectation.service';
                 <th class="text-nowrap">Poste</th>
                 <th class="text-nowrap">Service</th>
                 <th class="text-nowrap">Date début</th>
+                <th class="text-nowrap">Statut</th>
               </tr>
             </thead>
             <tbody>
               <tr *ngFor="let a of liste; index as i">
                 <td>{{ i + 1 + (page * size) }}</td>
+
                 <td>
                   <span class="badge" [ngClass]="badgePoste(a?.poste?.designation)">
                     {{ a?.poste?.designation || '—' }}
                   </span>
                 </td>
+
                 <td>{{ a?.poste?.service?.designation || '—' }}</td>
+
                 <td>{{ a?.dateDebut | date:'dd/MM/yyyy' }}</td>
+
+                <td>
+                  <span
+                    class="badge"
+                    [ngClass]="(page === 0 && i === 0) ? 'bg-success' : 'bg-secondary'">
+                    {{ (page === 0 && i === 0) ? 'Actuel' : 'Ancienne' }}
+                  </span>
+                </td>
               </tr>
 
               <tr *ngIf="!liste.length">
-                <td colspan="4" class="text-center">Aucune affectation</td>
+                <td colspan="5" class="text-center">
+                  Vous n'avez encore aucune affectation enregistrée.
+                </td>
               </tr>
             </tbody>
           </table>
@@ -83,19 +123,37 @@ import { AffectationService } from '../services/affectation.service';
 export class MesAffectationsComponent implements OnInit {
   loading = false;
   error = false;
+  errorMessage = 'Erreur de chargement';
 
-  liste: any[] = [];
-  page = 0; size = 10;
-  totalElements = 0; totalPages = 0; pages: number[] = [];
+  liste: Affectation[] = [];
+  page = 0;
+  size = 10;
+  totalElements = 0;
+  totalPages = 0;
+  pages: number[] = [];
 
   constructor(private srv: AffectationService) {}
 
-  ngOnInit(): void { this.load(); }
+  ngOnInit(): void {
+    this.load();
+  }
 
-  goto(p: number) { this.page = p; this.load(); }
+  /** Poste actuel = première affectation de la première page (triée du plus récent au plus ancien) */
+  get posteActuel(): Affectation | null {
+    return this.page === 0 && this.liste.length ? this.liste[0] : null;
+  }
+
+  goto(p: number) {
+    if (p < 0 || p >= this.totalPages) return;
+    this.page = p;
+    this.load();
+  }
 
   private load() {
-    this.loading = true; this.error = false;
+    this.loading = true;
+    this.error = false;
+    this.errorMessage = 'Erreur de chargement';
+
     this.srv.listerMesAffectations(this.page, this.size, 'id,desc').subscribe({
       next: (resp: any) => {
         const body = resp?.body || {};
@@ -105,11 +163,22 @@ export class MesAffectationsComponent implements OnInit {
         this.pages = Array.from({ length: this.totalPages }, (_, i) => i);
         this.loading = false;
       },
-      error: _ => { this.error = true; this.loading = false; }
+      error: (err) => {
+        this.loading = false;
+        this.error = true;
+
+        if (err?.status === 401) {
+          this.errorMessage =
+            'Vous devez être connecté en tant que personnel pour voir vos affectations.';
+        } else {
+          this.errorMessage =
+            err?.error?.message || 'Une erreur est survenue lors du chargement de vos affectations.';
+        }
+      }
     });
   }
 
-  /** Couleur douce par poste (même esprit que badges type de demande) */
+  /** Couleur douce par type de poste */
   badgePoste(label?: string): string {
     const v = (label || '').toLowerCase();
     if (v.includes('chef') || v.includes('responsable')) return 'bg-primary';

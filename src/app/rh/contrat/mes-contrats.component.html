@@ -1,59 +1,131 @@
 <!-- src/app/rh/contrat/mes-contrats.component.html -->
 <div class="page page-with-bg">
-  <div class="sj-card p-4">
-    <div class="sj-toolbar">
-      <h2 class="m-0">Mes contrats</h2>
-      <div class="spacer"></div>
 
-      <div class="tabs">
-        <button class="tab-btn" [class.active]="tab()==='tous'"    (click)="changeTab('tous')">Tous</button>
-        <button class="tab-btn" [class.active]="tab()==='actifs'"  (click)="changeTab('actifs')">Actifs</button>
-        <button class="tab-btn" [class.active]="tab()==='expires'" (click)="changeTab('expires')">Expirés</button>
+  <!-- Barre haut + filtres + synthèse dans UNE seule card -->
+  <div class="sj-card p-3 mb-3">
+    <!-- Titre + onglets -->
+    <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+      <div class="d-flex flex-column">
+        <h2 class="h5 m-0">Mes contrats</h2>
+        <span class="small text-muted">Contrats liés à votre compte</span>
+      </div>
+
+      <div class="spacer flex-grow-1"></div>
+
+      <div class="tabs d-flex">
+        <button class="tab-btn"
+                [class.active]="tab()==='tous'"
+                (click)="changeTab('tous')">
+          Tous
+        </button>
+        <button class="tab-btn"
+                [class.active]="tab()==='actifs'"
+                (click)="changeTab('actifs')">
+          Actifs
+        </button>
+        <button class="tab-btn"
+                [class.active]="tab()==='expires'"
+                (click)="changeTab('expires')">
+          Expirés
+        </button>
+      </div>
+    </div>
+
+    <!-- Filtre + stats en une ligne -->
+    <div class="d-flex flex-wrap gap-3 align-items-end">
+      <!-- Filtre -->
+      <div class="flex-grow-1">
+        <label class="form-label small mb-1">Filtrer</label>
+        <div class="input-group input-group-sm">
+          <span class="input-group-text">
+            <i class="bx bx-search-alt"></i>
+          </span>
+          <input
+            type="text"
+            class="form-control"
+            [(ngModel)]="searchTerm"
+            placeholder="Nature du contrat (CDI, CDD…)">
+        </div>
+      </div>
+
+      <!-- Mini stats (compact) -->
+      <div class="d-flex flex-wrap gap-3 small text-muted">
+        <span>Total : <strong>{{ contrats.length }}</strong></span>
+        <span>Actifs : <strong class="text-success">{{ nbActifs }}</strong></span>
+        <span>À venir : <strong class="text-warning">{{ nbAvenir }}</strong></span>
+        <span>Expirés : <strong class="text-danger">{{ nbExpires }}</strong></span>
       </div>
     </div>
   </div>
 
-  <div class="mt-4">
-    <div *ngIf="loading" class="sj-card p-4 text-center">Chargement…</div>
-    <div *ngIf="!loading && error" class="sj-card p-4 text-danger">{{ error }}</div>
+  <!-- États globaux -->
+  <div *ngIf="loading" class="sj-card p-3 text-center">
+    Chargement de vos contrats…
+  </div>
 
-    <div *ngIf="!loading && !error">
-      <div class="grid">
-        <div class="sj-card contrat-card" *ngFor="let c of contrats">
-          <div class="header">
-            <div class="badge sj-badge">{{ c?.natureContrat || 'Contrat' }}</div>
-            <button class="dl" (click)="telecharger(c.id)" title="Télécharger le contrat">
-              <i class="bx bx-download"></i>
-            </button>
+  <div *ngIf="!loading && error" class="sj-card p-3 text-danger">
+    {{ error }}
+  </div>
+
+  <!-- Liste des contrats (cartes compactes) -->
+  <div *ngIf="!loading && !error">
+    <div class="grid">
+      <div class="sj-card contrat-card p-3" *ngFor="let c of filteredContrats">
+        <!-- header compact -->
+        <div class="d-flex justify-content-between align-items-start mb-1">
+          <div>
+            <div class="fw-semibold text-primary">
+              {{ c?.natureContrat || 'Contrat' }}
+            </div>
+            <span class="badge mt-1" [ngClass]="statusBadgeClass(c)">
+              {{ statusLabel(c) }}
+            </span>
           </div>
 
-          <div class="body">
-            <div class="row">
-              <span class="label">Date de début</span>
-              <div class="value">{{ safeDate(c?.dateDebutContrat) || '—' }}</div>
-            </div>
-            <div class="row">
-              <span class="label">Date de fin</span>
-              <div class="value">{{ safeDate(c?.dateFinContrat) || '—' }}</div>
-            </div>
-            <div class="row">
-              <span class="label">Personnel</span>
-              <div class="value">{{ (c?.personnel?.etatCivil?.prenom || c?.personnel?.prenom || '') + ' ' + (c?.personnel?.etatCivil?.nom || c?.personnel?.nom || '') }}</div>
-            </div>
-          </div>
+          <button
+            class="btn btn-light btn-sm"
+            (click)="telecharger(c.id)"
+            title="Télécharger le contrat">
+            <i class="bx bx-download"></i>
+          </button>
+        </div>
+
+        <!-- dates sur une seule ligne -->
+        <div class="small text-muted mt-2">
+          du
+          <span class="fw-semibold">{{ safeDate(c?.dateDebutContrat) || '—' }}</span>
+          au
+          <span class="fw-semibold">{{ safeDate(c?.dateFinContrat) || '—' }}</span>
+        </div>
+
+        <!-- hint statut (facultatif, petite ligne) -->
+        <div *ngIf="statusHint(c)" class="small text-muted mt-1">
+          {{ statusHint(c) }}
         </div>
       </div>
+    </div>
 
-      <!-- pagination -->
-      <div class="sj-card p-3 mt-4 pager">
-        <button class="sj-btn-primary" [disabled]="page===0" (click)="prev()">Précédent</button>
-        <span class="muted">Page {{ page + 1 }} / {{ totalPages || 1 }}</span>
-        <button class="sj-btn-primary" [disabled]="page+1>=totalPages" (click)="next()">Suivant</button>
-      </div>
+    <!-- Pagination compacte -->
+    <div class="sj-card p-2 mt-3 d-flex justify-content-between align-items-center">
+      <button class="btn btn-sm btn-outline-primary"
+              [disabled]="page===0"
+              (click)="prev()">
+        Précédent
+      </button>
 
-      <div *ngIf="!contrats?.length" class="sj-card p-5 text-center muted">
-        Aucun contrat à afficher
-      </div>
+      <span class="small text-muted">
+        Page {{ page + 1 }} / {{ totalPages || 1 }} • Résultats : {{ filteredContrats.length }} / {{ total }}
+      </span>
+
+      <button class="btn btn-sm btn-outline-primary"
+              [disabled]="page+1>=totalPages"
+              (click)="next()">
+        Suivant
+      </button>
+    </div>
+
+    <div *ngIf="!filteredContrats?.length" class="sj-card p-4 text-center small text-muted mt-2">
+      Aucun contrat à afficher pour ce filtre / cet onglet.
     </div>
   </div>
 </div>

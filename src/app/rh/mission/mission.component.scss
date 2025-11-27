@@ -1,65 +1,128 @@
-
-.main{
-  background-image: url('../../../assets/Groupe 786.png'); /* remplacer image.jpg par l'URL de votre image de fond */
+/* Fond de page */
+.page-with-bg {
+  background-image: url('../../../assets/Groupe 786.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  padding-bottom: 1rem;
 }
 
-.btn-darkblue {
-  background-color: #0d47a1; /* Bleu foncé */
-  color: white;
-  border: none;
+/* Barre d’actions sticky en haut de la card */
+.sticky-actions {
+  position: sticky;
+  top: 0;
+  z-index: 5;
 }
 
-.btn-darkblue:hover {
-  background-color: #08306b; /* Encore plus foncé au survol */
+/* Bouton principal : léger lift on hover */
+.btn-action {
+  transition: transform .12s ease, box-shadow .12s ease;
+  border-radius: .5rem;
+}
+.btn-action:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 .6rem 1.2rem rgba(0,0,0,.08);
 }
 
- @import url('https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css');
-  
-  .search-icon {
+/* Icone dans les inputs */
+.input-icon {
+  position: relative;
+
+  .icon-right {
     position: absolute;
-    left: 15px;
+    right: .75rem;
     top: 50%;
     transform: translateY(-50%);
-    z-index: 10;
-    color: #6c757d;
+    pointer-events: none;
+    font-size: 1.1rem;
+    opacity: .5;
   }
-  
-  .mission-list .mission-item {
-    transition: all 0.3s ease;
+}
+
+/* Table compacte & lisible */
+.table {
+  --bs-table-bg: #fff;
+}
+.table thead th {
+  white-space: nowrap;
+}
+.table td,
+.table th {
+  vertical-align: middle;
+}
+.table-hover > tbody > tr:hover {
+  background-color: rgba(13,110,253,.04);
+}
+
+/* Lignes hoverables + effet léger */
+.row-hoverable {
+  transition: background-color .12s ease, transform .06s ease;
+}
+.row-hoverable:hover {
+  transform: translateZ(0);
+}
+
+/* Petits boutons pour la barre d’action */
+.btn-xs {
+  --btn-padding-y: .2rem;
+  --btn-padding-x: .45rem;
+  --btn-font-size: .74rem;
+  padding: var(--btn-padding-y) var(--btn-padding-x);
+  font-size: var(--btn-font-size);
+  line-height: 1.2;
+  border-radius: .35rem;
+}
+
+/* Groupe d’actions inline (icônes + workflow) */
+.actions-inline {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;      /* ❗ on force sur une seule ligne */
+  gap: .35rem;
+}
+
+.divider {
+  display: inline-block;
+  width: 1px;
+  height: 22px;
+  background: rgba(0,0,0,.1);
+}
+
+/* Liens discrets avec underline au survol */
+.link-underline {
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color .12s ease;
+}
+.link-underline:hover {
+  border-color: currentColor;
+}
+
+/* Colonnes utilitaires */
+.minw-180 { min-width: 180px; }
+.maxw-260 { max-width: 260px; }
+
+/* Icône pour l’état vide */
+.empty-icon {
+  color: #d9534f;
+  font-size: 2.5rem;
+}
+
+/* Modals */
+.modal-header,
+.modal-footer {
+  background: #fff;
+}
+
+/* Petits écrans */
+@media (max-width: 576px) {
+  .table td,
+  .table th {
+    padding-top: .5rem !important;
+    padding-bottom: .5rem !important;
   }
-  
-  .mission-list .mission-item:hover {
-    background-color: #f8f9fa;
-    transform: translateX(5px);
+  .maxw-260 { max-width: 180px; }
+  .actions-inline {
+    gap: .25rem;
   }
-  
-  .mission-link:hover {
-    color: #0d6efd !important;
-    text-decoration: underline !important;
-  }
-  
-  .file-upload-container {
-    position: relative;
-  }
-  
-  .empty-state {
-    opacity: 0.7;
-    transition: opacity 0.3s;
-  }
-  
-  .empty-state:hover {
-    opacity: 1;
-  }
-  
-  .page-item.active .page-link {
-    background-color: #0d6efd;
-    border-color: #0d6efd;
-  }
-  
-  .btn-rounded {
-    border-radius: 50px;
-  }
-  
-  .form-control.ps-5 {
-    padding-left: 2.5rem !important;
-  }
+}

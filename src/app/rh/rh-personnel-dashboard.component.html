@@ -1,0 +1,225 @@
+<div class="container-fluid rh-personnel-dashboard">
+
+  <app-titredepage
+    title="Mon espace RH"
+    [items]="[{label:'RH'}, {label:'Mon tableau de bord', active:true}]">
+  </app-titredepage>
+
+  <!-- States -->
+  <div *ngIf="loading" class="alert alert-info mb-3">Chargement…</div>
+  <div *ngIf="!loading && errorMsg" class="alert alert-danger mb-3">{{ errorMsg }}</div>
+
+  <!-- ====== KPI PERSONNEL ====== -->
+  <div class="row g-3 kpi-row" *ngIf="!loading && !errorMsg">
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card kpi-card kpi-modern kpi-primary h-100">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div class="kpi-text">
+            <div class="kpi-label">Contrat actif</div>
+            <div class="kpi-value">
+              {{ persoKpi.contratActif ? 'Oui' : 'Non' }}
+            </div>
+            <div class="kpi-caption" *ngIf="persoKpi.contratActif">
+              Vous êtes actuellement en poste
+            </div>
+            <div class="kpi-caption text-danger" *ngIf="!persoKpi.contratActif">
+              Aucun contrat actif détecté
+            </div>
+          </div>
+          <div class="kpi-icon-wrapper">
+            <div class="kpi-icon">
+              <i class="bx bx-id-card"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card kpi-card kpi-modern kpi-warning h-100">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div class="kpi-text">
+            <div class="kpi-label">Solde de congés</div>
+            <div class="kpi-value">
+              {{ persoKpi.soldeConges }} <span class="kpi-unit">j</span>
+            </div>
+            <div class="kpi-caption">
+              Jours restants sur votre solde
+            </div>
+          </div>
+          <div class="kpi-icon-wrapper">
+            <div class="kpi-icon">
+              <i class="bx bx-sun"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card kpi-card kpi-modern kpi-info h-100">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div class="kpi-text">
+            <div class="kpi-label">Présences (mois)</div>
+            <div class="kpi-value">
+              {{ persoKpi.presencesMois }}
+            </div>
+            <div class="kpi-caption">
+              Jours enregistrés ce mois
+            </div>
+          </div>
+          <div class="kpi-icon-wrapper">
+            <div class="kpi-icon">
+              <i class="bx bx-calendar-check"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="card kpi-card kpi-modern kpi-danger h-100">
+        <div class="card-body d-flex align-items-center justify-content-between">
+          <div class="kpi-text">
+            <div class="kpi-label">Missions en cours</div>
+            <div class="kpi-value">
+              {{ persoKpi.missionsEnCours }}
+            </div>
+            <div class="kpi-caption">
+              Missions actives ou planifiées
+            </div>
+          </div>
+          <div class="kpi-icon-wrapper">
+            <div class="kpi-icon">
+              <i class="bx bxs-plane-take-off"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions rapides -->
+  <div class="row g-3 mt-1" *ngIf="!loading && !errorMsg">
+    <div class="col-12">
+      <div class="quick-actions d-flex flex-wrap gap-2">
+        <a routerLink="/rh/mes-presences" class="btn btn-outline-primary action-chip">
+          <i class="bx bx-time me-1"></i> Mes présences
+        </a>
+        <a routerLink="/rh/mes-conges" class="btn btn-outline-warning action-chip">
+          <i class="bx bx-sun me-1"></i> Mes congés
+        </a>
+        <a routerLink="/rh/mes-missions" class="btn btn-outline-info action-chip">
+          <i class="bx bxs-plane-alt me-1"></i> Mes missions
+        </a>
+        <a routerLink="/rh/mes-contrats" class="btn btn-outline-secondary action-chip">
+          <i class="bx bx-file me-1"></i> Mon contrat
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== ROW 1 : Présence + Absence ====== -->
+  <div class="row g-3 mt-1" *ngIf="!loading && !errorMsg">
+    <div class="col-12 col-lg-8">
+      <div class="card chart-card glassy">
+        <div class="card-header chart-header">
+          <div>
+            <h6 class="card-title mb-0">Présences — 6 derniers mois</h6>
+            <small class="text-muted d-none d-sm-inline">
+              Visualisation de vos présences enregistrées
+            </small>
+          </div>
+        </div>
+        <div class="card-body">
+          <apx-chart
+            [series]="presenceArea.series"
+            [chart]="presenceArea.chart"
+            [xaxis]="presenceArea.xaxis"
+            [dataLabels]="presenceArea.dataLabels"
+            [stroke]="presenceArea.stroke"
+            [fill]="presenceArea.fill"
+            [grid]="presenceArea.grid"
+            [legend]="presenceArea.legend"
+            [tooltip]="presenceArea.tooltip">
+          </apx-chart>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-4">
+      <div class="card chart-card glassy">
+        <div class="card-header chart-header">
+          <div>
+            <h6 class="card-title mb-0">Taux d’absence (mois)</h6>
+            <small class="text-muted d-none d-sm-inline">
+              Pourcentage d’absence sur le mois en cours
+            </small>
+          </div>
+        </div>
+        <div class="card-body">
+          <apx-chart
+            [series]="absenceRadial.series"
+            [chart]="absenceRadial.chart"
+            [labels]="absenceRadial.labels"
+            [plotOptions]="absenceRadial.plotOptions"
+            [fill]="absenceRadial.fill"
+            [tooltip]="absenceRadial.tooltip">
+          </apx-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== ROW 2 : Missions vs Congés + Répartition congés ====== -->
+  <div class="row g-3 mt-1" *ngIf="!loading && !errorMsg">
+    <div class="col-12 col-lg-6">
+      <div class="card chart-card glassy">
+        <div class="card-header chart-header">
+          <div>
+            <h6 class="card-title mb-0">Missions vs Congés — 6 derniers mois</h6>
+            <small class="text-muted d-none d-sm-inline">
+              Comparaison de vos missions et congés
+            </small>
+          </div>
+        </div>
+        <div class="card-body">
+          <apx-chart
+            [series]="missionsCongesBar.series"
+            [chart]="missionsCongesBar.chart"
+            [xaxis]="missionsCongesBar.xaxis"
+            [yaxis]="missionsCongesBar.yaxis"
+            [plotOptions]="missionsCongesBar.plotOptions"
+            [dataLabels]="missionsCongesBar.dataLabels"
+            [grid]="missionsCongesBar.grid"
+            [tooltip]="missionsCongesBar.tooltip"
+            [legend]="missionsCongesBar.legend">
+          </apx-chart>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-12 col-lg-6">
+      <div class="card chart-card glassy">
+        <div class="card-header chart-header">
+          <div>
+            <h6 class="card-title mb-0">Répartition des types de congés</h6>
+            <small class="text-muted d-none d-sm-inline">
+              Vue globale sur vos différents types de congés
+            </small>
+          </div>
+        </div>
+        <div class="card-body">
+          <apx-chart
+            [series]="departmentsDonut.series"
+            [chart]="departmentsDonut.chart"
+            [labels]="departmentsDonut.labels"
+            [legend]="departmentsDonut.legend"
+            [responsive]="departmentsDonut.responsive"
+            [tooltip]="departmentsDonut.tooltip">
+          </apx-chart>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

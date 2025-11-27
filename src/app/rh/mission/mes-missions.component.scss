@@ -1,0 +1,19 @@
+.table-missions thead {
+  background: linear-gradient(90deg, #0d6efd, #6610f2);
+  color: #fff;
+}
+
+.table-missions tbody tr.row-hover:hover {
+  background-color: #f5f7ff;
+}
+
+.table-missions .maxw-260 {
+  max-width: 260px;
+}
+
+.mission-status-badge {
+  border-radius: 999px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}

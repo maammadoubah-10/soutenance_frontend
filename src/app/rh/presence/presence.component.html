@@ -32,10 +32,30 @@
         </div>
 
         <div class="ms-auto d-flex gap-2">
-          <button class="btn btn-outline-primary btn-sm" (click)="validerSelection()" [disabled]="!selectedIds.size">Valider sélection</button>
-          <button class="btn btn-outline-secondary btn-sm" (click)="invaliderSelection()" [disabled]="!selectedIds.size">Invalider sélection</button>
-          <button class="btn btn-primary btn-sm" (click)="openModal(formTpl)">Ajouter une présence</button>
-        </div>
+  <button class="btn btn-outline-primary btn-sm"
+          (click)="validerSelection()"
+          [disabled]="!selectedIds.size">
+    Valider sélection
+  </button>
+
+  <button class="btn btn-outline-secondary btn-sm"
+          (click)="invaliderSelection()"
+          [disabled]="!selectedIds.size">
+    Invalider sélection
+  </button>
+
+  <!-- 🔹 Nouveau : génération auto pour un mois -->
+<button class="btn btn-outline-success btn-sm"
+        (click)="openGenModal()">
+  Générer les feuilles du mois
+</button>
+
+
+  <!-- ancien bouton de création manuelle (tu peux le garder) -->
+  <button class="btn btn-primary btn-sm" (click)="openModal()">Ajouter une présence</button>
+
+</div>
+
       </div>
 
       <ng-container *ngIf="presences$ | async as resp" [ngSwitch]="resp.dataState">
@@ -80,7 +100,7 @@
               </td>
               <td>{{ p?.dateValidation | date:'dd/MM/yyyy' }}</td>
               <td>
-                <button class="btn btn-sm btn-info me-2" (click)="openModal(formTpl, p)">Modifier/Valider</button>
+<button class="btn btn-sm btn-info me-2" (click)="openModal(p)">Modifier/Valider</button>
                 <button class="btn btn-sm btn-outline-success me-2" (click)="valider(p)">Valider</button>
                 <button class="btn btn-sm btn-outline-danger" (click)="invalider(p)">Invalider</button>
               </td>
@@ -111,22 +131,77 @@
 </div>
 
 <!-- Modal formulaire -->
-<ng-template #formTpl let-modal>
+<!-- Modal génération mensuelle -->
+<ng-template #genTpl let-modal>
   <div class="modal-header">
-    <h5 class="modal-title">{{ form.get('id')?.value ? 'Modifier / Valider' : 'Ajouter' }} une présence</h5>
+    <h5 class="modal-title">Générer les feuilles de présence</h5>
     <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
   </div>
   <div class="modal-body">
+    <form [formGroup]="genForm" (ngSubmit)="submitGeneration(modal)">
+      <div class="row">
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Mois</label>
+          <select class="form-select" formControlName="mois"
+                  [ngClass]="{'is-invalid': genForm.get('mois')?.invalid && genForm.get('mois')?.touched}">
+            <option [ngValue]="null">-- Sélectionner un mois --</option>
+            <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [ngValue]="m">
+              {{ m }}
+            </option>
+          </select>
+          <div class="text-danger" *ngIf="genForm.get('mois')?.invalid && genForm.get('mois')?.touched">
+            Le mois est obligatoire
+          </div>
+        </div>
+
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Année</label>
+          <input type="number"
+                 class="form-control"
+                 formControlName="annee"
+                 [min]="2000" [max]="2100">
+          <div class="text-danger" *ngIf="genForm.get('annee')?.invalid && genForm.get('annee')?.touched">
+            L'année est obligatoire
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-warning small">
+        Cette opération va créer une feuille de présence <strong>pour chaque personnel</strong>
+        n’ayant pas encore de ligne pour le mois/année choisi.<br>
+        Les présences déjà existantes ne seront pas modifiées.
+      </div>
+
+      <div class="text-end">
+        <button type="button" class="btn btn-secondary me-2" (click)="modal.dismiss()">Annuler</button>
+        <button class="btn btn-success" type="submit" [disabled]="genForm.invalid">
+          Générer
+        </button>
+      </div>
+    </form>
+  </div>
+</ng-template>
+<!-- Modal formulaire création / édition -->
+<ng-template #formTpl let-modal>
+  <div class="modal-header">
+    <h5 class="modal-title">
+      {{ form.get('id')?.value ? 'Modifier / Valider' : 'Ajouter' }} une présence
+    </h5>
+    <button type="button" class="btn-close" (click)="modal.dismiss()"></button>
+  </div>
+
+  <div class="modal-body">
     <form [formGroup]="form" (ngSubmit)="submit()">
       <div class="row">
+        <!-- Personnel & Mois seulement en création -->
         <div class="col-md-6 mb-3" *ngIf="!form.get('id')?.value">
           <label>Personnel</label>
           <select class="form-select" formControlName="personnelId"
                   [ngClass]="{'is-invalid': form.get('personnelId')?.invalid && form.get('personnelId')?.touched}">
             <option [ngValue]="null">-- Sélectionner --</option>
-<option *ngFor="let p of listePersonnel; trackBy: trackById" [ngValue]="p.id">
-  {{ buildDisplayNamePersonnel(p) }}
-</option>
+            <option *ngFor="let p of listePersonnel; trackBy: trackById" [ngValue]="p.id">
+              {{ buildDisplayNamePersonnel(p) }}
+            </option>
           </select>
           <div class="text-danger" *ngIf="form.get('personnelId')?.invalid && form.get('personnelId')?.touched">
             Le personnel est obligatoire
@@ -138,7 +213,9 @@
           <select class="form-select" formControlName="mois"
                   [ngClass]="{'is-invalid': form.get('mois')?.invalid && form.get('mois')?.touched}">
             <option [ngValue]="null">-- Mois --</option>
-            <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [ngValue]="m">{{ m }}</option>
+            <option *ngFor="let m of [1,2,3,4,5,6,7,8,9,10,11,12]" [ngValue]="m">
+              {{ m }}
+            </option>
           </select>
           <div class="text-danger" *ngIf="form.get('mois')?.invalid && form.get('mois')?.touched">
             Le mois est obligatoire
@@ -160,3 +237,5 @@
     </form>
   </div>
 </ng-template>
+
+

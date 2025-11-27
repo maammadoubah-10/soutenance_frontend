@@ -63,6 +63,26 @@ export class EntetedepageComponent implements OnInit, OnDestroy {
   ];
 
   openMobileMenu = false;
+  // 👇 AJOUTER dans la classe EntetedepageComponent
+// 👇 À mettre DANS la classe EntetedepageComponent
+private buildProfilSrcFromUtilisateur(user: UtilisateurAuthentifie): SafeUrl | null {
+  const email = (user?.email || '').toLowerCase();
+
+  // 👑 Admin
+  if (email === 'contact@isi.com') {
+    return this.sanitizer.bypassSecurityTrustUrl('assets/avatars/admin.png');
+  }
+
+  // 🛠 Compte système (si tu as une image dédiée)
+  if (email === 'system@isi.com') {
+    return this.sanitizer.bypassSecurityTrustUrl('assets/avatars/system.png');
+  }
+
+  // 👤 Tous les autres utilisateurs
+  return this.sanitizer.bypassSecurityTrustUrl('assets/avatars/user.png');
+}
+
+
 
   @Output() settingsButtonClicked = new EventEmitter();
   @Output() mobileMenuButtonClicked = new EventEmitter();
@@ -302,7 +322,7 @@ export class EntetedepageComponent implements OnInit, OnDestroy {
       .pipe(
         map((data) => {
           this.utilisateurAuthentifie = data;
-
+         this.profilSrc = this.buildProfilSrcFromUtilisateur(data);
           const pid =
             data?.personnelId ??
             data?.personnel?.rhPersonnel ??
@@ -358,6 +378,8 @@ export class EntetedepageComponent implements OnInit, OnDestroy {
     this.webSocketService.disconnect();
     this.authenficationSerice.deconnexion();
   }
+
+  
 
   fullscreen(): void {
     document.body.classList.toggle('fullscreen-enable');

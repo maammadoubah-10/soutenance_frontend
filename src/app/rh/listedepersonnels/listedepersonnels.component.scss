@@ -1,149 +1,182 @@
-
-.main{
-  background-image: url('../../../assets/Groupe 786.png'); /* remplacer image.jpg par l'URL de votre image de fond */
+.main {
+  background-image: url('../../../assets/Groupe 786.png');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  min-height: 100vh;
+  padding-bottom: 24px;
 }
 
+/* Bouton bleu foncé */
 .btn-darkblue {
-  background-color: #0d47a1; /* Bleu foncé */
+  background-color: #0d47a1;
   color: white;
   border: none;
+  border-radius: 0.25rem;  /* même style que .btn Bootstrap */
+  padding: 0.45rem 0.75rem;
 }
 
 .btn-darkblue:hover {
-  background-color: #08306b; /* Encore plus foncé au survol */
+  background-color: #08306b;
 }
 
 
+/* GRID RESPONSIVE */
+.personnel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+}
 
-/* Styles pour les cartes de personnel */
+/* CARTE MINIMALISTE */
 .personnel-card {
-  transition: all 0.3s ease;
-  border: 1px solid #e9ecef;
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
-  margin-bottom: 1.5rem;
-  border-radius: 8px;
-  overflow: hidden;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 14px 16px 16px;
+  box-shadow:
+    0 10px 30px rgba(15, 23, 42, 0.06),
+    0 2px 10px rgba(15, 23, 42, 0.03);
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
 .personnel-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+  border-color: #2563eb;
+  box-shadow:
+    0 18px 45px rgba(37, 99, 235, 0.18),
+    0 3px 14px rgba(15, 23, 42, 0.06);
 }
 
-.personnel-card .card-body {
-  padding: 1.5rem;
+/* Ligne du haut : STATUT */
+.personnel-status {
   display: flex;
-  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.avatar-photo {
+  width: 48px;
+  height: 48px;
+  border-radius: 999px;
+  overflow: hidden;
+  border: 2px solid #1e40af10;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+  flex-shrink: 0;
+}
+
+.avatar-photo img {
+  width: 100%;
   height: 100%;
+  object-fit: cover;
 }
 
-.personnel-card .avatar-md {
-  width: 70px;
-  height: 70px;
-  margin: 0 auto 1rem;
+
+/* Chips de statut */
+.status-chip {
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
-.personnel-card .avatar-title {
+.status-actif {
+  background: rgba(34, 197, 94, 0.08);
+  color: #16a34a;
+}
+
+.status-sorti {
+  background: rgba(250, 204, 21, 0.12);
+  color: #d97706;
+}
+
+.status-retraite {
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+}
+
+/* Ligne principale : avatar + nom + actions */
+.personnel-main {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* AVATAR INITIAL */
+.avatar-circle {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 20% 0%, #e0ecff 0, #1e40af 55%);
+  color: #ffffff;
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 700;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+/* NOM / PRENOM */
+.personnel-info {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.personnel-name {
+  font-size: 15px;
   font-weight: 600;
-  font-size: 1.25rem;
-  background-color: rgba(2, 13, 68, 0.1);
-  // color: #04045f !important;
+  color: #0f172a;
+  margin: 0;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
 }
 
-.personnel-card h5 {
-  font-weight: 600;
-  color: #343a40;
-  margin-bottom: 0.5rem;
-}
-
-.personnel-card h4 {
-  color: #6c757d;
-  font-weight: 500;
-  margin-bottom: 0.5rem;
-}
-
-/* Badges d'état */
-.badge-soft-success {
-  background-color: rgba(52, 195, 143, 0.15);
-  color: #34c38f;
-}
-
-.badge-soft-warning {
-  background-color: rgba(241, 180, 76, 0.15);
-  color: #f1b44c;
-}
-
-.badge-soft-danger {
-  background-color: rgba(244, 106, 106, 0.15);
-  color: #f46a6a;
-}
-
-.badge-soft-secondary {
-  background-color: rgba(116, 120, 141, 0.15);
-  color: #74788d;
-}
-
-/* Actions en bas de carte */
-.personnel-card-actions {
-  margin-top: auto;
+/* ACTIONS À DROITE */
+.personnel-actions {
   display: flex;
-  justify-content: space-between;
-  gap: 0.5rem;
-  padding-top: 1rem;
-  border-top: 1px solid #f6f6f6;
+  flex-shrink: 0;
+  gap: 6px;
 }
 
-.view-profile-btn {
-  flex: 2;
-  background-color: #556ee6;
-  border-color: #556ee6;
-  color: white;
-  border-radius: 6px;
-  font-weight: 500;
-  transition: all 0.2s ease;
+/* Bouton profil */
+.personnel-actions .btn-outline-primary {
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 12px;
+  white-space: nowrap;
 }
 
-.view-profile-btn:hover {
-  background-color: #485ec4;
-  border-color: #485ec4;
-  color: white;
-  transform: translateY(-2px);
+/* Icône supprimer */
+.btn-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
 }
 
-.delete-btn {
-  flex: 1;
-  border-radius: 6px;
-  font-weight: 500;
-  transition: all 0.2s ease;
+/* Filtres / barre de recherche */
+.job-filter .form-control {
+  border-radius: 999px;
+  border: 1px solid #e2e8f0;
+  padding: 0.55rem 1rem;
+  font-size: 14px;
 }
 
-.delete-btn:hover {
-  background-color: #f46a6a;
-  color: white;
-  transform: translateY(-2px);
+.job-filter .form-control:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 0.12rem rgba(37, 99, 235, 0.18);
 }
 
-/* Responsive adjustments */
-@media (max-width: 1199.98px) {
-  .personnel-card-actions {
-    flex-direction: column;
-  }
-}
-
-@media (max-width: 767.98px) {
-  .personnel-card {
-    margin-bottom: 1rem;
-  }
-  
-  .personnel-card-actions {
-    flex-direction: row;
-  }
-}
-
-/* Pagination améliorée */
+/* Pagination améliorée (conserve le thème bleu) */
 .btn-primary {
   background-color: #556ee6;
   border-color: #556ee6;
@@ -175,14 +208,15 @@
   color: #f46a6a;
 }
 
-/* Barre de recherche */
-.form-control {
-  border-radius: 6px;
-  border: 1px solid #e9ecef;
-  padding: 0.75rem 1rem;
-}
+/* Responsive */
+@media (max-width: 576px) {
+  .personnel-main {
+    align-items: flex-start;
+    flex-direction: column;
+  }
 
-.form-control:focus {
-  border-color: #556ee6;
-  box-shadow: 0 0 0 0.15rem rgba(85, 110, 230, 0.25);
+  .personnel-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
 }

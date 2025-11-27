@@ -4,339 +4,378 @@
   </div>
 
   <ng-container *ngIf="contrats | async as response" [ngSwitch]="response.dataState">
+
+    <!-- ÉTAT CHARGEMENT -->
     <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
       <div class="alert alert-info" role="alert">
-        {{ dataStateEnum.CHARGEMENT }}
+        Chargement des contrats…
       </div>
     </ng-container>
 
+    <!-- ÉTAT ERREUR -->
     <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
-      <div class="alert alert-danger" role="alert">Erreur:</div>
+      <div class="alert alert-danger" role="alert">
+        Une erreur est survenue lors du chargement des contrats.
+      </div>
     </ng-container>
 
+    <!-- ÉTAT CHARGÉ -->
     <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
-      <div class="d-flex">
-        <button class="btn-darkblue ms-auto mb-3" (click)="openModal(content)">Nouveau Contrat</button>
-      </div>
 
-      <div class="row">
-        <div class="col-md-6 col-xl-8">
-          <form class="app-search">
-            <div class="position-relative">
+      <!-- Barre outils / filtres -->
+      <div class="card mb-3">
+        <div class="card-body d-flex flex-wrap gap-3 align-items-center">
+
+          <!-- Recherche -->
+          <div class="flex-grow-1">
+            <label class="form-label mb-1">Rechercher</label>
+            <div class="input-group input-group-sm">
+              <span class="input-group-text">
+                <i class="bx bx-search-alt"></i>
+              </span>
               <input
                 type="text"
                 class="form-control"
-                placeholder="Tapez le nom du personnel"
+                placeholder="Nom du personnel ou nature du contrat…"
                 [(ngModel)]="designationPersonnel"
-                (keyup)="onPageChange(currentPage)"
-                name="searchValue"
-              />
-              <span class="bx bx-search-alt"></span>
+                name="searchValue" />
             </div>
-          </form>
+            <div class="small text-muted mt-1">
+              Affichage de {{ filteredContrats.length }} contrat(s) sur {{ totalInsertions }}
+            </div>
+          </div>
+
+          <!-- Filtre statut -->
+          <div class="flex-shrink-0">
+            <label class="form-label mb-1">Statut</label>
+            <select class="form-select form-select-sm" [(ngModel)]="filterStatut">
+              <option value="tous">Tous les statuts</option>
+              <option value="actifs">Actifs</option>
+              <option value="avenir">À venir</option>
+              <option value="expires">Expirés</option>
+            </select>
+          </div>
+
+          <!-- Bouton nouveau contrat -->
+          <div class="ms-auto">
+            <label class="form-label mb-1 d-block">&nbsp;</label>
+            <button class="btn btn-primary btn-sm" (click)="openModal(content)">
+              <i class="mdi mdi-plus me-1"></i> Nouveau contrat
+            </button>
+          </div>
         </div>
       </div>
 
-      <div class="container">
-        <div class="row">
-          <div class="content-body col-md-6" *ngFor="let contrat of listeContrat ?? []">
-            <div class="card project-card border">
-              <div class="card-body">
-                <div class="d-flex mb-4 align-items-start">
-                  <div class="dz-media mr-3">
-                    <img src="assets/images/pic1.jpg" class="img-fluid" alt="" />
+      <!-- Liste des contrats -->
+      <div class="row">
+        <div
+          class="col-md-6 col-xl-4 mb-3"
+          *ngFor="let contrat of filteredContrats">
+
+          <div class="card h-100 shadow-sm border-0">
+            <div class="card-body d-flex flex-column">
+
+              <!-- Header carte -->
+              <div class="d-flex justify-content-between align-items-start mb-2">
+                <div>
+                  <div class="small text-muted">Nature du contrat</div>
+                  <h5 class="mb-1 text-primary text-wrap">
+                    {{ contrat.natureContrat || 'Contrat' }}
+                  </h5>
+                  <span
+                    class="badge"
+                    [ngClass]="statusBadgeClass(contrat)">
+                    {{ statusLabel(contrat) }}
+                  </span>
+                </div>
+
+                <div class="d-flex flex-column align-items-end gap-1">
+                  <!-- Lien détail -->
+                  <a
+                    class="btn btn-sm btn-link p-0"
+                    [routerLink]="['details/', encodeId(contrat.id)]"
+                    ngbTooltip="Voir le détail">
+                    <i class="bx bx-detail"></i>
+                  </a>
+
+                  <!-- Télécharger -->
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-light"
+                    (click)="telechargerContrat(contrat)"
+                    ngbTooltip="Télécharger le contrat">
+                    <i class="mdi mdi-download"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Infos dates -->
+              <div class="row mb-3">
+                <div class="col-6 d-flex">
+                  <div class="me-2">
+                    <i class="bx bx-calendar-event text-primary"></i>
                   </div>
-                  <div style="text-align: justify; margin-left: 20px">
-                    <a [routerLink]="['details/', encodeId(contrat.id)]">
-                      <p class="text-primary mb-1">{{ contrat.natureContrat }}</p>
-                    </a>
-                    <h5 class="title font-w600 mb-2">
-                      <a class="text-black"></a>{{ contrat.natureContrat }}
-                    </h5>
-                    <span>
-                      {{
-                        (contrat?.natureContrat ?? '').length <= 30
-                          ? (contrat?.natureContrat ?? '')
-                          : (contrat?.natureContrat ?? '').substring(0, 30) + '...'
-                      }}
-                    </span>
+                  <div>
+                    <div class="small text-muted">Date de début</div>
+                    <div class="fw-semibold">
+                      {{ contrat.dateDebutContrat | date: 'dd MMMM yyyy':'':'fr-FR' }}
+                    </div>
                   </div>
                 </div>
 
-                <div class="row mb-4">
-                  <div class="col-sm-6 mb-sm-0 mb-3 d-flex">
-                    <div class="dt-icon bgl-info mr-3 mx-3">
-                      <!-- icon -->
+                <div class="col-6 d-flex">
+                  <div class="me-2">
+                    <i class="bx bx-calendar-x text-danger"></i>
+                  </div>
+                  <div>
+                    <div class="small text-muted">Date de fin</div>
+                    <div class="fw-semibold">
+                      {{ contrat.dateFinContrat | date: 'dd MMMM yyyy':'':'fr-FR' }}
                     </div>
-                    <div>
-                      <span>Date de début</span>
-                      <p class="mb-0 pt-1 font-w500 text-black">
-                        {{ contrat.dateDebutContrat | date: 'dd MMMM yyyy':'':'fr-FR' }}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div class="col-sm-6 d-flex">
-                    <div class="dt-icon mr-3 bgl-danger">
-                      <!-- icon -->
-                    </div>
-                    <div>
-                      <span>Date de fin</span>
-                      <p class="mb-0 pt-1 font-w500 text-black">
-                        {{ contrat.dateFinContrat | date: 'dd MMMM yyyy':'':'fr-FR' }}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="d-flex flex-wrap align-items-center">
-                  <div class="mr-auto mb-4">
-                    <p class="mb-2 font-w500 text-black">
-                      Personnel:
-                      <a>{{ displayName(contrat?.personnel) }}</a>
-                    </p>
-                  </div>
-                </div>
-
-                <div class="row justify-content-center align-items-center mt-3">
-                  <div class="col-auto">
-                    <button
-                      placement="top"
-                      ngbTooltip="Modifier le contrat"
-                      class="btn btn-info mx-1 btn-sm"
-                      style="font-size: 8px"
-                      (click)="openModal(content, contrat)"
-                    >
-                      <i class="mdi mdi-pencil"></i>
-                    </button>
-                  </div>
-
-                  <div class="col-auto">
-                    <button
-                      placement="top"
-                      ngbTooltip="Supprimer le contrat"
-                      class="btn btn-danger mx-1 btn-sm"
-                      style="font-size: 8px"
-                      (click)="supprimerContrat(contrat.id)"
-                    >
-                      <i class="bx bx-trash-alt"></i>
-                    </button>
-                  </div>
-
-                  <div class="col-auto">
-                    <button
-                      placement="top"
-                      ngbTooltip="Télécharger le contrat"
-                      class="btn btn-secondary mx-1 btn-sm"
-                      style="font-size: 8px"
-                      (click)="telechargerContrat(contrat)"
-                    >
-                      <i class="mdi mdi-download"></i>
-                    </button>
                   </div>
                 </div>
               </div>
+
+              <!-- Personnel + statut temps -->
+              <div class="mb-2">
+                <div class="small text-muted">Personnel</div>
+                <div class="fw-semibold">
+                  {{ displayName(contrat?.personnel) }}
+                </div>
+              </div>
+
+              <div *ngIf="statusHint(contrat)" class="small text-muted mb-3">
+                {{ statusHint(contrat) }}
+              </div>
+
+              <!-- Actions bas de carte -->
+              <div class="mt-auto pt-2 border-top d-flex justify-content-end gap-2">
+                <button
+                  placement="top"
+                  ngbTooltip="Modifier le contrat"
+                  class="btn btn-outline-info btn-sm"
+                  (click)="openModal(content, contrat)">
+                  <i class="mdi mdi-pencil"></i>
+                </button>
+
+                <button
+                  placement="top"
+                  ngbTooltip="Supprimer le contrat"
+                  class="btn btn-outline-danger btn-sm"
+                  (click)="supprimerContrat(contrat.id)">
+                  <i class="bx bx-trash-alt"></i>
+                </button>
+              </div>
             </div>
-          </div> <!-- /ngFor -->
+          </div>
         </div>
       </div>
 
-      <div class="content-body" *ngIf="response.data?.length == 0">
+      <!-- Aucun contrat -->
+      <div class="content-body" *ngIf="filteredContrats.length == 0">
         <div class="container-fluid">
           <div class="row">
             <div class="col-xl-12 col-lg-6 text-center mt-3" style="font-size: xx-large">
-              <i style="color: #d9534f; font-size: 60px" class="bx bxs-data btn btn-lg"></i><br />Aucun Contrat
+              <i style="color: #d9534f; font-size: 60px" class="bx bxs-data btn btn-lg"></i><br />
+              Aucun contrat ne correspond aux filtres
             </div>
           </div>
         </div>
       </div>
     </ng-container>
+
   </ng-container>
 </div>
 
+<!-- MODAL CRÉATION / MODIFICATION -->
 <ng-template #content let-modal>
   <div class="modal-header">
-    <h4>{{ formulaireContrat.get('id')?.value ? 'Modifier' : 'Créer' }} Contrat Personnel</h4>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('Cliquer pour fermer')"></button>
+    <h4 class="modal-title">
+      {{ formulaireContrat.get('id')?.value ? 'Modifier un contrat' : 'Créer un contrat' }}
+    </h4>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('Cliquer pour fermer')">
+    </button>
   </div>
 
   <div class="modal-body">
     <form [formGroup]="formulaireContrat" (ngSubmit)="creerModifierContrat()">
-      <div class="row">
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label for="personnelId">Personnel</label>
-            <select
-              formControlName="personnelId"
-              id="personnelId"
-              class="form-control"
-              [ngClass]="{
-                'is-invalid': formulaireContrat.get('personnelId')?.invalid && formulaireContrat.get('personnelId')?.touched,
-                'is-valid': formulaireContrat.get('personnelId')?.valid && formulaireContrat.get('personnelId')?.touched
-              }"
-            >
-              <option value="">Sélectionnez un personnel</option>
-              <option *ngFor="let personnel of listePersonnel" [value]="personnel.id">
-                {{ personnel._displayName }}
-              </option>
-            </select>
+      <div class="row g-3">
 
-            <div *ngIf="formulaireContrat.get('personnelId')?.invalid && formulaireContrat.get('personnelId')?.touched" class="text-danger">
-              <div *ngIf="formulaireContrat.get('personnelId')?.errors?.['required']">Le Personnel est obligatoire</div>
-            </div>
+        <!-- SECTION : Infos principales -->
+        <div class="col-12">
+          <h6 class="text-uppercase text-muted mb-2">Informations principales</h6>
+        </div>
+
+        <div class="col-md-6">
+          <label for="personnelId" class="form-label">Personnel</label>
+          <select
+            formControlName="personnelId"
+            id="personnelId"
+            class="form-select"
+            [ngClass]="{
+              'is-invalid': formulaireContrat.get('personnelId')?.invalid && formulaireContrat.get('personnelId')?.touched,
+              'is-valid': formulaireContrat.get('personnelId')?.valid && formulaireContrat.get('personnelId')?.touched
+            }">
+            <option value="">Sélectionnez un personnel</option>
+            <option *ngFor="let personnel of listePersonnel" [value]="personnel.id">
+              {{ personnel._displayName }}
+            </option>
+          </select>
+          <div *ngIf="formulaireContrat.get('personnelId')?.invalid && formulaireContrat.get('personnelId')?.touched" class="text-danger small">
+            Le personnel est obligatoire
           </div>
         </div>
 
         <div class="col-md-6">
-          <div class="mb-3">
-            <label>Nature du Contrat</label>
-            <input
-              type="text"
-              class="form-control"
-              formControlName="natureContrat"
-              id="natureContrat"
-              placeholder="Nature du contrat (CDI, CDD, etc.)"
-              [ngClass]="{
-                'is-invalid': formulaireContrat.get('natureContrat')?.invalid && formulaireContrat.get('natureContrat')?.touched,
-                'is-valid': formulaireContrat.get('natureContrat')?.valid && formulaireContrat.get('natureContrat')?.touched
-              }"
-            />
-            <div *ngIf="formulaireContrat.get('natureContrat')?.invalid && formulaireContrat.get('natureContrat')?.touched" class="text-danger">
-              <div *ngIf="formulaireContrat.get('natureContrat')?.errors?.['required']">La nature du contrat est obligatoire</div>
-            </div>
+          <label class="form-label" for="natureContrat">Nature du contrat</label>
+          <input
+            type="text"
+            class="form-control"
+            formControlName="natureContrat"
+            id="natureContrat"
+            placeholder="CDI, CDD, Stage…"
+            [ngClass]="{
+              'is-invalid': formulaireContrat.get('natureContrat')?.invalid && formulaireContrat.get('natureContrat')?.touched,
+              'is-valid': formulaireContrat.get('natureContrat')?.valid && formulaireContrat.get('natureContrat')?.touched
+            }">
+          <div *ngIf="formulaireContrat.get('natureContrat')?.invalid && formulaireContrat.get('natureContrat')?.touched" class="text-danger small">
+            La nature du contrat est obligatoire
           </div>
         </div>
+
+        <!-- SECTION : Période contrat -->
+        <div class="col-12 mt-2">
+          <h6 class="text-uppercase text-muted mb-2">Période du contrat</h6>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" for="dateDebutContrat">Date de début</label>
+          <input
+            type="date"
+            class="form-control"
+            formControlName="dateDebutContrat"
+            id="dateDebutContrat"
+            [ngClass]="{
+              'is-invalid': formulaireContrat.get('dateDebutContrat')?.invalid && formulaireContrat.get('dateDebutContrat')?.touched,
+              'is-valid': formulaireContrat.get('dateDebutContrat')?.valid && formulaireContrat.get('dateDebutContrat')?.touched
+            }">
+          <div *ngIf="formulaireContrat.get('dateDebutContrat')?.invalid && formulaireContrat.get('dateDebutContrat')?.touched" class="text-danger small">
+            La date de début est obligatoire
+          </div>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" for="dateFinContrat">Date de fin</label>
+          <input
+            type="date"
+            class="form-control"
+            formControlName="dateFinContrat"
+            id="dateFinContrat"
+            [ngClass]="{
+              'is-invalid': formulaireContrat.get('dateFinContrat')?.invalid && formulaireContrat.get('dateFinContrat')?.touched,
+              'is-valid': formulaireContrat.get('dateFinContrat')?.valid && formulaireContrat.get('dateFinContrat')?.touched
+            }">
+          <div *ngIf="formulaireContrat.get('dateFinContrat')?.invalid && formulaireContrat.get('dateFinContrat')?.touched" class="text-danger small">
+            La date de fin est obligatoire
+          </div>
+        </div>
+
+        <!-- SECTION : Période d'essai -->
+        <div class="col-12 mt-2">
+          <h6 class="text-uppercase text-muted mb-2">Période d'essai</h6>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" for="dateDebutEssaie">Début d'essai</label>
+          <input type="date" class="form-control" formControlName="dateDebutEssaie" id="dateDebutEssaie">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" for="dateFinEssaie">Fin d'essai</label>
+          <input type="date" class="form-control" formControlName="dateFinEssaie" id="dateFinEssaie">
+        </div>
+
+        <!-- SECTION : Ancienneté / Emploi -->
+        <div class="col-12 mt-2">
+          <h6 class="text-uppercase text-muted mb-2">Embauche & ancienneté</h6>
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" for="dateEmbauche">Date d'embauche</label>
+          <input type="date" class="form-control" formControlName="dateEmbauche" id="dateEmbauche">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" for="dateAncienneteEntreprise">Ancienneté entreprise</label>
+          <input type="date" class="form-control" formControlName="dateAncienneteEntreprise" id="dateAncienneteEntreprise">
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label" for="dateAncienneteProfession">Ancienneté profession</label>
+          <input type="date" class="form-control" formControlName="dateAncienneteProfession" id="dateAncienneteProfession">
+        </div>
+
+        <!-- SECTION : Années / droits (optionnel) -->
+        <div class="col-12 mt-2">
+          <h6 class="text-uppercase text-muted mb-2">Données annuelles (optionnel)</h6>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label" for="anneeEncours">Année en cours</label>
+          <input type="number" class="form-control" formControlName="anneeEncours" id="anneeEncours" placeholder="">
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label" for="anneePassee">Année passée</label>
+          <input type="number" class="form-control" formControlName="anneePassee" id="anneePassee" placeholder="">
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label" for="anneeSurpassee">Année surpassée</label>
+          <input type="number" class="form-control" formControlName="anneeSurpassee" id="anneeSurpassee" placeholder="">
+        </div>
+
+        <!-- SECTION : Motif départ -->
+        <div class="col-12 mt-2">
+          <h6 class="text-uppercase text-muted mb-2">Motif de départ (si applicable)</h6>
+        </div>
+
+        <div class="col-12">
+          <textarea
+            rows="3"
+            class="form-control"
+            formControlName="motifDepart"
+            id="motifDepart"
+            placeholder="Motif de départ le cas échéant…">
+          </textarea>
+        </div>
+
+        <!-- Fichier contrat -->
+        <div class="col-12 mt-2">
+          <h6 class="text-uppercase text-muted mb-2">Fichier du contrat</h6>
+          <input
+            type="file"
+            class="form-control"
+            (change)="uploaderFicher($event)"
+            id="pieces"
+            name="pieces" />
+          <div class="form-text">
+            Format recommandé : PDF
+          </div>
+        </div>
+
       </div>
 
-      <!-- Dates principales -->
-      <div class="row">
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label>Date de Début Contrat</label>
-            <input
-              type="date"
-              class="form-control"
-              formControlName="dateDebutContrat"
-              id="dateDebutContrat"
-              [ngClass]="{
-                'is-invalid': formulaireContrat.get('dateDebutContrat')?.invalid && formulaireContrat.get('dateDebutContrat')?.touched,
-                'is-valid': formulaireContrat.get('dateDebutContrat')?.valid && formulaireContrat.get('dateDebutContrat')?.touched
-              }"
-            />
-            <div *ngIf="formulaireContrat.get('dateDebutContrat')?.invalid && formulaireContrat.get('dateDebutContrat')?.touched" class="text-danger">
-              <div *ngIf="formulaireContrat.get('dateDebutContrat')?.errors?.['required']">La date de début est obligatoire</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label>Date de Fin Contrat</label>
-            <input
-              type="date"
-              class="form-control"
-              formControlName="dateFinContrat"
-              id="dateFinContrat"
-              [ngClass]="{
-                'is-invalid': formulaireContrat.get('dateFinContrat')?.invalid && formulaireContrat.get('dateFinContrat')?.touched,
-                'is-valid': formulaireContrat.get('dateFinContrat')?.valid && formulaireContrat.get('dateFinContrat')?.touched
-              }"
-            />
-            <div *ngIf="formulaireContrat.get('dateFinContrat')?.invalid && formulaireContrat.get('dateFinContrat')?.touched" class="text-danger">
-              <div *ngIf="formulaireContrat.get('dateFinContrat')?.errors?.['required']">La date de fin est obligatoire</div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Essai -->
-      <div class="row">
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label>Date de Début Essai</label>
-            <input type="date" class="form-control" formControlName="dateDebutEssaie" id="dateDebutEssaie" />
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label>Date de Fin Essai</label>
-            <input type="date" class="form-control" formControlName="dateFinEssaie" id="dateFinEssaie" />
-          </div>
-        </div>
-      </div>
-
-      <!-- Embauche / Anciennetés -->
-      <div class="row">
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label>Date d'Embauche</label>
-            <input type="date" class="form-control" formControlName="dateEmbauche" id="dateEmbauche" />
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label>Ancienneté Entreprise</label>
-            <input type="date" class="form-control" formControlName="dateAncienneteEntreprise" id="dateAncienneteEntreprise" />
-          </div>
-        </div>
-      </div>
-
-      <div class="row">
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label>Ancienneté Profession</label>
-            <input type="date" class="form-control" formControlName="dateAncienneteProfession" id="dateAncienneteProfession" />
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label>Année en Cours</label>
-            <input type="number" class="form-control" formControlName="anneeEncours" id="anneeEncours" placeholder="Nombre de jours" />
-          </div>
-        </div>
-      </div>
-
-      <!-- Années -->
-      <div class="row">
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label>Année Passée</label>
-            <input type="number" class="form-control" formControlName="anneePassee" id="anneePassee" placeholder="Nombre de jours" />
-          </div>
-        </div>
-        <div class="col-md-6">
-          <div class="mb-3">
-            <label>Année Surpassée</label>
-            <input type="number" class="form-control" formControlName="anneeSurpassee" id="anneeSurpassee" placeholder="Nombre de jours" />
-          </div>
-        </div>
-      </div>
-
-      <!-- Motif -->
-      <div class="row">
-        <div class="col-md-12">
-          <div class="mb-3">
-            <label>Motif de Départ</label>
-            <textarea
-              rows="3"
-              class="form-control"
-              formControlName="motifDepart"
-              id="motifDepart"
-              placeholder="Motif de départ (le cas échéant)"
-            ></textarea>
-          </div>
-        </div>
-      </div>
-
-      <!-- Fichier -->
-      <div class="form-group mb-2">
-        <label for="pieces">Fichier du contrat</label>
-        <input type="file" class="form-control" (change)="uploaderFicher($event)" id="pieces" name="pieces" />
-      </div>
-
-      <div class="modal-footer">
+      <div class="modal-footer mt-3">
+        <button type="button" class="btn btn-outline-secondary" (click)="modal.dismiss()">
+          Annuler
+        </button>
         <button class="btn btn-primary" [disabled]="formulaireContrat.invalid" type="submit">
-          {{ formulaireContrat.get('id')?.value ? 'Modifier' : 'Créer' }}
+          {{ formulaireContrat.get('id')?.value ? 'Enregistrer les modifications' : 'Créer le contrat' }}
         </button>
       </div>
     </form>

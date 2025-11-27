@@ -27,7 +27,7 @@ export class MenuComponent implements OnInit, AfterViewInit, OnChanges {
 
   @Input() isCondensed = false;
 
-  menu: any;
+  menu: any;              // instance MetisMenu
   data: any;
   menuItems: MenuItem[] = [];
 
@@ -46,46 +46,51 @@ export class MenuComponent implements OnInit, AfterViewInit, OnChanges {
     });
   }
 
-  // ✅ REQUIRED by OnInit
   ngOnInit(): void {
-    this.initialize();      // initialise le menu
-    this._scrollElement();  // conserve ton comportement existant
+    this.initialize();      // construit le menu une première fois
+    this._scrollElement();
   }
 
   ngAfterViewInit(): void {
+    // Une seule initialisation de MetisMenu ici
+    this.initMetisMenu();
+  }
+
+  ngOnChanges(): void {
+    // Quand le mode condensed change, on re-init proprement MetisMenu
     if (this.sideMenu?.nativeElement) {
-      this.menu = new MetisMenu(this.sideMenu.nativeElement);
-      this._activateMenuDropdown();
+      setTimeout(() => this.initMetisMenu(), 0);
+    } else if (this.menu) {
+      this.menu.dispose();
+      this.menu = null;
     }
   }
 
-  // ✅ SINGLE initialize() — version “améliorée” (flag + check backend)
+  // ================== INITIALISATION DU MENU (admin / personnel) ==================
+
   private initialize(): void {
-    // 1) Lecture rapide depuis le stockage
+    // 1) Valeur rapide depuis la session
     let isAdmin = this.auth.isAdmin();
 
-    // 2) Réglage initial du menu
     const apply = (admin: boolean) => {
+      // admin → MENU complet, personnel → menu simplifié
       this.menuItems = admin ? MENU : this.buildPersonnelMenu(MENU);
       setTimeout(() => {
-        if (this.sideMenu?.nativeElement) {
-          this.menu = new MetisMenu(this.sideMenu.nativeElement);
-          this._activateMenuDropdown();
-        }
-      });
+        this.initMetisMenu();
+      }, 0);
     };
 
     apply(isAdmin);
 
-    // 3) Vérif backend (plus fiable) pour confirmer le rôle
+    // 3) Vérification côté backend pour confirmer le rôle
     const email = (sessionStorage.getItem('email') || '').trim();
     if (email) {
       this.auth.obtenirUnUtilisateurParEmail(email).subscribe({
         next: (user: any) => {
           const fromFlag   = !!(user?.est_admin ?? user?.estAdmin);
           const rolesArray = (user?.roles ?? user?.roleList ?? [])
-            .map((r:any)=> (r?.nom || r).toString().toUpperCase());
-          const fromRoles  = rolesArray.some((r:string)=> r.includes('ADMIN'));
+            .map((r: any) => (r?.nom || r).toString().toUpperCase());
+          const fromRoles  = rolesArray.some((r: string) => r.includes('ADMIN'));
           const finalIsAdmin = isAdmin || fromFlag || fromRoles;
 
           if (finalIsAdmin !== isAdmin) {
@@ -94,89 +99,91 @@ export class MenuComponent implements OnInit, AfterViewInit, OnChanges {
             sessionStorage.setItem('isAdmin', String(isAdmin));
           }
         },
-        error: _ => {
-          // on garde l’affichage courant si l’API tombe
+        error: () => {
+          // en cas d'erreur API, on garde le menu actuel
         }
       });
     }
   }
 
-private buildPersonnelMenu(source: MenuItem[]): MenuItem[] {
-  // Index par link pour réutiliser icônes/links existants
-  const byLink = new Map<string, MenuItem>();
-  const collect = (items: MenuItem[]) => {
-    for (const it of items) {
-      if (it.link) byLink.set(String(it.link).trim(), it);
-      if (it.subItems?.length) collect(it.subItems);
-    }
-  };
-  collect(source);
+  /** Build du menu côté personnel à partir du MENU admin */
+  private buildPersonnelMenu(source: MenuItem[]): MenuItem[] {
+    const byLink = new Map<string, MenuItem>();
 
-  // Récupérer quelques items utiles
-  const titreFonct1 = source.find(i => i.isTitle && (i.label ?? '').toLowerCase() === 'les fonctionalites');
-  const titreFonct2 = source.find(i => i.isTitle && (i.label ?? '').toLowerCase() === 'les fonctionnalités');
-  const portail = source.find(i => (i.label ?? '').trim() === 'Portail')
-              ?? byLink.get('/espacedetravail')
-              ?? byLink.get('espacedetravail');
+    const collect = (items: MenuItem[]) => {
+      for (const it of items) {
+        if (it.link) byLink.set(String(it.link).trim(), it);
+        if (it.subItems?.length) collect(it.subItems);
+      }
+    };
+    collect(source);
 
-  // Construit le menu pour le PERSONNEL
-  const out: MenuItem[] = [];
+    const titreFonct1 = source.find(
+      i => i.isTitle && (i.label ?? '').toLowerCase() === 'les fonctionalites'
+    );
+    const titreFonct2 = source.find(
+      i => i.isTitle && (i.label ?? '').toLowerCase() === 'les fonctionnalités'
+    );
+    const portail =
+      source.find(i => (i.label ?? '').trim() === 'Portail') ||
+      byLink.get('/espacedetravail') ||
+      byLink.get('espacedetravail');
 
-  if (titreFonct1) out.push({ ...titreFonct1, subItems: undefined });
-  if (portail) out.push({ ...portail, subItems: undefined });
-  if (titreFonct2) out.push({ ...titreFonct2, subItems: undefined });
+    const out: MenuItem[] = [];
 
-  // ➕ AJOUT EXPLICITE du dashboard personnel (NE TOUCHE PAS à tableaudebord)
-  out.push({
-    id: 9001,
-    label: 'Mon tableau de bord',
-    icon: 'bx-bar-chart-square',
-    link: 'mon-dashboard'
-  });
+    if (titreFonct1) out.push({ ...titreFonct1, subItems: undefined });
+    if (portail) out.push({ ...portail, subItems: undefined });
+    if (titreFonct2) out.push({ ...titreFonct2, subItems: undefined });
 
-  // Liens personnels (on remappe vers “mes-*” quand tu veux)
-  const wanted: Array<{ link: string; newLabel: string; newLink?: string }> = [
-    { link: 'presences',     newLabel: 'Mes présences',     newLink: 'mes-presences' },
-    { link: 'demandes',      newLabel: 'Mes demandes',      newLink: 'mes-demandes' },
-    { link: 'conges',        newLabel: 'Mes congés',        newLink: 'mes-conges' },
-    { link: 'affectations',  newLabel: 'Mes affectations',  newLink: 'mes-affectations' },
-    { link: 'missions',      newLabel: 'Mes missions',      newLink: 'mes-missions' },
-    { link: 'frais',         newLabel: 'Mes frais' },
-    { link: 'contrats',      newLabel: 'Mes contrats',      newLink: 'mes-contrats' },
-  ];
-
-  for (const w of wanted) {
-    const src = byLink.get(w.link);
-    if (!src) continue;
+    // Dashboard perso
     out.push({
-      ...src,
-      label: w.newLabel,
-      link: w.newLink ?? src.link,
-      subItems: undefined
+      id: 9001,
+      label: 'Mon tableau de bord',
+      icon: 'bx-bar-chart-square',
+      link: 'mon-dashboard'
     });
-  }
 
-  return out;
-}
+    const wanted: Array<{ link: string; newLabel: string; newLink?: string }> = [
+      { link: 'presences',     newLabel: 'Mes présences',     newLink: 'mes-presences' },
+      { link: 'demandes',      newLabel: 'Mes demandes',      newLink: 'mes-demandes' },
+      { link: 'conges',        newLabel: 'Mes congés',        newLink: 'mes-conges' },
+      { link: 'affectations',  newLabel: 'Mes affectations',  newLink: 'mes-affectations' },
+      { link: 'missions',      newLabel: 'Mes missions',      newLink: 'mes-missions' },
+      { link: 'frais',         newLabel: 'Mes frais' },
+      { link: 'contrats',      newLabel: 'Mes contrats',      newLink: 'mes-contrats' },
+    ];
 
-
-
-
-  toggleMenu(event: any) {
-    event.currentTarget.nextElementSibling.classList.toggle('mm-show');
-  }
-
-  ngOnChanges(): void {
-    if ((!this.isCondensed && this.sideMenu) || this.isCondensed) {
-      setTimeout(() => {
-        if (this.sideMenu?.nativeElement) {
-          this.menu = new MetisMenu(this.sideMenu.nativeElement);
-        }
+    for (const w of wanted) {
+      const src = byLink.get(w.link);
+      if (!src) continue;
+      out.push({
+        ...src,
+        label: w.newLabel,
+        link: w.newLink ?? src.link,
+        subItems: undefined
       });
-    } else if (this.menu) {
-      this.menu.dispose();
     }
+
+    return out;
   }
+
+  // ================== METISMENU : UNE SEULE INSTANCE ==================
+
+  private initMetisMenu(): void {
+    if (!this.sideMenu?.nativeElement) return;
+
+    // On détruit l’ancienne instance si elle existe
+    if (this.menu) {
+      this.menu.dispose();
+      this.menu = null;
+    }
+
+    // On crée une nouvelle instance sur l’élément actuel
+    this.menu = new MetisMenu(this.sideMenu.nativeElement);
+    this._activateMenuDropdown();
+  }
+
+  // ================== GESTION DU SCROLL / ACTIVE ==================
 
   private _scrollElement(): void {
     setTimeout(() => {
@@ -229,12 +236,19 @@ private buildPersonnelMenu(source: MenuItem[]): MenuItem[] {
         parentEl.classList.add('mm-active');
         const ulEl = parentEl.querySelector('ul');
         if (ulEl) ulEl.classList.add('mm-show');
-        parentEl = parentEl.parentElement;
+        parentEl = parentEl.parentElement as HTMLElement;
       }
     }
   }
 
+  // ================== UTILES ==================
+
   hasItems(item: MenuItem): boolean {
-    return item.subItems !== undefined && item.subItems.length > 0;
+    return !!item.subItems && item.subItems.length > 0;
+  }
+
+  toggleMenu(event: any) {
+    // si tu veux gérer manuellement certains parents, tu peux l’utiliser
+    event.currentTarget.nextElementSibling?.classList.toggle('mm-show');
   }
 }

@@ -457,7 +457,7 @@ export class DetailmissionComponent implements OnInit {
   }
 
   genererLesEtats(mission:Mission) {
-    this.reference = mission.reference;
+this.reference = mission.reference ?? '';
     Swal.fire({
       title: 'Êtes-vous sûr ?',
       text: 'Êtes-vous sûr de vouloir générer les états de paiemants de la mission  '+this.reference+'  ? Il vous sera impossible de revenir en arrière !',
@@ -505,7 +505,7 @@ export class DetailmissionComponent implements OnInit {
   }
 
   telechargerFrais(mission:Mission) {
-    this.reference = mission.reference;
+this.reference = mission.reference ?? '';
     Swal.fire({
       title: 'Êtes-vous sûr ?',
       text: 'Êtes-vous sûr de vouloir Télécharger la fiche  de la mission '+this.mission?.motif+' ? Il vous sera impossible de revenir en arrière !',
@@ -558,7 +558,7 @@ export class DetailmissionComponent implements OnInit {
   }
 
   telechargerOrdre(mission:Mission) {
-    this.reference = mission.reference;
+this.reference = mission.reference ?? '';
     Swal.fire({
       title: 'Êtes-vous sûr ?',
       text: 'Êtes-vous sûr de vouloir Télécharger l attestation e la mission '+this.reference+' ? Il vous sera impossible de revenir en arrière !',

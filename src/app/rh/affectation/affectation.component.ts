@@ -111,39 +111,91 @@ export class AffectationComponent implements OnInit {
     }
     this.modal.open(modalRef, { size: 'lg', backdrop: 'static', keyboard: false });
   }
-
-  submit() {
-    if (this.form.invalid) return;
-
-    const v = this.form.value;
-    const dto: AffectationDto = {
-      personnel: Number(v.personnel),
-      poste: Number(v.poste),
-      dateDebut: String(v.dateDebut) // "yyyy-MM-dd"
-    };
-
-    if (v.id) {
-      this.affectationService.modifier(Number(v.id), dto).subscribe({
-        next: () => {
-          this.toastr.success('Affectation modifiée');
-          this.modal.dismissAll();
-          this.chargerPage();
-        },
-        error: (err) => this.handleError(err)
-      });
-    } else {
-      this.affectationService.creer(dto).subscribe({
-        next: () => {
-          this.toastr.success('Affectation créée');
-          this.modal.dismissAll();
-          this.chargerPage();
-        },
-        error: (err) => this.handleError(err)
-      });
-      // ⤷ si ton backend préfère la route alternative, remplace par:
-      // this.affectationService.affecter(dto.personnel, dto.poste, dto.dateDebut)...
-    }
+submit() {
+  if (this.form.invalid) {
+    this.toastr.error('Veuillez remplir les champs obligatoires', 'Erreur');
+    return;
   }
+
+  const v = this.form.value;
+  const dto: AffectationDto = {
+    personnel: Number(v.personnel),
+    poste: Number(v.poste),
+    dateDebut: String(v.dateDebut) // "yyyy-MM-dd"
+  };
+
+  if (v.id) {
+    // 🔁 MODIFICATION
+    this.affectationService.modifier(Number(v.id), dto).subscribe({
+      next: () => {
+        this.toastr.success('Affectation modifiée', 'Succès');
+        this.modal.dismissAll();
+        this.chargerPage();
+      },
+      error: (error) => {
+        console.error('Erreur MODIF affectation =>', error);
+        const res = error.error || error;
+
+        // 🔴 Conflit 409 → doublon
+        if (error.status === 409) {
+          Swal.fire(
+            'Affectation impossible',
+            'Ce personnel est déjà affecté à ce poste.',
+            'error'
+          );
+          // (tu peux garder aussi un toast si tu veux)
+          // this.toastr.error('Ce personnel est déjà affecté à ce poste.', 'Affectation impossible');
+          return;
+        }
+
+        // Autres erreurs avec tableau errors
+        if (res?.errors) {
+          for (let er of res.errors) {
+            this.toastr.error(`${er.champs} : ${er.message}`, 'Erreur');
+          }
+        } else {
+          this.toastr.error(res?.message || 'Erreur lors de la modification', 'Erreur');
+        }
+      }
+    });
+  } else {
+    // 🆕 CREATION
+    this.affectationService.creer(dto).subscribe({
+      next: () => {
+        this.toastr.success('Affectation créée', 'Succès');
+        this.modal.dismissAll();
+        this.chargerPage();
+      },
+      error: (error) => {
+        console.error('Erreur CREATION affectation =>', error);
+        const res = error.error || error;
+
+        // 🔴 Conflit 409 → doublon
+        if (error.status === 409) {
+          Swal.fire(
+            'Affectation impossible',
+            'Ce personnel est déjà affecté à ce poste.',
+            'error'
+          );
+          // Optionnel : toast en plus
+          // this.toastr.error('Ce personnel est déjà affecté à ce poste.', 'Affectation impossible');
+          return;
+        }
+
+        // Autres erreurs avec tableau errors
+        if (res?.errors) {
+          for (let er of res.errors) {
+            this.toastr.error(`${er.champs} : ${er.message}`, 'Erreur');
+          }
+        } else {
+          this.toastr.error(res?.message || 'Erreur lors de la création', 'Erreur');
+        }
+      }
+    });
+  }
+}
+
+
 
   supprimer(id?: number) {
     if (!id) return;
@@ -163,22 +215,12 @@ export class AffectationComponent implements OnInit {
             this.toastr.success('Affectation supprimée');
             this.chargerPage();
           },
-          error: (err) => this.handleError(err)
+          //error: (err) => this.handleError(err)
         });
       }
     });
   }
 
-  private handleError(error: any) {
-    console.error('Affectation error raw =>', error);
-    if (error?.error?.errors?.length) {
-      for (const e of error.error.errors) {
-        this.toastr.error(`${e.champs} : ${e.message}`, 'Erreur');
-      }
-    } else if (error?.error?.message) {
-      this.toastr.error(error.error.message, 'Erreur');
-    } else {
-      this.toastr.error('Erreur serveur', 'Erreur');
-    }
-  }
+
+
 }

@@ -129,6 +129,54 @@ export class MesCongesComponent implements OnInit {
     this.load();
   }
 
+  /* ========= Synthèse "à la Mes présences" ========= */
+
+  // nombre de congés par statut global (sur la liste chargée)
+  get nbValides(): number {
+    return this.list.filter(c => this.globalStatus(c) === 1).length;
+  }
+
+  get nbEnCours(): number {
+    return this.list.filter(c => this.globalStatus(c) === 9).length;
+  }
+
+  get nbRejectes(): number {
+    return this.list.filter(c => this.globalStatus(c) === 0).length;
+  }
+
+  // prochain congé à venir (dateDebut >= aujourd'hui)
+  get prochainConge(): Conge | null {
+    if (!this.list.length) return null;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const candidats = this.list
+      .filter(c => c.dateDebut)
+      .map(c => ({
+        conge: c,
+        date: new Date(c.dateDebut as any)
+      }))
+      .filter(x => !isNaN(x.date.getTime()) && x.date >= today)
+      .sort((a, b) => a.date.getTime() - b.date.getTime());
+
+    return candidats.length ? candidats[0].conge : null;
+  }
+
+  // dernière demande (basée sur dateDebut la plus récente)
+  get dernierConge(): Conge | null {
+    if (!this.list.length) return null;
+    const avecDate = this.list
+      .filter(c => c.dateDebut)
+      .map(c => ({
+        conge: c,
+        date: new Date(c.dateDebut as any)
+      }))
+      .filter(x => !isNaN(x.date.getTime()))
+      .sort((a, b) => b.date.getTime() - a.date.getTime());
+
+    return avecDate.length ? avecDate[0].conge : null;
+  }
+
   /* ========= Create ========= */
 
   openCreate(tpl: any) {
@@ -183,7 +231,6 @@ export class MesCongesComponent implements OnInit {
   private hydratePersonnelId() {
     const raw = sessionStorage.getItem('personnelId');
     this.currentPersonnelId = raw != null && raw !== '' ? Number(raw) : null;
-    // Plan B: via un service auth si besoin
   }
 
   private todayISO(): string {

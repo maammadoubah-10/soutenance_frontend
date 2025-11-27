@@ -14,7 +14,7 @@
             <div class="d-flex flex-column h-100">
               <div class="mb-4 mb-md-5">
                 <a routerLink="/" class="d-block auth-logo">
-                  <img src="assets/Jilmonde%20ERP%20LOGO.png" alt="" height="100" class="auth-logo-dark">
+                  <img src="assets/groupe_isi.png" alt="" height="100" class="auth-logo-dark">
 
                 </a>
               </div>
@@ -36,10 +36,23 @@
                     </ng-container>
 
                     <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
-                      <div class="alert alert-danger" role="alert">
-                        Code d'erreur : {{reponse.errorStatus}} {{reponse.errorMessage}}
-                      </div>
-                    </ng-container>
+
+  <!-- Cas spécifique : email non trouvé (400) -->
+  <div class="alert alert-info" role="alert" *ngIf="reponse.errorStatus === 400; else autreErreur">
+    Si un compte existe avec cette adresse e-mail, 
+    un lien de réinitialisation vous a été envoyé.
+  </div>
+
+  <!-- Autres erreurs (serveur, réseau, etc.) -->
+  <ng-template #autreErreur>
+    <div class="alert alert-danger" role="alert">
+      Une erreur est survenue lors du traitement de votre demande.
+      Veuillez réessayer plus tard.
+    </div>
+  </ng-template>
+
+</ng-container>
+
 
                     <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
                       <div class="alert alert-success" role="alert">

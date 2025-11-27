@@ -122,12 +122,14 @@ getMe(): Observable<any> {
   }
 
   /** ====== Password & divers ====== */
-  motdepasseoublie(email: string): Observable<any> {
-    return this.http.post(host + 'utilisateurs/motdepasseoublie/', email, httpOptions);
-  }
-  motdepasseoubliePedagogie(email: string): Observable<any> {
-    return this.http.post(hostPedago + 'requerant/motdepasseoublie/', email, httpOptions);
-  }
+ motdepasseoublie(body: { email: string }): Observable<any> {
+  return this.http.post(host + 'utilisateurs/motdepasseoublie/', body, httpOptions);
+}
+
+motdepasseoubliePedagogie(body: { email: string }): Observable<any> {
+  return this.http.post(hostPedago + 'requerant/motdepasseoublie/', body, httpOptions);
+}
+
 
   reinitialiseLeMotDePasse(motdepasse: string, confirmationdemotdepasse: string, token: string): Observable<any> {
     return this.http.patch(

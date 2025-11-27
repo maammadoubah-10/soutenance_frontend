@@ -1,8 +1,9 @@
+// src/app/rh/services/poste.service.ts
 import { Injectable } from '@angular/core';
-import {environment} from "../../../environments/environment";
-import {HttpClient, HttpParams} from "@angular/common/http";
-import {Observable} from "rxjs";
-import {Poste} from "../models/poste";
+import { environment } from "../../../environments/environment";
+import { HttpClient, HttpParams } from "@angular/common/http";
+import { Observable } from "rxjs";
+import { Poste } from "../models/poste";
 
 @Injectable({
   providedIn: 'root'
@@ -13,13 +14,42 @@ export class PosteService {
 
   constructor(private httpClient: HttpClient) {}
 
-  public listerPostePage(page: number, size: number, sort: string): Observable<any> {
-    const url = `${this.contextPath}?page=${page}&size=${size}&sort=${sort}`;
-    return this.httpClient.get<any>(url, { observe: 'response' });
+  /**
+   * Liste paginée des postes avec filtres :
+   * - designation (optionnel)
+   * - chefService (optionnel : 'true' | 'false' | '')
+   */
+  public listerPostePage(
+    page: number,
+    size: number,
+    sort: string,
+    designation?: string,
+    chefService?: string | null
+  ): Observable<any> {
+    let params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString())
+      .set('sort', sort || 'desc');
+
+    if (designation && designation.trim().length > 0) {
+      params = params.set('designation', designation.trim());
+    }
+
+    if (chefService !== null && chefService !== undefined && chefService !== '') {
+      // le back attend un Boolean "chef"
+      params = params.set('chef', chefService); // 'true' ou 'false'
+    }
+
+    return this.httpClient.get<any>(this.contextPath, {
+      observe: 'response',
+      params
+    });
   }
 
-  public listerPosteNoPage(): Observable<any> {
-    const url = `${this.contextPath+ '/listes'}`;
+  // Tu peux garder ces méthodes si elles servent ailleurs,
+  // mais PosteComponent n'en aura plus besoin pour la recherche.
+  public listerPosteNoPage(): Observable<any>  {
+    const url = `${this.contextPath + '/listes'}`;
     return this.httpClient.get<any>(url, { observe: 'response' });
   }
 

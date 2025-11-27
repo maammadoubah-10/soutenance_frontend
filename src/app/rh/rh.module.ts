@@ -1,3 +1,4 @@
+// src/app/rh/rh.module.ts
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
@@ -31,10 +32,11 @@ import { MissionComponent } from './mission/mission.component';
 import { DetailmissionComponent } from './mission/detailmission/detailmission.component';
 import { AffectationComponent } from './affectation/affectation.component';
 import { PresenceComponent } from './presence/presence.component';
-import { RhDashboardComponent } from './rh-dashboard.component';
 import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
-//import { RhDashboardComponent } from './rh-dashboard.component';
-//import { NgApexchartsModule } from 'ng-apexcharts';
+
+import { RhAdminDashboardComponent } from './rh-admin-dashboard.component';
+import { RhPersonnelDashboardComponent } from './rh-personnel-dashboard.component';
+
 @NgModule({
   declarations: [
     RhComponent,
@@ -43,7 +45,7 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
     ServiceComponent,
     DetailComponent,
     ListedepersonnelsComponent,
-    DetailpersonnelComponent, 
+    DetailpersonnelComponent,
     NumberWithSpacesPipe,
     FormatPhoneNumberPipe,
     CongeComponent,
@@ -54,10 +56,8 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
     DetailmissionComponent,
     AffectationComponent,
     PresenceComponent,
-    RhDashboardComponent
-    
-    
-    
+    RhAdminDashboardComponent,
+    RhPersonnelDashboardComponent
   ],
   imports: [
     CommonModule,
@@ -65,21 +65,16 @@ import { NgxExtendedPdfViewerModule } from 'ngx-extended-pdf-viewer';
     SimplebarAngularModule,
     CommunModule,
     TranslateModule,
-    RhRoutingModule,
     LayoutModule,
     NgApexchartsModule,
     FormsModule,
     UiSwitchModule,
     ReactiveFormsModule,
     NgSelectModule,
-   // ArchwizardModule,
     ToastrModule.forRoot(),
-    //NgxPaginationModule,
     NgbTooltipModule,
-    MatStepperModule ,
-    NgApexchartsModule,
+    MatStepperModule,
     NgxExtendedPdfViewerModule,
-  
-]
+  ]
 })
 export class RhModule { }

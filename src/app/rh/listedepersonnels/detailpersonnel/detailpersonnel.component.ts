@@ -935,35 +935,52 @@ export class DetailpersonnelComponent implements OnInit {
       );
   }
 
-  isTodayBetweenDates(startDate: Date, endDate: Date): boolean {
-    const today = new Date();
-    return startDate <= today && endDate >= today;
-  }
+ isTodayBetweenDates(startDate?: Date | null, endDate?: Date | null): boolean {
+  if (!startDate || !endDate) return false;
+
+  const today = new Date();
+
+  // On compare en "jour" seulement, sans heures
+  const s = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+  const e = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+  const t = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+
+  return s <= t && t <= e;
+}
+
 
   encodeId(id: number) {
     return this.hashids.encode(id);
   }
 
-  chargerListeMissionsPersonnel() {
-    this.missions = this.personnelService
-      .listerMissionsPersonnel(this.id$, this.currentPage, this.nombrePerPage, `dateDebut,${this.sort}`)
-      .pipe(
-        map((response: any) => {
-          this.listeMissionPersonnel = response?.body?.content ?? [];
-          this.listeMissionPersonnel.forEach((mission: Mission) => {
-            const startDate = new Date(mission.dateDebut);
-            const endDate = new Date(mission.dateFin);
-            mission.isTodayBetweenDates = this.isTodayBetweenDates(startDate, endDate);
-          });
-          this.totalMission = response?.body?.totalElements ?? this.listeMissionPersonnel.length;
-          this.totalPages = response?.body?.totalPages ?? 1;
-          this.pages = this.getPages();
-          return { dataState: this.dataStateEnum.CHARGE, data: this.listeMissionPersonnel };
-        }),
-        startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
-        catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] }))
-      );
-  }
+chargerListeMissionsPersonnel() {
+  this.missions = this.personnelService
+    .listerMissionsPersonnel(this.id$, this.currentPage, this.nombrePerPage, `dateDebut,${this.sort}`)
+    .pipe(
+      map((response: any) => {
+        this.listeMissionPersonnel = response?.body?.content ?? [];
+
+        this.listeMissionPersonnel.forEach((mission: Mission) => {
+          const startDate = mission.dateDebut
+            ? new Date(mission.dateDebut as any)
+            : null;
+          const endDate = mission.dateFin
+            ? new Date(mission.dateFin as any)
+            : null;
+
+          mission.isTodayBetweenDates = this.isTodayBetweenDates(startDate, endDate);
+        });
+
+        this.totalMission = response?.body?.totalElements ?? this.listeMissionPersonnel.length;
+        this.totalPages = response?.body?.totalPages ?? 1;
+        this.pages = this.getPages();
+        return { dataState: this.dataStateEnum.CHARGE, data: this.listeMissionPersonnel };
+      }),
+      startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
+      catchError(() => of({ dataState: this.dataStateEnum.ERREUR, data: [] }))
+    );
+}
+
 
   /** 🔧 Réparation complète */
   chargerListeDemandesPersonnel() {

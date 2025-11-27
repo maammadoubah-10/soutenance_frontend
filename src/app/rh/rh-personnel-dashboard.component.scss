@@ -1,0 +1,286 @@
+.rh-personnel-dashboard {
+  padding-bottom: 1.5rem;
+
+  // palette (tu peux adapter à ta charte ISI)
+  --rh-primary: #2563eb;
+  --rh-primary-soft: rgba(37, 99, 235, 0.08);
+  --rh-warning: #facc15;
+  --rh-warning-soft: rgba(250, 204, 21, 0.08);
+  --rh-info: #0ea5e9;
+  --rh-info-soft: rgba(14, 165, 233, 0.08);
+  --rh-danger: #ef4444;
+  --rh-danger-soft: rgba(239, 68, 68, 0.08);
+
+  .kpi-row {
+    margin-top: 0.75rem;
+  }
+
+  /* ===================== KPI CARDS ===================== */
+
+  .kpi-card {
+    border: none;
+    border-radius: 1rem;
+    background: #ffffff;
+    box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+    transition: all 0.25s ease;
+    position: relative;
+    overflow: hidden;
+
+    .card-body {
+      padding: 1rem 1.1rem;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+      background: radial-gradient(circle at top right, rgba(255, 255, 255, 0.35), transparent 55%);
+    }
+
+    &:hover {
+      transform: translateY(-4px) scale(1.01);
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.12);
+
+      &::after {
+        opacity: 1;
+      }
+
+      .kpi-icon {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 12px 24px rgba(15, 23, 42, 0.25);
+      }
+    }
+  }
+
+  .kpi-modern {
+    .kpi-text {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+      min-width: 0;
+
+      .kpi-label {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: .08em;
+        color: #6b7280;
+        font-weight: 600;
+      }
+
+      .kpi-value {
+        font-size: 1.7rem;
+        font-weight: 700;
+        line-height: 1.1;
+        color: #0f172a;
+
+        .kpi-unit {
+          font-size: 0.9rem;
+          margin-left: 0.1rem;
+          font-weight: 500;
+          color: #6b7280;
+        }
+      }
+
+      .kpi-caption {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+      }
+    }
+
+    .kpi-icon-wrapper {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .kpi-icon {
+      width: 3rem;
+      height: 3rem;
+      border-radius: 999px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #e5e7eb;
+      color: #111827;
+      box-shadow: 0 8px 16px rgba(15, 23, 42, 0.18);
+      transition: all 0.25s ease;
+
+      i {
+        font-size: 1.6rem;
+      }
+    }
+  }
+
+  /* Variantes de couleur KPI */
+  .kpi-primary {
+    border-top: 3px solid var(--rh-primary-soft);
+
+    .kpi-icon {
+      background: linear-gradient(135deg, var(--rh-primary), #4f46e5);
+      color: #fff;
+    }
+  }
+
+  .kpi-warning {
+    border-top: 3px solid var(--rh-warning-soft);
+
+    .kpi-icon {
+      background: linear-gradient(135deg, var(--rh-warning), #f97316);
+      color: #1f2933;
+    }
+  }
+
+  .kpi-info {
+    border-top: 3px solid var(--rh-info-soft);
+
+    .kpi-icon {
+      background: linear-gradient(135deg, var(--rh-info), #22c55e);
+      color: #f9fafb;
+    }
+  }
+
+  .kpi-danger {
+    border-top: 3px solid var(--rh-danger-soft);
+
+    .kpi-icon {
+      background: linear-gradient(135deg, var(--rh-danger), #f97373);
+      color: #fff;
+    }
+  }
+
+  /* ===================== QUICK ACTIONS ===================== */
+
+  .quick-actions {
+    margin-top: 0.25rem;
+
+    .action-chip {
+      border-radius: 999px;
+      font-size: 0.85rem;
+      padding: 0.4rem 0.9rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      border-width: 1px;
+      transition: all 0.2s ease;
+      background-color: #ffffff;
+
+      i {
+        font-size: 1rem;
+      }
+
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 12px 25px rgba(15, 23, 42, 0.08);
+        color: #fff !important;
+
+        &.btn-outline-primary {
+          background-image: linear-gradient(135deg, var(--rh-primary), #4f46e5);
+          border-color: transparent;
+        }
+        &.btn-outline-warning {
+          background-image: linear-gradient(135deg, var(--rh-warning), #f97316);
+          border-color: transparent;
+        }
+        &.btn-outline-info {
+          background-image: linear-gradient(135deg, var(--rh-info), #0ea5e9);
+          border-color: transparent;
+        }
+        &.btn-outline-secondary {
+          background-image: linear-gradient(135deg, #6b7280, #4b5563);
+          border-color: transparent;
+        }
+      }
+    }
+  }
+
+  /* ===================== CHART CARDS ===================== */
+
+  .chart-card {
+    border-radius: 1rem;
+    border: 1px solid rgba(148, 163, 184, 0.25);
+    background: radial-gradient(circle at top left, rgba(248, 250, 252, 0.95), rgba(248, 250, 252, 0.9));
+    box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+    transition: all 0.25s ease;
+    overflow: hidden;
+
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 20px 40px rgba(15, 23, 42, 0.12);
+    }
+
+    .card-body {
+      padding: 0.9rem 0.9rem 1.1rem 0.9rem;
+    }
+  }
+
+  .glassy {
+    backdrop-filter: blur(10px);
+    background-color: rgba(15, 23, 42, 0.03);
+    border-color: rgba(148, 163, 184, 0.2);
+  }
+
+  .chart-header {
+    padding: 0.8rem 1rem 0.4rem 1rem;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+    background: linear-gradient(
+      135deg,
+      rgba(248, 250, 252, 0.9),
+      rgba(239, 246, 255, 0.9)
+    );
+
+    .card-title {
+      font-weight: 600;
+      color: #111827;
+    }
+
+    small {
+      font-size: 0.75rem;
+    }
+  }
+
+  /* ===================== RESPONSIVE ===================== */
+
+  @media (max-width: 991.98px) {
+    .kpi-card .card-body {
+      padding: 0.9rem 0.9rem;
+    }
+
+    .kpi-modern .kpi-value {
+      font-size: 1.4rem;
+    }
+
+    .chart-card .card-body {
+      padding: 0.8rem;
+    }
+  }
+
+  @media (max-width: 575.98px) {
+    .kpi-row {
+      .col-12 {
+        // les KPI prennent toute la largeur, un par ligne
+      }
+    }
+
+    .quick-actions {
+      .action-chip {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+
+    .chart-header {
+      padding-inline: 0.75rem;
+
+      .card-title {
+        font-size: 0.9rem;
+      }
+    }
+  }
+}

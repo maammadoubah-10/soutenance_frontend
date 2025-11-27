@@ -121,42 +121,33 @@ export class PresenceService {
   }
 
 
-  private getMyPersonnelIdFromToken(): number | null {
-  const raw = sessionStorage.getItem('token') || localStorage.getItem('token') || '';
-  if (!raw) return null;
-  try {
-    const payload = JSON.parse(atob(raw.split('.')[1] || ''));
-    const id = payload?.personnelId ?? payload?.personnel_id ?? payload?.personnelID;
-    const asNum = typeof id === 'number' ? id : Number(id);
-    return Number.isFinite(asNum) ? asNum : null;
-  } catch {
-    return null;
-  }
-}
-
-/** Mes présences (paginated) via /personnels/{id}/presences */
+ /** Mes présences (paginated) via /presences/moi (back lit le token) */
 listerMesPresences(
   page = 0,
   size = 10,
   sortField = 'dateValidation',
   sortDir: 'asc' | 'desc' = 'desc'
 ) {
-  const meId = this.getMyPersonnelIdFromToken();
-  if (meId == null) {
-    // on renvoie un Observable qui échoue proprement
-    return this.httpClient.get<any>('__invalid__/no-token'); // forcera l'erreur catch côté component
-  }
-
   const params = new HttpParams()
     .set('page', page)
     .set('size', size)
     .set('sort', `${sortField},${sortDir}`);
 
-  // ⚠️ cette route correspond à PersonnelRelationsController.listPresences
   return this.httpClient.get<any>(
-    `${this.base}/personnels/${meId}/presences`,
+    `${this.contextPath}/moi`,
     { observe: 'response', params }
   );
 }
+
+
+/** Génération des feuilles de présence pour un mois/année */
+genererPourMois(mois: number, annee?: number) {
+  let params = new HttpParams().set('mois', mois);
+  if (annee != null) {
+    params = params.set('annee', annee);
+  }
+  return this.httpClient.post<Presence[]>(`${this.contextPath}/generer`, null, { params });
+}
+
 
 }

@@ -1,0 +1,189 @@
+/* On s'assure que le composant occupe toute la hauteur */
+:host {
+  display: block;
+  min-height: 100vh;
+}
+
+/* Fond bleu clair + centrage parfait de la carte */
+.login-wrap {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #eaf3ff;  /* bleu très clair comme sur la connexion */
+  padding: 24px;
+}
+
+/* Carte de login / réinitialisation */
+.login-card {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  width: 100%;
+  max-width: 380px;           /* même largeur que la connexion */
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 40px 30px 44px;
+  min-height: 560px;
+
+  box-shadow:
+    0 30px 90px rgba(30, 64, 175, 0.18),
+    0 10px 34px rgba(15, 23, 42, 0.07);
+
+  /* Espacement vertical uniforme entre les enfants */
+  --sp: 18px;
+}
+
+/* Utilitaire : applique une marge entre les éléments enfants */
+.stack > * + * {
+  margin-top: var(--sp);
+}
+
+/* Logo dans un cercle centré */
+.logo-circle {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 14px;
+  display: grid;
+  place-items: center;
+}
+
+.logo-circle img {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.14));
+}
+
+/* Titres */
+.title {
+  font-size: 30px;
+  font-weight: 700;
+  color: #0b1225;
+}
+
+.subtitle {
+  color: #475569;
+  font-size: 14px;
+}
+
+/* Champs de saisie */
+.input {
+  width: 100%;
+  height: 52px;
+  border-radius: 12px;
+  border: 1px solid #e2e8f0;
+  padding: 0 14px;
+  font-size: 15px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* état invalide simple (tu peux adapter si tu as déjà un style global) */
+.input.is-invalid {
+  border-color: #b91c1c;
+}
+
+/* Message d’erreur sous les champs */
+.field-error {
+  margin-top: 6px;
+  font-size: 13px;
+  color: #b91c1c;
+  text-align: left;
+}
+
+/* Bouton principal */
+.primary-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 52px;
+  width: 100%;
+  border-radius: 12px;
+  background: #0b5bd3;
+  color: #ffffff;
+  border: 1px solid #0b5bd3;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+  cursor: pointer;
+}
+
+.primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Lien vers la connexion */
+.text-center {
+  text-align: center;
+}
+
+.help-link {
+  color: #2563eb;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.help-link:hover {
+  text-decoration: underline;
+}
+
+/* Footer */
+.footer-login {
+  margin-top: 10px;
+  font-size: 12px;
+  color: #64748b;
+}
+
+/* Alerts (optionnel) */
+.alert {
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-top: 16px;
+  font-size: 13px;
+  text-align: left;
+}
+
+.alert-info {
+  background: #d1ecf1;
+  color: #0c5460;
+  border: 1px solid #bee5eb;
+}
+
+.alert-danger {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+
+.alert-success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+
+.alert-warning {
+  background: #fff3cd;
+  color: #856404;
+  border: 1px solid #ffeeba;
+}
+
+/* Responsive : carte un peu plus petite sur mobile */
+@media (max-width: 480px) {
+  .login-card {
+    max-width: 94%;
+    padding: 28px 22px 32px;
+    min-height: auto;
+  }
+
+  .title {
+    font-size: 26px;
+  }
+}

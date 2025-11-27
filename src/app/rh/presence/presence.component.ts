@@ -1,5 +1,6 @@
 // src/app/rh/presence/presence.component.ts
-import { Component, OnInit } from '@angular/core';
+//import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { ToastrService } from 'ngx-toastr';
@@ -35,6 +36,9 @@ export class PresenceComponent implements OnInit {
   pages: number[] = [];
   totalPages = 0;
 
+  //@ViewChild('formTpl') formTpl!: TemplateRef<any>;
+  @ViewChild('genTpl') genTpl!: TemplateRef<any>;
+  @ViewChild('formTpl') formTpl!: TemplateRef<any>;
   // filtres
   moisCtrl = new FormControl<number | null>(null);
   anneeCtrl = new FormControl<number | null>(null);
@@ -145,25 +149,36 @@ buildDisplayNamePersonnel(p: any): string {
     );
   }
 
-  // --- modal ---
-  openModal(modalRef: any, presence?: Presence): void {
-    if (presence) {
-      this.form.patchValue({
-        id: presence.id ?? null,
-        personnelId: presence.personnel?.id ?? null,
-        mois: presence.mois ?? null,
-        nbreJourAbsent: presence.nbreJourAbsent ?? 0
-      });
-    } else {
-      this.form.reset({
-        id: null,
-        personnelId: null,
-        mois: null,
-        nbreJourAbsent: 0
-      });
-    }
-    this.modal.open(modalRef, { size: 'lg', backdrop: 'static', keyboard: false });
+   // --- modal création / édition ---
+ // --- modal création / édition ---
+openModal(presence?: any): void {
+  if (presence) {
+    // 👇 mode EDITION : on prend les champs FLATS renvoyés par PresenceDto
+    this.form.patchValue({
+      id: presence.id ?? null,
+      personnelId: presence.personnelId ?? null,  // ✅ plus de .personnel.id
+      mois: presence.mois ?? null,                // ✅ vient direct du DTO
+      nbreJourAbsent: presence.nbreJourAbsent ?? 0
+    });
+  } else {
+    // 👇 mode CREATION
+    this.form.reset({
+      id: null,
+      personnelId: null,
+      mois: null,
+      nbreJourAbsent: 0
+    });
   }
+
+  this.modal.open(this.formTpl, {
+    size: 'lg',
+    backdrop: 'static',
+    keyboard: false
+  });
+}
+
+
+
 
   // création ou validation unitaire
   async submit(): Promise<void> {
@@ -277,4 +292,45 @@ afficherNomPersonnel(row: any): string {
     this.currentPage = 0;
     this.chargerPage();
   }
+
+    // formulaire pour la génération automatique des feuilles
+  genForm = new FormGroup({
+    mois: new FormControl<number | null>(null, [Validators.required]),
+    annee: new FormControl<number | null>(new Date().getFullYear(), [Validators.required])
+  });
+
+     openGenModal(): void {
+    this.genForm.reset({
+      mois: null,
+      annee: new Date().getFullYear()
+    });
+    this.modal.open(this.genTpl, { size: 'md', backdrop: 'static', keyboard: false });
+  }
+
+  submitGeneration(modalRef: any): void {
+    if (this.genForm.invalid) return;
+
+    const mois = this.genForm.value.mois!;
+    const annee = this.genForm.value.annee!;
+
+    this.presenceService.genererPourMois(mois, annee).subscribe({
+      next: (res) => {
+        if ((res as any[])?.length) {
+          this.toastr.success(`Feuilles de présence générées pour ${mois}/${annee}`);
+        } else {
+          this.toastr.info(`Aucune nouvelle feuille n'a été créée (tout existait déjà)`);
+        }
+        modalRef.close();
+        this.chargerPage();
+      },
+      error: (e) => {
+        this.toastr.error(
+          e?.error?.message || 'Erreur lors de la génération des feuilles de présence',
+          'Erreur'
+        );
+      }
+    });
+  }
+
+
 }

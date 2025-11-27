@@ -9,36 +9,62 @@
           <div class="row g-3">
             <div class="col-xxl-4 col-lg-6">
               <div class="position-relative">
-                <input type="search" placeholder="Taper les trois premières lettres du nom ..."
-                       [(ngModel)]="nom" (keyup)="onPageChangenom(currentPage)" class="form-control">
+                <input
+                  type="search"
+                  placeholder="Taper les trois premières lettres du nom ..."
+                  [(ngModel)]="nom"
+                  (keyup)="onPageChangenom(currentPage)"
+                  class="form-control"
+                />
               </div>
             </div>
 
             <div class="col-xxl-4 col-lg-6">
               <div class="position-relative">
-                <input type="search" placeholder="Taper les trois premières lettres du prénom ..."
-                       [(ngModel)]="prenom" (keyup)="onPageChangePrenom(currentPage)" class="form-control">
+                <input
+                  type="search"
+                  placeholder="Taper les trois premières lettres du prénom ..."
+                  [(ngModel)]="prenom"
+                  (keyup)="onPageChangePrenom(currentPage)"
+                  class="form-control"
+                />
               </div>
             </div>
 
             <div class="col-xxl-4 col-lg-6">
               <div class="position-relative">
-                <input type="search" placeholder="Taper les trois premiers chiffres du matricule ..."
-                       [(ngModel)]="matricule" (keyup)="onPageChangeMatricule(currentPage)" class="form-control">
+                <input
+                  type="search"
+                  placeholder="Taper les trois premiers chiffres du matricule ..."
+                  [(ngModel)]="matricule"
+                  (keyup)="onPageChangeMatricule(currentPage)"
+                  class="form-control"
+                />
               </div>
             </div>
 
             <div class="col-xxl-2 col-lg-6">
               <div class="position-relative h-100 hstack gap-3">
-                <button (click)="openModal(content)" type="button" class="btn-darkblue h-100 w-100">
-                  <i class="mdi mdi-plus align-middle me-2"></i> Ajouter un nouveau personnel
+                <button
+                  (click)="openModal(content)"
+                  type="button"
+                  class="btn-darkblue h-100 w-100"
+                >
+                  <i class="mdi mdi-plus align-middle me-2"></i>
+                  Ajouter un nouveau personnel
                 </button>
-                <button (click)="retraitePersonnelGroupe()" type="button" class="btn btn-danger h-100 w-100">
-                  <i class="mdi mdi-alert-remove align-middle me-2"></i> Mise en retraites
+                <button
+                  (click)="retraitePersonnelGroupe()"
+                  type="button"
+                  class="btn btn-danger h-100 w-100"
+                >
+                  <i class="mdi mdi-alert-remove align-middle me-2"></i>
+                  Mise en retraites
                 </button>
               </div>
             </div>
-          </div> <!-- row -->
+          </div>
+          <!-- row -->
         </div>
       </div>
     </div>
@@ -47,7 +73,9 @@
   <!-- Liste -->
   <ng-container *ngIf="dossiers | async as response" [ngSwitch]="response?.dataState">
     <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
-      <div class="alert alert-info" role="alert">{{ dataStateEnum.CHARGEMENT }}</div>
+      <div class="alert alert-info" role="alert">
+        {{ dataStateEnum.CHARGEMENT }}
+      </div>
     </ng-container>
 
     <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
@@ -55,94 +83,118 @@
     </ng-container>
 
     <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
-      <div class="row" id="candidate-list">
-        <div class="col-xl-3 col-md-6" *ngFor="let dossier of listeDossierPage; trackBy: trackById">
-          <div class="card personnel-card">
-            <div class="card-body">
-              <div class="d-flex align-start mb-3">
-                <div *ngIf="dossier?.dateEmbauchage && !dossier?.debaucher && !dossier?.retraiter" class="flex-grow-1">
-                  <span class="badge badge-soft-success">En Fonction</span>
-                </div>
-                <div *ngIf="dossier?.debaucher" class="flex-grow-1">
-                  <span class="badge badge-soft-warning">Débaucher</span>
-                </div>
-                <div *ngIf="dossier?.retraiter" class="flex-grow-1">
-                  <span class="badge badge-soft-danger">En Retraite</span>
-                </div>
-              </div>
+      <!-- En-tête léger -->
+      <div
+        class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2"
+      >
+        <h5 class="mb-0 fw-semibold text-dark">
+          Personnel
+          <span class="text-muted" *ngIf="totalDossier">
+            · {{ totalDossier }} collaborateurs
+          </span>
+        </h5>
+        <button (click)="openModal(content)" type="button" class="btn btn-primary btn-sm">
+          <i class="mdi mdi-plus align-middle me-1"></i> Nouveau collaborateur
+        </button>
+      </div>
 
-              <div class="text-center">
-                <div class="avatar-md mx-auto">
-                  <span class="avatar-title rounded-circle bg-soft btn-darkblue text-primary font-size-30">
-                    {{ dossier?.nom?.charAt(0) }}{{ dossier?.nom?.charAt(1) }}{{ dossier?.nom?.charAt(2) }}{{ dossier?.nom?.charAt(3) }}
-                  </span>
-                </div>
-                <h4 class="mt-2 font-size-15">
-                    {{ dossier?.matricule || (dossier?.etatCivil?.matricule) || 'Pas de Matricule' }}
-                </h4>
+      <!-- GRID PERSONNEL MINIMALISTE -->
+      <div class="personnel-grid" *ngIf="listeDossierPage.length; else aucunPersonnel">
+        <article
+          class="personnel-card"
+          *ngFor="let dossier of listeDossierPage; trackBy: trackById"
+        >
+          <!-- Statut -->
+          <div class="personnel-status">
+            <span
+              *ngIf="
+                dossier?.dateEmbauchage &&
+                !dossier?.debaucher &&
+                !dossier?.retraiter
+              "
+              class="status-chip status-actif"
+            >
+              En fonction
+            </span>
+            <span *ngIf="dossier?.debaucher" class="status-chip status-sorti">
+              Débauché
+            </span>
+            <span *ngIf="dossier?.retraiter" class="status-chip status-retraite">
+              En retraite
+            </span>
+          </div>
 
-                <h5 class="font-size-15 mb-1">
-                  {{ (dossier?.prenom?.length || 0) <= 13 ? dossier?.prenom : (dossier?.prenom | slice:0:10) + '...  ' }}
-                  {{ (dossier?.nom?.length || 0) <= 13 ? dossier?.nom : (dossier?.nom | slice:0:10) + '...' }}
-                </h5>
-              </div>
-
-                      <div class="d-flex mb-2 justify-content-center gap-2 text-muted">
-            <ng-container *ngIf="dossier?.adresse || dossier?.coordonnee?.adresse; else noAddress">
-              <i class="bx bx-map align-middle text-primary"></i>
-              {{ dossier?.adresse || dossier?.coordonnee?.adresse }}
-            </ng-container>
-            <ng-template #noAddress>
-              <i class="bx bx-map align-middle text-primary"></i> Pas d'adresse
-            </ng-template>
+          <!-- Contenu principal : avatar + nom/prénom + actions -->
+          <div class="personnel-main">
+            <div class="avatar-photo">
+            <img src="assets/avatars/user.png" alt="Photo profil" />
           </div>
 
 
+            <div class="personnel-info">
+              <h3 class="personnel-name">
+                {{ dossier?.prenom }} {{ dossier?.nom }}
+              </h3>
+            </div>
 
-              <div class="hstack gap-2 justify-content-center">
-                <span class="font-size-14 badge badge-soft-secondary">{{ dossier?.poste?.service?.sigle }}</span>
-              </div>
-
-              <div class="personnel-card-actions mt-3">
-                <a [routerLink]="['details/' + encodeId(dossier.id)]" class="btn btn-primary btn-sm view-profile-btn">
-                  <i class="bx bx-user"></i> Voir le Profil
-                </a>
-                <button type="button" title="Supprimer ce personnel"
-                        (click)="supprimerPersonnel(dossier.id)"
-                        class="btn btn-outline-danger btn-sm delete-btn">
-                  <i class="bx bx-trash-alt"></i> Supprimer
-                </button>
-              </div>
-
+            <div class="personnel-actions">
+              <a
+                class="btn btn-outline-primary btn-sm"
+                [routerLink]="['details/' + encodeId(dossier.id)]"
+              >
+                Voir le profil
+              </a>
+              <button
+                type="button"
+                class="btn btn-icon btn-light btn-sm"
+                title="Supprimer"
+                (click)="supprimerPersonnel(dossier.id)"
+              >
+                <i class="bx bx-trash-alt"></i>
+              </button>
             </div>
           </div>
+        </article>
+      </div>
+
+      <!-- Aucun personnel -->
+      <ng-template #aucunPersonnel>
+        <div class="text-center py-5">
+          <i class="bx bxs-user-x" style="font-size: 72px; color: #cbd5f5"></i>
+          <p class="mt-3 mb-1 fw-semibold">Aucun collaborateur enregistré</p>
+          <p class="text-muted mb-3">
+            Cliquez sur “Nouveau collaborateur” pour créer une première fiche.
+          </p>
+          <button (click)="openModal(content)" class="btn btn-primary btn-sm">
+            Ajouter un collaborateur
+          </button>
         </div>
-      </div>
+      </ng-template>
 
-      <div class="row" *ngIf="!listeDossierPage.length">
-        <p class="text-center" style="font-size: xx-large">
-          <i style="color: red; font-size: 150px" class="bx bxs-data"></i><br>
-          Aucun Personnel
-        </p>
-      </div>
-
-      <!-- Pagination -->
-      <div class="row justify-content-between align-items-center mb-3" *ngIf="totalDossier > 8">
+      <!-- Pagination (inchangée) -->
+      <div
+        class="row justify-content-between align-items-center mb-3"
+        *ngIf="totalDossier > 8"
+      >
         <div class="col-auto me-auto"></div>
         <div class="col-auto">
           <div class="d-flex align-items-center">
-            <button class="btn btn-primary mr-2 mx-3 btn-sm"
-                    (click)="currentPage = currentPage - 1; handleClick()"
-                    [disabled]="currentPage === 0">
+            <button
+              class="btn btn-primary mr-2 mx-3 btn-sm"
+              (click)="currentPage = currentPage - 1; handleClick()"
+              [disabled]="currentPage === 0"
+            >
               Précédent
             </button>
 
             <ng-container *ngIf="pages.length > 1">
               <ng-container *ngIf="pages.length <= 11">
                 <ng-container *ngFor="let page of pages">
-                  <button class="btn btn-primary btn-sm mx-1"
-                          (click)="currentPage = page; handleClick()"
-                          [disabled]="currentPage === page">
+                  <button
+                    class="btn btn-primary btn-sm mx-1"
+                    (click)="currentPage = page; handleClick()"
+                    [disabled]="currentPage === page"
+                  >
                     {{ page + 1 }}
                   </button>
                 </ng-container>
@@ -150,54 +202,74 @@
 
               <ng-container *ngIf="pages.length > 11">
                 <ng-container *ngIf="currentPage <= 6">
-                  <ng-container *ngFor="let page of pages.slice(0,5)">
-                    <button class="btn btn-primary btn-sm mx-1"
-                            (click)="currentPage = page; handleClick()"
-                            [disabled]="currentPage === page">
+                  <ng-container *ngFor="let page of pages.slice(0, 5)">
+                    <button
+                      class="btn btn-primary btn-sm mx-1"
+                      (click)="currentPage = page; handleClick()"
+                      [disabled]="currentPage === page"
+                    >
                       {{ page + 1 }}
                     </button>
                   </ng-container>
                   <button class="btn btn-primary btn-sm mx-1" disabled>...</button>
                   <ng-container *ngFor="let page of pages.slice(-5)">
-                    <button class="btn btn-primary btn-sm mx-1"
-                            (click)="currentPage = page; handleClick()"
-                            [disabled]="currentPage === page">
+                    <button
+                      class="btn btn-primary btn-sm mx-1"
+                      (click)="currentPage = page; handleClick()"
+                      [disabled]="currentPage === page"
+                    >
                       {{ page + 1 }}
                     </button>
                   </ng-container>
                 </ng-container>
 
-                <ng-container *ngIf="currentPage > 6 && currentPage < pages.length - 5">
-                  <ng-container *ngFor="let page of pages.slice(currentPage - 4, currentPage)">
-                    <button class="btn btn-primary btn-sm mx-1"
-                            (click)="currentPage = page; handleClick()"
-                            [disabled]="currentPage === page">
+                <ng-container
+                  *ngIf="
+                    currentPage > 6 && currentPage < pages.length - 5
+                  "
+                >
+                  <ng-container
+                    *ngFor="let page of pages.slice(currentPage - 4, currentPage)"
+                  >
+                    <button
+                      class="btn btn-primary btn-sm mx-1"
+                      (click)="currentPage = page; handleClick()"
+                      [disabled]="currentPage === page"
+                    >
                       {{ page + 1 }}
                     </button>
                   </ng-container>
                   <button class="btn btn-primary btn-sm mx-1" disabled>...</button>
-                  <ng-container *ngFor="let page of pages.slice(currentPage, currentPage + 4)">
-                    <button class="btn btn-primary btn-sm mx-1"
-                            (click)="currentPage = page; handleClick()"
-                            [disabled]="currentPage === page">
+                  <ng-container
+                    *ngFor="let page of pages.slice(currentPage, currentPage + 4)"
+                  >
+                    <button
+                      class="btn btn-primary btn-sm mx-1"
+                      (click)="currentPage = page; handleClick()"
+                      [disabled]="currentPage === page"
+                    >
                       {{ page + 1 }}
                     </button>
                   </ng-container>
                 </ng-container>
 
                 <ng-container *ngIf="currentPage >= pages.length - 5">
-                  <ng-container *ngFor="let page of pages.slice(0,5)">
-                    <button class="btn btn-primary btn-sm mx-1"
-                            (click)="currentPage = page; handleClick()"
-                            [disabled]="currentPage === page">
+                  <ng-container *ngFor="let page of pages.slice(0, 5)">
+                    <button
+                      class="btn btn-primary btn-sm mx-1"
+                      (click)="currentPage = page; handleClick()"
+                      [disabled]="currentPage === page"
+                    >
                       {{ page + 1 }}
                     </button>
                   </ng-container>
                   <button class="btn btn-primary btn-sm mx-1" disabled>...</button>
                   <ng-container *ngFor="let page of pages.slice(-5)">
-                    <button class="btn btn-primary btn-sm mx-1"
-                            (click)="currentPage = page; handleClick()"
-                            [disabled]="currentPage === page">
+                    <button
+                      class="btn btn-primary btn-sm mx-1"
+                      (click)="currentPage = page; handleClick()"
+                      [disabled]="currentPage === page"
+                    >
                       {{ page + 1 }}
                     </button>
                   </ng-container>
@@ -205,9 +277,11 @@
               </ng-container>
             </ng-container>
 
-            <button class="btn btn-primary btn-sm mx-3"
-                    (click)="currentPage = currentPage + 1; handleClick()"
-                    [disabled]="currentPage + 1 === totalPages">
+            <button
+              class="btn btn-primary btn-sm mx-3"
+              (click)="currentPage = currentPage + 1; handleClick()"
+              [disabled]="currentPage + 1 === totalPages"
+            >
               Suivant
             </button>
           </div>
@@ -220,29 +294,50 @@
 <!-- MODAL -->
 <ng-template #content let-modal>
   <div class="modal-header">
-    <h5 class="modal-title mt-0">{{ formulaireDossier.get('id')?.value ? 'Modifier' : 'Créer' }}</h5>
-    <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss('close')"></button>
+    <h5 class="modal-title mt-0">
+      {{ formulaireDossier.get('id')?.value ? 'Modifier' : 'Créer' }}
+    </h5>
+    <button
+      type="button"
+      class="btn-close"
+      aria-label="Close"
+      (click)="modal.dismiss('close')"
+    ></button>
   </div>
 
   <div class="modal-body">
     <form [formGroup]="formulaireDossier" (ngSubmit)="creerModifierPersonnel()">
       <mat-stepper #stepper class="kycwizard">
-
         <!-- Step 1 -->
-        <mat-step [stepControl]="formulaireDossier.get('identitePersonnelGroupe')!"
-                  label="Identité du personnel">
+        <mat-step
+          [stepControl]="formulaireDossier.get('identitePersonnelGroupe')!"
+          label="Identité du personnel"
+        >
           <div formGroupName="identitePersonnelGroupe">
             <div class="kyc-tab-content">
               <div class="row">
-
                 <div class="col-lg-6">
                   <div class="mb-3">
                     <label>Matricule *</label>
-                    <input class="form-control" placeholder="Veuillez entrer le matricule"
-                           formControlName="matricule" type="number">
-                    <div *ngIf="ctrl('identitePersonnelGroupe.matricule')?.invalid && (ctrl('identitePersonnelGroupe.matricule')?.dirty || ctrl('identitePersonnelGroupe.matricule')?.touched)"
-                         class="text-danger">
-                      <div *ngIf="ctrl('identitePersonnelGroupe.matricule')?.errors?.['required']">
+                    <input
+                      class="form-control"
+                      placeholder="Veuillez entrer le matricule"
+                      formControlName="matricule"
+                      type="number"
+                    />
+                    <div
+                      *ngIf="
+                        ctrl('identitePersonnelGroupe.matricule')?.invalid &&
+                        (ctrl('identitePersonnelGroupe.matricule')?.dirty ||
+                          ctrl('identitePersonnelGroupe.matricule')?.touched)
+                      "
+                      class="text-danger"
+                    >
+                      <div
+                        *ngIf="
+                          ctrl('identitePersonnelGroupe.matricule')?.errors?.['required']
+                        "
+                      >
                         Le matricule est obligatoire
                       </div>
                     </div>
@@ -252,10 +347,25 @@
                 <div class="col-lg-6">
                   <div class="mb-3">
                     <label>Nom *</label>
-                    <input class="form-control" placeholder="Nom" formControlName="nom" type="text">
-                    <div *ngIf="ctrl('identitePersonnelGroupe.nom')?.invalid && (ctrl('identitePersonnelGroupe.nom')?.dirty || ctrl('identitePersonnelGroupe.nom')?.touched)"
-                         class="text-danger">
-                      <div *ngIf="ctrl('identitePersonnelGroupe.nom')?.errors?.['required']">
+                    <input
+                      class="form-control"
+                      placeholder="Nom"
+                      formControlName="nom"
+                      type="text"
+                    />
+                    <div
+                      *ngIf="
+                        ctrl('identitePersonnelGroupe.nom')?.invalid &&
+                        (ctrl('identitePersonnelGroupe.nom')?.dirty ||
+                          ctrl('identitePersonnelGroupe.nom')?.touched)
+                      "
+                      class="text-danger"
+                    >
+                      <div
+                        *ngIf="
+                          ctrl('identitePersonnelGroupe.nom')?.errors?.['required']
+                        "
+                      >
                         Le nom est obligatoire
                       </div>
                     </div>
@@ -265,41 +375,79 @@
                 <div class="col-lg-6">
                   <div class="mb-3">
                     <label>Prénom *</label>
-                    <input class="form-control" placeholder="Prénom" formControlName="prenom" type="text">
-                    <div *ngIf="ctrl('identitePersonnelGroupe.prenom')?.invalid && (ctrl('identitePersonnelGroupe.prenom')?.dirty || ctrl('identitePersonnelGroupe.prenom')?.touched)"
-                         class="text-danger">
-                      <div *ngIf="ctrl('identitePersonnelGroupe.prenom')?.errors?.['required']">
+                    <input
+                      class="form-control"
+                      placeholder="Prénom"
+                      formControlName="prenom"
+                      type="text"
+                    />
+                    <div
+                      *ngIf="
+                        ctrl('identitePersonnelGroupe.prenom')?.invalid &&
+                        (ctrl('identitePersonnelGroupe.prenom')?.dirty ||
+                          ctrl('identitePersonnelGroupe.prenom')?.touched)
+                      "
+                      class="text-danger"
+                    >
+                      <div
+                        *ngIf="
+                          ctrl('identitePersonnelGroupe.prenom')?.errors?.['required']
+                        "
+                      >
                         Le prénom est obligatoire
                       </div>
                     </div>
                   </div>
                 </div>
+
                 <div class="col-lg-6">
-  <div class="mb-3">
-    <label>Email</label>
-    <input class="form-control" placeholder="Email"
-           formControlName="email" type="email">
-    <div *ngIf="ctrl('identitePersonnelGroupe.email')?.invalid
-                 && (ctrl('identitePersonnelGroupe.email')?.dirty || ctrl('identitePersonnelGroupe.email')?.touched)"
-         class="text-danger">
-      <div *ngIf="ctrl('identitePersonnelGroupe.email')?.errors?.['email']">
-        Format d'email invalide
-      </div>
-    </div>
-  </div>
-</div>
+                  <div class="mb-3">
+                    <label>Email</label>
+                    <input
+                      class="form-control"
+                      placeholder="Email"
+                      formControlName="email"
+                      type="email"
+                    />
+                    <div
+                      *ngIf="
+                        ctrl('identitePersonnelGroupe.email')?.invalid &&
+                        (ctrl('identitePersonnelGroupe.email')?.dirty ||
+                          ctrl('identitePersonnelGroupe.email')?.touched)
+                      "
+                      class="text-danger"
+                    >
+                      <div
+                        *ngIf="
+                          ctrl('identitePersonnelGroupe.email')?.errors?.['email']
+                        "
+                      >
+                        Format d'email invalide
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 <div class="col-lg-6">
                   <div class="mb-3">
                     <label>Civilité *</label>
                     <select formControlName="civilite" class="form-select">
                       <option [ngValue]="null" disabled>Choisir la civilité</option>
-                      <option *ngFor="let typeCivilite of typeCivilites" [value]="typeCivilite">
+                      <option
+                        *ngFor="let typeCivilite of typeCivilites"
+                        [value]="typeCivilite"
+                      >
                         {{ typeCivilite }}
                       </option>
                     </select>
-                    <p *ngIf="ctrl('identitePersonnelGroupe.civilite')?.invalid && (ctrl('identitePersonnelGroupe.civilite')?.dirty || ctrl('identitePersonnelGroupe.civilite')?.touched)"
-                       class="text-danger mt-2">
+                    <p
+                      *ngIf="
+                        ctrl('identitePersonnelGroupe.civilite')?.invalid &&
+                        (ctrl('identitePersonnelGroupe.civilite')?.dirty ||
+                          ctrl('identitePersonnelGroupe.civilite')?.touched)
+                      "
+                      class="text-danger mt-2"
+                    >
                       La civilité est obligatoire
                     </p>
                   </div>
@@ -308,11 +456,27 @@
                 <div class="col-lg-6">
                   <div class="mb-3">
                     <label>Date de naissance *</label>
-                    <input class="form-control" placeholder="Date de naissance"
-                           formControlName="dateDeNaissance" type="date">
-                    <div *ngIf="ctrl('identitePersonnelGroupe.dateDeNaissance')?.invalid && (ctrl('identitePersonnelGroupe.dateDeNaissance')?.dirty || ctrl('identitePersonnelGroupe.dateDeNaissance')?.touched)"
-                         class="text-danger">
-                      <div *ngIf="ctrl('identitePersonnelGroupe.dateDeNaissance')?.errors?.['required']">
+                    <input
+                      class="form-control"
+                      placeholder="Date de naissance"
+                      formControlName="dateDeNaissance"
+                      type="date"
+                    />
+                    <div
+                      *ngIf="
+                        ctrl('identitePersonnelGroupe.dateDeNaissance')?.invalid &&
+                        (ctrl('identitePersonnelGroupe.dateDeNaissance')?.dirty ||
+                          ctrl('identitePersonnelGroupe.dateDeNaissance')?.touched)
+                      "
+                      class="text-danger"
+                    >
+                      <div
+                        *ngIf="
+                          ctrl('identitePersonnelGroupe.dateDeNaissance')?.errors?.[
+                            'required'
+                          ]
+                        "
+                      >
                         La date de naissance est obligatoire
                       </div>
                     </div>
@@ -322,174 +486,271 @@
                 <div class="col-lg-6">
                   <div class="mb-3">
                     <label>Référence comptable *</label>
-                    <input class="form-control" placeholder="Référence comptable"
-                           formControlName="referenceComptable" type="number">
+                    <input
+                      class="form-control"
+                      placeholder="Référence comptable"
+                      formControlName="referenceComptable"
+                      type="number"
+                    />
                   </div>
                 </div>
 
                 <div class="col-lg-12">
                   <div class="mb-3">
                     <label>Situation matrimoniale *</label>
-                    <select formControlName="situationMatrimoniale" class="form-select">
-                      <option [ngValue]="null" disabled>Choisir la situation matrimoniale</option>
-                      <option *ngFor="let s of situationMatrimoniales" [value]="s">{{ s }}</option>
+                    <select
+                      formControlName="situationMatrimoniale"
+                      class="form-select"
+                    >
+                      <option [ngValue]="null" disabled>
+                        Choisir la situation matrimoniale
+                      </option>
+                      <option
+                        *ngFor="let s of situationMatrimoniales"
+                        [value]="s"
+                      >
+                        {{ s }}
+                      </option>
                     </select>
-                    <p *ngIf="ctrl('identitePersonnelGroupe.situationMatrimoniale')?.invalid && (ctrl('identitePersonnelGroupe.situationMatrimoniale')?.dirty || ctrl('identitePersonnelGroupe.situationMatrimoniale')?.touched)"
-                       class="text-danger mt-2">
+                    <p
+                      *ngIf="
+                        ctrl('identitePersonnelGroupe.situationMatrimoniale')
+                          ?.invalid &&
+                        (ctrl('identitePersonnelGroupe.situationMatrimoniale')
+                          ?.dirty ||
+                          ctrl('identitePersonnelGroupe.situationMatrimoniale')
+                            ?.touched)
+                      "
+                      class="text-danger mt-2"
+                    >
                       La situation matrimoniale est obligatoire
                     </p>
                   </div>
                 </div>
-
               </div>
             </div>
 
             <ul class="list-inline wizard mb-0">
               <li class="next list-inline-item float-end">
-                <button class="btn btn-primary" type="button" (click)="onNext(stepper)">Suivant</button>
+                <button
+                  class="btn btn-primary"
+                  type="button"
+                  (click)="onNext(stepper)"
+                >
+                  Suivant
+                </button>
               </li>
             </ul>
           </div>
         </mat-step>
 
         <!-- Step 2 -->
-        <mat-step [stepControl]="formulaireDossier.get('identitePersonnelGroupe')!"
-                  label="Identité du personnel (suite)">
+        <mat-step
+          [stepControl]="formulaireDossier.get('identitePersonnelGroupe')!"
+          label="Identité du personnel (suite)"
+        >
           <div formGroupName="identitePersonnelGroupe">
             <div class="kyc-tab-content">
               <div class="row">
-                
-
                 <div class="col-lg-6">
                   <div class="mb-3">
                     <label>Nombre d'enfants *</label>
-                    <input class="form-control" placeholder="Nombre d'enfants"
-                           formControlName="nombreEnfant" type="number">
+                    <input
+                      class="form-control"
+                      placeholder="Nombre d'enfants"
+                      formControlName="nombreEnfant"
+                      type="number"
+                    />
                   </div>
                 </div>
 
                 <div class="col-lg-6">
                   <div class="mb-3">
                     <label>Numéro pièce d'identité *</label>
-                    <input class="form-control" placeholder="N° pièce d'identité"
-                           formControlName="pieceIdentite" type="text">
+                    <input
+                      class="form-control"
+                      placeholder="N° pièce d'identité"
+                      formControlName="pieceIdentite"
+                      type="text"
+                    />
                   </div>
                 </div>
 
                 <div class="col-lg-6">
                   <div class="mb-3">
                     <label>Numéro CNSS *</label>
-                    <input class="form-control" placeholder="N° CNSS"
-                           formControlName="numeroCnss" type="text">
+                    <input
+                      class="form-control"
+                      placeholder="N° CNSS"
+                      formControlName="numeroCnss"
+                      type="text"
+                    />
                   </div>
                 </div>
 
                 <div class="col-lg-6">
                   <div class="mb-3">
                     <label>Téléphone</label>
-                    <input class="form-control" placeholder="Téléphone"
-                           formControlName="telephone" type="text">
+                    <input
+                      class="form-control"
+                      placeholder="Téléphone"
+                      formControlName="telephone"
+                      type="text"
+                    />
                   </div>
                 </div>
 
                 <div class="col-lg-6">
                   <div class="mb-3">
                     <label>Date d'embauche *</label>
-                    <input class="form-control" placeholder="Date d'embauche"
-                           formControlName="dateEmbauchage" type="date">
+                    <input
+                      class="form-control"
+                      placeholder="Date d'embauche"
+                      formControlName="dateEmbauchage"
+                      type="date"
+                    />
                   </div>
                 </div>
 
                 <div class="col-lg-12">
                   <div class="mb-3">
                     <label>Adresse *</label>
-                    <textarea class="form-control" placeholder="Adresse"
-                              formControlName="adresse" rows="5"></textarea>
+                    <textarea
+                      class="form-control"
+                      placeholder="Adresse"
+                      formControlName="adresse"
+                      rows="5"
+                    ></textarea>
                   </div>
                 </div>
-
               </div>
             </div>
 
             <ul class="list-inline wizard mb-0">
               <li class="previous list-inline-item">
-                <button class="btn btn-primary" type="button" matStepperPrevious>Précédent</button>
+                <button class="btn btn-primary" type="button" matStepperPrevious>
+                  Précédent
+                </button>
               </li>
               <li class="next list-inline-item float-end">
-                <button class="btn btn-primary" type="button" (click)="onNext(stepper)">Suivant</button>
+                <button
+                  class="btn btn-primary"
+                  type="button"
+                  (click)="onNext(stepper)"
+                >
+                  Suivant
+                </button>
               </li>
             </ul>
           </div>
         </mat-step>
 
         <!-- Step 3 -->
-        <mat-step [stepControl]="formulaireDossier.get('personneContacterGroupe')!"
-                  label="Personne à contacter">
+        <mat-step
+          [stepControl]="formulaireDossier.get('personneContacterGroupe')!"
+          label="Personne à contacter"
+        >
           <div formGroupName="personneContacterGroupe">
             <div class="kyc-tab-content">
               <div class="row">
                 <div class="col-lg-6">
                   <div class="mb-3">
                     <label>Contact téléphone</label>
-                    <input class="form-control" placeholder="Téléphone contact"
-                           formControlName="telephoneContact" type="text">
+                    <input
+                      class="form-control"
+                      placeholder="Téléphone contact"
+                      formControlName="telephoneContact"
+                      type="text"
+                    />
                   </div>
                 </div>
                 <div class="col-lg-6">
                   <div class="mb-3">
                     <label>Prénom contact</label>
-                    <input class="form-control" placeholder="Prénom contact"
-                           formControlName="prenomContact" type="text">
+                    <input
+                      class="form-control"
+                      placeholder="Prénom contact"
+                      formControlName="prenomContact"
+                      type="text"
+                    />
                   </div>
                 </div>
                 <div class="col-lg-12">
                   <div class="mb-3">
                     <label>Nom contact</label>
-                    <input class="form-control" placeholder="Nom contact"
-                           formControlName="nomContact" type="text">
+                    <input
+                      class="form-control"
+                      placeholder="Nom contact"
+                      formControlName="nomContact"
+                      type="text"
+                    />
                   </div>
                 </div>
               </div>
             </div>
             <ul class="list-inline wizard mb-0">
               <li class="previous list-inline-item">
-                <button class="btn btn-primary" type="button" matStepperPrevious>Précédent</button>
+                <button class="btn btn-primary" type="button" matStepperPrevious>
+                  Précédent
+                </button>
               </li>
               <li class="next list-inline-item float-end">
-                <button class="btn btn-primary" type="button" (click)="onNext(stepper)">Suivant</button>
+                <button
+                  class="btn btn-primary"
+                  type="button"
+                  (click)="onNext(stepper)"
+                >
+                  Suivant
+                </button>
               </li>
             </ul>
           </div>
         </mat-step>
 
         <!-- Step 4 -->
-        <mat-step [stepControl]="formulaireDossier.get('autrePersonnelGroupe')!"
-                  label="Autres informations">
+        <mat-step
+          [stepControl]="formulaireDossier.get('autrePersonnelGroupe')!"
+          label="Autres informations"
+        >
           <div formGroupName="autrePersonnelGroupe">
             <div class="kyc-tab-content">
               <div class="row">
                 <div class="col-md-6">
                   <div class="mb-3">
                     <label for="poste">Poste *</label>
-                    <ng-select [searchable]="true" (search)="onSearchPoste($event)"
-                               [loading]="loading" formControlName="poste" id="poste"
-                               placeholder="Tapez les trois premières lettres">
-                      <ng-option *ngFor="let poste of listePoste" [value]="poste.id">
+                    <ng-select
+                      [searchable]="true"
+                      (search)="onSearchPoste($event)"
+                      [loading]="loading"
+                      formControlName="poste"
+                      id="poste"
+                      placeholder="Tapez les trois premières lettres"
+                    >
+                      <ng-option
+                        *ngFor="let poste of listePoste"
+                        [value]="poste.id"
+                      >
                         {{ poste.designation }}
                       </ng-option>
                     </ng-select>
                   </div>
                 </div>
 
-              
-
                 <div class="col-md-12">
                   <div class="mb-3">
                     <label for="indice">Indice</label>
-                    <ng-select [searchable]="true" (search)="onSearchIndice($event)"
-                               [loading]="loading" formControlName="indice" id="indice"
-                               placeholder="Tapez les trois premières lettres">
-                      <ng-option *ngFor="let indice of listeIndice" [value]="indice.id">
+                    <ng-select
+                      [searchable]="true"
+                      (search)="onSearchIndice($event)"
+                      [loading]="loading"
+                      formControlName="indice"
+                      id="indice"
+                      placeholder="Tapez les trois premières lettres"
+                    >
+                      <ng-option
+                        *ngFor="let indice of listeIndice"
+                        [value]="indice.id"
+                      >
                         {{ indice.nom }}
                       </ng-option>
                     </ng-select>
@@ -500,18 +761,22 @@
 
             <ul class="list-inline wizard mb-0">
               <li class="previous list-inline-item">
-                <button class="btn btn-primary" type="button" matStepperPrevious>Précédent</button>
+                <button class="btn btn-primary" type="button" matStepperPrevious>
+                  Précédent
+                </button>
               </li>
               <li class="next list-inline-item float-end">
-                <button class="btn btn-primary" type="submit"
-                        [disabled]="formulaireDossier.get('autrePersonnelGroupe')?.invalid">
+                <button
+                  class="btn btn-primary"
+                  type="submit"
+                  [disabled]="formulaireDossier.get('autrePersonnelGroupe')?.invalid"
+                >
                   {{ formulaireDossier.get('id')?.value ? 'Modifier' : 'Créer' }}
                 </button>
               </li>
             </ul>
           </div>
         </mat-step>
-
       </mat-stepper>
     </form>
   </div>

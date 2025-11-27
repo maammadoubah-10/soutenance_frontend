@@ -1,5 +1,5 @@
 <div class="container-fluid px-3 page-with-bg">
-  <!-- En-tête de page (optionnel, si standalone dispo) -->
+  <!-- En-tête de page -->
   <app-titredepage
     title="Mes congés"
     [items]="[{label:'RH'}, {label:'Mes congés', active:true}]">
@@ -8,14 +8,103 @@
   <div class="card shadow-sm">
     <div class="card-body">
 
-      <!-- Toolbar actions en haut à droite -->
+      <!-- 🔹 Bloc synthèse (style Mes présences) -->
+      <div class="row g-3 mb-4">
+        <!-- Carte 1 : Vue globale -->
+        <div class="col-md-4">
+          <div class="border rounded-3 p-3 h-100 bg-light">
+            <div class="small text-muted mb-1">Vue globale</div>
+            <div class="fs-5 fw-semibold">
+              Total de mes congés : {{ total }}
+            </div>
+            <div class="mt-2 small">
+              <div>
+                <span class="badge bg-success me-1">{{ nbValides }}</span>
+                <span class="text-muted">Validés</span>
+              </div>
+              <div class="mt-1">
+                <span class="badge bg-info me-1">{{ nbEnCours }}</span>
+                <span class="text-muted">En cours</span>
+              </div>
+              <div class="mt-1">
+                <span class="badge bg-danger me-1">{{ nbRejectes }}</span>
+                <span class="text-muted">Rejetés</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Carte 2 : Prochain congé -->
+        <div class="col-md-4">
+          <div class="border rounded-3 p-3 h-100">
+            <div class="small text-muted mb-1">Prochain congé</div>
+
+            <ng-container *ngIf="prochainConge; else noNextLeave">
+              <div class="fw-semibold">
+                {{ prochainConge?.typeConge || '—' }}
+              </div>
+              <div class="small text-muted mt-1">
+                Du
+                <strong>{{ prochainConge?.dateDebut | date:'dd/MM/yyyy' }}</strong>
+                au
+                <strong>{{ prochainConge?.dateFin | date:'dd/MM/yyyy' }}</strong>
+              </div>
+              <div class="mt-2">
+                <span class="badge" [ngClass]="badgeUnifie(prochainConge!)">
+                  {{ computeStatus(prochainConge!) }}
+                </span>
+              </div>
+            </ng-container>
+
+            <ng-template #noNextLeave>
+              <div class="small text-muted">
+                Aucun congé planifié à venir.
+              </div>
+            </ng-template>
+          </div>
+        </div>
+
+        <!-- Carte 3 : Dernière demande -->
+        <div class="col-md-4">
+          <div class="border rounded-3 p-3 h-100">
+            <div class="small text-muted mb-1">Dernière demande</div>
+
+            <ng-container *ngIf="dernierConge; else noLastLeave">
+              <div class="fw-semibold">
+                {{ dernierConge?.typeConge || '—' }}
+              </div>
+              <div class="small text-muted mt-1">
+                Début : <strong>{{ dernierConge?.dateDebut | date:'dd/MM/yyyy' }}</strong>
+              </div>
+              <div class="small text-muted">
+                Jours demandés : <strong>{{ dernierConge?.nbreJour || 0 }}</strong>
+              </div>
+              <div class="mt-2">
+                <span class="badge" [ngClass]="badgeUnifie(dernierConge!)">
+                  {{ computeStatus(dernierConge!) }}
+                </span>
+                <span class="small text-muted ms-1">
+                  ({{ labelGlobal(dernierConge!) }})
+                </span>
+              </div>
+            </ng-container>
+
+            <ng-template #noLastLeave>
+              <div class="small text-muted">
+                Vous n’avez pas encore de demande de congé enregistrée.
+              </div>
+            </ng-template>
+          </div>
+        </div>
+      </div>
+
+      <!-- 🔹 Toolbar actions en haut à droite (comme avant) -->
       <div class="d-flex flex-wrap gap-2 justify-content-between align-items-center mb-3">
         <div class="small text-muted">
           <ng-container *ngIf="loading">Chargement…</ng-container>
           <ng-container *ngIf="!loading && !error">Total: {{ total }}</ng-container>
         </div>
         <div class="d-flex gap-2">
-          <!-- Place pour filtres si besoin plus tard -->
           <button class="btn btn-primary btn-sm" (click)="openCreate(createTpl)">
             <i class="mdi mdi-plus align-middle me-1"></i> Demander un congé
           </button>
@@ -48,7 +137,7 @@
                 <span class="fw-semibold">{{ i + 1 + (page * size) }}</span>
               </td>
 
-              <!-- Type : badge compact sans espace superflu -->
+              <!-- Type : badge compact -->
               <td class="col-type">
                 <span class="badge badge-type" [ngClass]="typeClass(c?.typeConge)">
                   {{ c?.typeConge || '—' }}
@@ -66,13 +155,13 @@
                 {{ c?.nbreJour }}
               </td>
 
-              <!-- Statut global (badge + sous-libellé) -->
+              <!-- Statut global -->
               <td class="col-statut">
                 <span class="badge" [ngClass]="badgeUnifie(c)">{{ computeStatus(c) }}</span>
                 <small class="text-muted d-block mt-1 lh-1">{{ labelGlobal(c) }}</small>
               </td>
 
-              <!-- Actions alignées à droite -->
+              <!-- Actions -->
               <td class="text-end col-actions">
                 <button class="btn btn-outline-secondary btn-sm btn-ghost"
                         (click)="openDetail(c, detailTpl)"
@@ -162,7 +251,7 @@
   </div>
 </ng-template>
 
-<!-- Modal CRÉATION -->
+<!-- Modal CRÉATION (inchangé) -->
 <ng-template #createTpl let-modal>
   <div class="modal-header">
     <h5 class="modal-title">Demander un congé</h5>

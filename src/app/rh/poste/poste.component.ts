@@ -1,3 +1,4 @@
+// src/app/rh/poste/poste.component.ts
 import { Component, OnInit } from '@angular/core';
 import { DataStateEnum, ModelDataState } from "../../state/state";
 import { BehaviorSubject, Observable, of } from "rxjs";
@@ -20,26 +21,28 @@ import Hashids from 'hashids';
 export class PosteComponent implements OnInit {
 
   items: any[] = [];
-  dataStateEnum = DataStateEnum
-  state?: DataStateEnum
-  dossiers?: Observable<ModelDataState<Poste[]>>
-  listeDossierPage: Poste[] = []
-  listePoste: Poste[] = []
-  listeService: Service[] = []
-  public designation: string= '';
-  public searchValue: string = '';
+  dataStateEnum = DataStateEnum;
+  state?: DataStateEnum;
+  dossiers?: Observable<ModelDataState<Poste[]>>;
+
+  listeDossierPage: Poste[] = [];
+  listePoste: Poste[] = [];
+  listeService: Service[] = [];
+
+  // 🔎 Filtres
+  public designation: string = '';
+  public chefServiceFilter: string = ''; // '', 'true', 'false'
   public loading: boolean = false;
 
-  file: File | undefined
+  file: File | undefined;
 
   formulaireDossier = new FormGroup({
     id: new FormControl(),
     designation: new FormControl('', [Validators.required]),
     description: new FormControl(''),
-    chefService: new FormControl('false', [Validators.required]), // "true"/"false" string -> back boolean ok
-    service: new FormControl<number | null>(null, [Validators.required]),
-    poste: new FormControl<number | null>(null)
-  })
+    chefService: new FormControl('false', [Validators.required]),
+    service: new FormControl<number | null>(null, [Validators.required])
+  });
 
   totalDossier: number = 0;
   currentPage: number = 0;
@@ -63,39 +66,74 @@ export class PosteComponent implements OnInit {
       { label: 'Ressources Humaines' },
       { label: 'Poste', active: true }
     ];
-    this.chargerListePostePage();
+
+    this.loadPostes();         // charge la liste des postes
+    this.chargerServices();    // charge la liste des services pour le <select>
   }
 
-  chargerListePostePage(): void {
+  /* =======================
+     Chargement + filtres
+  ==========================*/
+
+  loadPostes(): void {
     this.dossiers = this.dossierService
-      .listerPostePage(this.currentPage, this.dossierPerPage, this.sort)
+      .listerPostePage(
+        this.currentPage,
+        this.dossierPerPage,
+        this.sort,
+        this.designation,
+        this.chefServiceFilter
+      )
       .pipe(
         map((response: any) => {
-          this.listeDossierPage = response.body.content;
-          this.totalDossier = response.body.totalElements;
-          this.totalPages = response.body.totalPages;
+          this.listeDossierPage = response.body.content || [];
+          this.totalDossier = response.body.totalElements || this.listeDossierPage.length;
+          this.totalPages = response.body.totalPages || 1;
           this.pages = this.getPages();
+
           return {
             dataState: this.dataStateEnum.CHARGE,
             data: this.listeDossierPage,
           };
         }),
-        startWith({ dataState: this.dataStateEnum.CHARGEMENT })
-      )
-      .pipe(
+        startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
         catchError((err) => {
           return of({ dataState: this.dataStateEnum.ERREUR, data: [] });
         })
       );
   }
 
+  // 👉 charge tous les services pour alimenter le <select>
+  chargerServices(): void {
+    // adapte le nom de la méthode si besoin (listerService / findAll / etc.)
+    this.serviceService.rechercheService('').subscribe(
+      (response: any) => {
+        this.listeService = response.body?.content || response.body || response || [];
+      },
+      () => { }
+    );
+  }
+
   getPages(): number[] {
     const pages: number[] = [];
-    for (let i = 0; i < this.totalPages; i++) {
-      pages.push(i);
-    }
+    for (let i = 0; i < this.totalPages; i++) pages.push(i);
     return pages;
   }
+
+  onPageChange(page: number): void {
+    if (page < 0 || page >= this.totalPages) return;
+    this.currentPage = page;
+    this.loadPostes();
+  }
+
+  onFilterChanged(): void {
+    this.currentPage = 0;
+    this.loadPostes();
+  }
+
+  /* =======================
+     Modal Création / Edition
+  ==========================*/
 
   openModal(content: any, dossier: Poste | undefined = undefined) {
     if (dossier) {
@@ -105,16 +143,20 @@ export class PosteComponent implements OnInit {
         designation: dossier.designation,
         description: dossier.description,
         chefService: String(dossier.chefService),
-        service: dossier.service?.id ?? null,
-        poste: dossier.poste?.id ?? null
+        service: dossier.service?.id ?? null
       });
     } else {
       this.formulaireDossier.reset();
       this.formulaireDossier.get('chefService')?.setValue('false');
       this.formulaireDossier.get('service')?.setValue(null);
-      this.formulaireDossier.get('poste')?.setValue(null);
       this.file = undefined;
     }
+
+    // S'assure que la liste des services est dispo quand on ouvre le modal
+    if (!this.listeService || this.listeService.length === 0) {
+      this.chargerServices();
+    }
+
     this.modalService.open(content, {
       size: 'lg',
       backdrop: 'static',
@@ -135,13 +177,11 @@ export class PosteComponent implements OnInit {
     const description = this.formulaireDossier.get('description')?.value || '';
     const chefService = this.formulaireDossier.get('chefService')?.value || 'false';
     const service = this.formulaireDossier.get('service')?.value || '';
-    const poste = this.formulaireDossier.get('poste')?.value || '';
 
     formData.append('designation', designation.toString());
     formData.append('description', description.toString());
     formData.append('chefService', chefService.toString());
     formData.append('service', service.toString());
-    if (poste !== '') formData.append('poste', poste.toString());
 
     const id = this.formulaireDossier.get('id')?.value;
 
@@ -150,7 +190,7 @@ export class PosteComponent implements OnInit {
         (response) => {
           this.listeDossierPage = this.listeDossierPage.map(e => e.id === response.id ? response : e);
           this.modalService.dismissAll();
-          this.chargerListePostePage();
+          this.loadPostes();
           this.successmsg("Poste modifié", "Le Poste a été modifié avec succès");
           this.formulaireDossier.reset();
         },
@@ -169,7 +209,7 @@ export class PosteComponent implements OnInit {
           this.listeDossierPage.unshift(response);
           this.formulaireDossier.reset();
           this.modalService.dismissAll();
-          this.chargerListePostePage();
+          this.loadPostes();
           this.successmsg();
         },
         (error) => {
@@ -241,55 +281,13 @@ export class PosteComponent implements OnInit {
     return this.hashids?.encode(id);
   }
 
-  onSearchService(sigle: string) {
-    if (sigle.length >= 1) {
-      this.serviceService.rechercheService(sigle).subscribe(
-        (response: any) => this.listeService = response.body.content,
-        () => {}
-      );
-    }
-  }
-
+  // search Poste (si tu veux le réutiliser ailleurs)
   onSearchPoste(designation: string) {
     if (designation.length >= 3) {
       this.dossierService.recherchePoste(designation).subscribe(
         (response: any) => this.listePoste = response.body.content,
         () => {}
       );
-    }
-  }
-
-  handleClick() {
-    if (!this.designation) this.chargerListePostePage();
-    else this.search();
-  }
-
-  search(): void {
-    this.dossiers = this.dossierService.recherchePostePage(this.designation, this.currentPage, this.dossierPerPage, this.sort)
-      .pipe(
-        map((response: any) => {
-          this.listeDossierPage = response.body.content;
-          if (this.listeDossierPage.length === 0) {
-            this.errormsg('Erreur', 'Aucun enregistrement ne correspond à votre recherche');
-            this.chargerListePostePage();
-          }
-          this.totalDossier = response.body.totalElements;
-          this.totalPages = response.body.totalPages;
-          this.pages = this.getPages();
-          return { dataState: this.dataStateEnum.CHARGE, data: this.listeDossierPage };
-        }),
-        startWith({ dataState: this.dataStateEnum.CHARGEMENT }),
-        catchError(err => of({ dataState: this.dataStateEnum.ERREUR, data: [] }))
-      );
-  }
-
-  onPageChange(event: any): void {
-    this.currentPage = 0;
-    this.dossierPerPage = 10;
-    if (this.designation && this.designation.length >= 3) {
-      this.search();
-    } else if (!this.designation?.length) {
-      this.chargerListePostePage();
     }
   }
 }

@@ -46,20 +46,25 @@ export class MotdepasseoublieComponent implements OnInit {
   }
 
   onReinitialiseLeMotDePasse() {
-    const email: string = this.resetForm.value;
+  if (this.resetForm.invalid) return;
 
-    this.response = this.authenticationService.motdepasseoublie(email).pipe(
-      map(data => {
-        this.resetForm.reset();  // Corrected line
-        return {
-          dataState: DataStateEnum.CHARGE,
-          data: data,
-        };
-      }),
-      startWith({dataState: DataStateEnum.CHARGEMENT}),
-      catchError((error: HttpErrorResponse) => {
-        return this.authenticationService.gestionnaireDerreur(error);
-      }),
-    );
-  }
+  const payload = {
+    email: this.resetForm.get('email')?.value
+  };
+
+  this.response = this.authenticationService.motdepasseoublie(payload).pipe(
+    map(data => {
+      this.resetForm.reset();
+      return {
+        dataState: DataStateEnum.CHARGE,
+        data: data,
+      };
+    }),
+    startWith({ dataState: DataStateEnum.CHARGEMENT }),
+    catchError((error: HttpErrorResponse) => {
+      return this.authenticationService.gestionnaireDerreur(error);
+    }),
+  );
+}
+
 }

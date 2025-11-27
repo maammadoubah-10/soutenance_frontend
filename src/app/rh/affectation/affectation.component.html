@@ -28,7 +28,7 @@
                 <td>{{ i + 1 + (currentPage * pageSize) }}</td>
                 <td>{{ a?.personnel?.etatCivil?.prenom || a?.personnel?.prenom }} {{ a?.personnel?.etatCivil?.nom || a?.personnel?.nom }}</td>
                 <td>{{ a?.poste?.designation }}</td>
-                <td>{{ a?.dateDebut | date:'dd MMMM yyyy':'?':'fr-FR' }}</td>
+                <td>{{ a?.dateDebut | date:'dd/MM/yyyy' }}</td>
                 <td>
                   <button class="btn btn-sm btn-info me-2" (click)="openModal(formTpl, a)">Modifier</button>
                   <button class="btn btn-sm btn-danger" (click)="supprimer(a.id!)">Supprimer</button>
