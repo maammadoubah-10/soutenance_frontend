@@ -7,226 +7,216 @@
   <div class="main">
     <div class="page-content">
       <div class="container-fluid">
+        <div class="ws-layout">
 
-        <!-- HERO PARALLAX -->
-        <section class="hero-landing">
-<div class="hero-bg" [style.background-image]="'url(/assets/home/hero.jpg)'"></div>
-          <div class="hero-overlay"></div>
-          <div class="hero-content container">
-            <div class="row align-items-center g-4">
-              <div class="col-12 col-lg-7">
-                <div class="glass p-4 p-lg-5">
-                  <p class="text-uppercase fw-bold text-primary-300 mb-2">{{ greeting }}</p>
-                  <h1 class="display-6 display-lg-5 text-white mb-2">
-                    Bienvenue, {{ utilisateurAuthentifie?.personnel?.etatCivil?.prenom }} !
+          <!-- HERO STYLE MYScol -->
+          <section class="workspace-hero">
+            <div class="row g-4 align-items-center">
+              <!-- GAUCHE : gros titre + texte -->
+              <div class="col-12 col-lg-6">
+                <div class="hero-left">
+            
+
+                  <!-- mot outline façon MyScol -->
+                  <div class="hero-logo-block">
+                      <span class="hero-brand-outline">
+                        <span class="brand-isi">ISI</span>
+                        <span class="brand-rh">&nbsp;RH</span>
+                      </span>
+                    </div>
+
+
+
+                  <!-- titre noir sous le outline -->
+                  <h1 class="hero-main-title">
+                    Logiciel de gestion du personnel &amp; de la formation
                   </h1>
-                  <p class="lead text-white-75 mb-4">
-                    Votre espace de travail – RH, Paie, Formation, Utilisateurs – tout en un.
+
+                  <p class="hero-main-subtitle">
+                    Solution tout-en-un pour la gestion quotidienne des
+                    <strong>ressources humaines</strong>, de la
+                    <strong>paie</strong> et des
+                    <strong>parcours de formation</strong> des collaborateurs de l’ISI.
                   </p>
 
-                  <div class="d-flex flex-wrap gap-2 align-items-center mb-3">
-                    <span class="badge bg-white text-primary fw-semibold" *ngIf="utilisateurAuthentifie?.personnel?.posteGeneral?.poste?.designation">
-                      <i class="bx bx-briefcase me-1"></i>
+                  <!-- Bonjour + rôles -->
+                  <div class="hero-user-line">
+                    <span *ngIf="utilisateurAuthentifie?.personnel?.etatCivil?.prenom">
+                      Bonjour,
+                      <strong>{{ utilisateurAuthentifie?.personnel?.etatCivil?.prenom }}</strong> 👋
+                    </span>
+
+                    <span
+                      class="hero-user-pill"
+                      *ngIf="utilisateurAuthentifie?.personnel?.posteGeneral?.poste?.designation">
+                      <i class="bx bx-briefcase"></i>
                       {{ utilisateurAuthentifie?.personnel?.posteGeneral?.poste?.designation }}
                     </span>
-                    <span class="badge bg-white text-primary fw-semibold" *ngFor="let role of utilisateurAuthentifie?.role">
-                      <i class="bx bx-shield-quarter me-1"></i>{{ role?.nom }}
+
+                    <span
+                      class="hero-user-pill"
+                      *ngFor="let role of utilisateurAuthentifie?.role">
+                      <i class="bx bx-shield-quarter"></i>
+                      {{ role?.nom }}
                     </span>
                   </div>
 
-                  <div class="d-flex flex-wrap gap-2">
-                    <a class="btn btn-primary btn-lg shadow" routerLink="/rh">
-                      <i class="bx bx-id-card me-1"></i> Ressources Humaines
-                    </a>
-                    <a class="btn btn-outline-light btn-lg" routerLink="/paie">
-                      <i class="bx bx-wallet me-1"></i> Paiement
-                    </a>
+                  <!-- Boutons principaux -->
+                  <div class="hero-actions">
+                    <button class="btn btn-primary" routerLink="/rh">
+                      <i class="bx bx-user-circle me-1"></i>
+                      Ouvrir le module RH
+                    </button>
+                    <button class="btn btn-outline-primary" routerLink="/paie">
+                      <i class="bx bx-wallet me-1"></i>
+                      Ouvrir la paie
+                    </button>
                   </div>
                 </div>
               </div>
 
-              <div class="col-12 col-lg-5">
-                <div class="hero-card grid-tiles">
-                  <div class="tile" *ngFor="let s of heroStats">
-                    <div class="tile-icon"><i [class]="s.icon"></i></div>
-                    <div class="tile-body">
-                      <span class="tile-label">{{ s.label }}</span>
-                      <div class="tile-value">{{ s.value }}</div>
-                    </div>
+              <!-- DROITE : illustration + play -->
+              <div class="col-12 col-lg-6">
+                <div class="hero-illustration-card">
+                  <div class="hero-illustration-wrapper">
+                    <img
+                      src="/assets/home/herou.jpg"
+                      alt="Illustration ISI RH & Formation"
+                      class="hero-illustration-img" />
+
+                    <button type="button" class="hero-play-btn">
+                      <span class="hero-play-circle">
+                        <i class="bx bx-play"></i>
+                      </span>
+                    </button>
+                  </div>
+
+                  <div class="d-flex justify-content-center mt-3">
+                    <button
+                      class="btn btn-primary hero-more-btn"
+                      routerLink="/moncompte/parametre">
+                      En savoir plus
+                      <i class="bx bx-right-arrow-alt ms-1"></i>
+                    </button>
                   </div>
                 </div>
               </div>
             </div>
+          </section>
 
-            <!-- carrousel d’annonces -->
-            <div class="row mt-4">
-              <div class="col-12">
-                <div class="announcements glass">
-                  <div class="d-flex align-items-center gap-2 mb-2">
-                    <i class="bx bx-bell-ring fs-4 text-white-75"></i>
-                    <h3 class="h6 text-white mb-0">Annonces</h3>
-                  </div>
+          <!-- BANDE DATE + MOTIVATION, SOUS LE HERO, À GAUCHE -->
+          <section class="ws-top-strip">
+            <div class="row">
+              <div class="col-12 col-lg-8">
+               <div class="ws-info-card ws-info-card-live">
+  <div class="ws-info-header">
+    <div class="ws-info-title-block">
+      <div class="ws-info-pill">
+        <i class="bx bx-calendar-event"></i>
+        Aujourd’hui
+      </div>
 
-                  <ngb-carousel *ngIf="annonces?.length" [interval]="6000" [pauseOnHover]="true" [wrap]="true">
-                    <ng-template ngbSlide *ngFor="let a of annonces; let i = index" id="{{'slide-'+i}}">
-                      <div class="d-flex align-items-center justify-content-between flex-wrap gap-2">
-                        <div class="text-white-75">
-                          <strong class="text-white me-2">{{ a.title }}</strong> — {{ a.text }}
-                        </div>
-                      <a *ngIf="a.cta" class="btn btn-sm btn-outline-light" [routerLink]="a.cta!.route">
-  {{ a.cta!.label }} <i class="bx bx-right-arrow-alt ms-1"></i>
-</a>
-
-                      </div>
-                    </ng-template>
-                  </ngb-carousel>
-                </div>
-              </div>
-            </div>
-
-          </div>
-        </section>
-
-        <!-- ACCÈS RAPIDES -->
-        <section class="container mt-4">
-          <h2 class="section-title text-primary mb-3">Accès rapides</h2>
-          <div class="row g-3">
-            <div class="col-6 col-sm-4 col-lg-3 col-xxl-2" *ngFor="let link of quickLinks">
-              <a [routerLink]="link.route" class="quick-link card border-0 h-100">
-                <div class="card-body d-flex flex-column align-items-center justify-content-center p-4">
-                  <div class="quick-link-icon">
-                    <i [class]="link.icon"></i>
-                  </div>
-                  <div class="quick-link-label text-center">
-                    {{ link.label }}
-                  </div>
-                </div>
-              </a>
-            </div>
-          </div>
-        </section>
-
-        <!-- BANDE KPI -->
-        <section class="kpi-band mt-4">
-          <div class="container">
-            <div class="row g-3">
-              <div class="col-6 col-md-3" *ngFor="let k of kpis">
-                <div class="kpi-item">
-                  <div class="kpi-value">{{ k.value }}</div>
-                  <div class="kpi-label">{{ k.label }}</div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- FEATURES CARDS -->
-        <section class="container mt-4">
-          <div class="row g-3">
-            <div class="col-12 col-lg-4" *ngFor="let f of features">
-              <div class="feature-card card border-0 h-100">
-                <div class="feature-img" [style.background-image]="'url(' + f.image + ')'"></div>
-                <div class="card-body">
-                  <h3 class="h6 mb-1">{{ f.title }}</h3>
-                  <p class="text-muted small mb-3">{{ f.text }}</p>
-                  <a [routerLink]="f.route" class="btn btn-primary btn-sm">
-                    Ouvrir <i class="bx bx-right-arrow-alt ms-1"></i>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- GALERIE (masonry responsive) -->
-        <section class="container mt-4">
-          <h2 class="section-title text-primary mb-3">Galerie</h2>
-          <div class="masonry">
-            <div class="masonry-item" *ngFor="let g of gallery">
-              <div class="masonry-img" [style.background-image]="'url(' + g + ')'"></div>
-            </div>
-          </div>
-        </section>
-
-        <!-- TÉMOIGNAGES -->
-        <section class="container mt-5">
-          <div class="row g-3 align-items-stretch">
-            <div class="col-12 col-lg-4">
-              <h2 class="section-title text-primary mb-2">Ils en parlent</h2>
-              <p class="text-muted">
-                Les équipes apprécient la simplicité, la rapidité et la cohérence de l’espace de travail.
-              </p>
-            </div>
-            <div class="col-12 col-lg-8">
-              <div class="row g-3">
-                <div class="col-12 col-md-6" *ngFor="let t of testimonials">
-                  <div class="testimonial card border-0 h-100">
-                    <div class="card-body">
-                      <div class="d-flex align-items-center gap-2 mb-2">
-                        <img [src]="t.avatar" class="rounded-circle" width="40" height="40" alt="avatar">
-                        <div>
-                          <div class="fw-semibold">{{ t.name }}</div>
-                          <div class="text-muted small">{{ t.role }}</div>
-                        </div>
-                      </div>
-                      <p class="mb-0 text-muted">“{{ t.text }}”</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- ACTUALITÉS / BLOG -->
-        <section class="container mt-4">
-          <div class="d-flex align-items-center justify-content-between mb-2">
-            <h2 class="section-title text-primary mb-0">Actualités</h2>
-            <!-- <a routerLink="/publication" class="btn btn-link p-0">Tout voir</a> -->
-          </div>
-          <div class="row g-3">
-            <div class="col-12 col-md-6 col-xl-3" *ngFor="let n of news">
-              <div class="news-card card border-0 h-100">
-                <div class="news-img" [style.background-image]="'url(' + n.image + ')'"></div>
-                <div class="card-body">
-                  <h3 class="h6 mb-1">{{ n.title }}</h3>
-                  <p class="text-muted small mb-2">{{ n.excerpt }}</p>
-                  <div class="d-flex align-items-center justify-content-between">
-                    <span class="text-muted tiny">{{ n.date | date:'d MMM yyyy':'':'fr-FR' }}</span>
-                    <a [routerLink]="n.route" class="btn btn-outline-primary btn-sm">
-                      Lire <i class="bx bx-right-arrow-alt ms-1"></i>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- CTA FINAL -->
-        <section class="cta container mt-5">
-          <div class="cta-card">
-            <div class="cta-bg" [style.background-image]="'url(/assets/home/cta.jpg)'"></div>
-            <div class="cta-overlay"></div>
-            <div class="cta-body">
-              <h3 class="h4 text-white mb-2">Besoin d’aide ou d’une formation rapide ?</h3>
-              <p class="text-white-75 mb-3">Consultez le centre d’aide et les guides pas-à-pas.</p>
-              <a routerLink="/moncompte/parametre" class="btn btn-light btn-lg">
-                Centre d’aide
-              </a>
-            </div>
-          </div>
-        </section>
-
+      <div class="ws-info-date">
+        {{ today | date:'EEEE d MMMM y':'':'fr-FR' }}
       </div>
     </div>
 
+    <div class="ws-info-time">
+      <i class="bx bx-time-five"></i>
+      <span class="ws-info-time-label">Heure actuelle</span>
+      <span class="ws-info-time-value">
+        {{ now | date:'HH:mm:ss' }}
+      </span>
+    </div>
+  </div>
+
+  <div class="ws-info-extra">
+    <i class="bx bx-message-rounded-dots"></i>
+    <span>{{ motivationMessage }}</span>
+  </div>
+</div>
+
+              </div>
+            </div>
+          </section>
+
+          <!-- ACCÈS RAPIDES -->
+          <section class="mt-4">
+            <div class="ws-section-header">
+              <h2 class="ws-section-title">Accès rapides</h2>
+              <p class="ws-section-subtitle">
+                Modules principaux de votre quotidien à l’ISI.
+              </p>
+            </div>
+
+            <div class="row g-3 ws-quicklinks-row">
+              <div
+                class="col-6 col-sm-3 col-lg-3"
+                *ngFor="let link of quickLinks">
+                <a [routerLink]="link.route" class="ws-quick-tile">
+                  <div class="ws-quick-icon">
+                    <i [class]="link.icon"></i>
+                  </div>
+                  <div class="ws-quick-label">
+                    {{ link.label }}
+                  </div>
+                </a>
+              </div>
+            </div>
+          </section>
+
+          <!-- ANNONCES INTERNES -->
+          <section class="mt-4">
+            <div class="ws-section-header d-flex align-items-center justify-content-between flex-wrap gap-2">
+              <div>
+                <h2 class="ws-section-title mb-0">Annonces internes</h2>
+                <p class="ws-section-subtitle mb-0">
+                  Informations partagées avec les équipes de l’ISI.
+                </p>
+              </div>
+
+              <div class="d-flex gap-2">
+                <a routerLink="/publication" class="btn btn-sm btn-outline-primary">
+                  En savoir +
+                </a>
+                <a routerLink="/moncompte/parametre" class="btn btn-sm btn-primary">
+                  Centre d’aide
+                </a>
+              </div>
+            </div>
+
+            <div class="ws-panel">
+              <div *ngIf="!annonces || !annonces.length" class="ws-panel-empty">
+                Aucune annonce pour le moment.
+              </div>
+
+              <ul class="list-unstyled mb-0" *ngIf="annonces && annonces.length">
+                <li class="ws-panel-item" *ngFor="let a of annonces | slice:0:4">
+                  <div class="ws-panel-main">
+                    <div class="ws-panel-title">{{ a.title }}</div>
+                    <div class="ws-panel-text">{{ a.text }}</div>
+                  </div>
+                  <div class="ws-panel-cta" *ngIf="a.cta">
+                    <a [routerLink]="a.cta.route" class="btn btn-sm btn-outline-primary">
+                      {{ a.cta.label }}
+                    </a>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- FOOTER -->
     <footer class="footer-dashboard">
       <div class="container-fluid">
         <div class="row align-items-center g-2">
-          <div class="col-sm-6 small">© {{year}} ISI</div>
+          <div class="col-sm-6 small">© {{ year }} ISI</div>
           <div class="col-sm-6 small text-sm-end text-muted">
-            Design & Develop by ISI Dev Teams
+            Espace de travail ISI – RH &amp; Formation
           </div>
         </div>
       </div>

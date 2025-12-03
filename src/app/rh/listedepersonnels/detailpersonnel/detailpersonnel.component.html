@@ -19,36 +19,62 @@
           <div class="card mx-n4 mt-n4 btn-darkblue bg-soft">
             <div class="card-body">
               <div class="text-center mb-4">
-                <div class="avatar-md mx-auto">
-                  <span class="avatar-title rounded-circle bg-soft bg-primary text-primary font-size-30">
-                    {{personnel?.nom?.charAt(0)}}
-                    {{personnel?.nom?.charAt(1)}}
-                    {{personnel?.nom?.charAt(2)}}
-                    {{personnel?.nom?.charAt(3)}}
-                  </span>
-                </div>
-                <h5 class="mt-3 mb-1">{{personnel?.matricule}}</h5>
-                <h5 class="mb-1">{{personnel?.prenom + " " + personnel?.nom}}</h5>
-                <p class="text-muted mb-3">{{personnel?.poste?.designation}}</p>
-                <div class="hstack mb-2 gap-2 justify-content-center"><span
-                    class="font-size-20 badge badge-soft-secondary">{{personnel?.poste?.service?.sigle}}</span>
-                </div>
-                <div class="mx-auto d-flex gap-1 justify-content-center">
-                  <div *ngIf="personnel?.dateEmbauchage && !personnel?.debaucher && !personnel?.retraiter"
-                    class="flex-grow-1 "><span class="badge badge-soft-success  font-size-20">En Fonction</span></div>
-                  <div *ngIf="personnel?.debaucher" class="flex-grow-1 "><span
-                      class="badge badge-soft-warning font-size-20">Débaucher</span></div>
-                  <div *ngIf="personnel?.retraiter" class="flex-grow-1 "><span
-                      class="badge badge-soft-danger font-size-20">En Retraite</span>
-                  </div>
-                </div>
+
+  <!-- Avatar comme dans la liste -->
+  <div class="avatar-photo mx-auto mb-3">
+
+    <!-- 🔹 SI le personnel a une signature/photo -->
+    <ng-container *ngIf="personnel?.signature; else defaultAvatar">
+      <img
+        [src]="telechargerSignature(personnel!)"
+        alt="Photo"
+        class="img-fluid rounded-circle"
+      />
+    </ng-container>
+
+    <!-- 🔹 Sinon avatar par défaut -->
+    <ng-template #defaultAvatar>
+      <img
+        src="assets/avatars/user.png"
+        alt="Photo profil"
+        class="img-fluid rounded-circle"
+      />
+    </ng-template>
+
+  </div>
+
+  <!-- Nom + prénom -->
+  <h5 class="mb-1">{{ personnel?.prenom }} {{ personnel?.nom }}</h5>
+
+  <p class="text-muted mb-3">{{ personnel?.poste?.designation }}</p>
+
+  <div class="hstack mb-2 gap-2 justify-content-center">
+    <span class="font-size-20 badge badge-soft-secondary">
+      {{ personnel?.poste?.service?.sigle }}
+    </span>
+  </div>
+
+  <div class="mx-auto d-flex gap-1 justify-content-center">
+    <div *ngIf="personnel?.dateEmbauchage && !personnel?.debaucher && !personnel?.retraiter"
+      class="flex-grow-1">
+      <span class="badge badge-soft-success font-size-20">En Fonction</span>
+    </div>
+
+    <div *ngIf="personnel?.debaucher" class="flex-grow-1">
+      <span class="badge badge-soft-warning font-size-20">Débaucher</span>
+    </div>
+
+    <div *ngIf="personnel?.retraiter" class="flex-grow-1">
+      <span class="badge badge-soft-danger font-size-20">En Retraite</span>
+    </div>
+  </div>
+  
+</div>
+
               </div>
               <div class="d-flex align-items-center">
-                <ul *ngIf="personnel?.adresse" class="list-unstyled hstack gap-3 mb-0 flex-grow-1">
-                  <li><i class="bx bx-map align-middle text-primary"></i> {{personnel?.adresse}}</li>
-                </ul>
+              
                 <ul *ngIf="!personnel?.adresse" class="list-unstyled hstack gap-3 mb-0 flex-grow-1">
-                  <li><i class="bx bx-map align-middle text-primary"></i> {{'Pas d\'adresse '}}</li>
                 </ul>
                 <div class="hstack gap-2">
                   <button type="button" (click)="openModalPersonnel(content, personnel)" class="btn btn-info">Modifier
@@ -86,7 +112,6 @@
             </div>
           </div>
         </div>
-      </div>
       <div class="row">
         <div class="col-lg-3">
           <div class="card">
@@ -652,357 +677,7 @@
           </div>
 
 
-          <div class="col-lg-12 d-flex">
-            <h2 class="mb-3">Pièces</h2>
-            <div class="ms-auto">
-              <button type="button" (click)="openModalPiece(piecesContente)" placement="top"
-                ngbTooltip="Ajouter une pièce" class="btn btn-primary btn-md">
-                Ajouter
-                <i class="mdi mdi-plus align-baseline ms-1"></i>
-              </button>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-body border-bottom">
-              <div class="d-flex align-items-center">
-                <h4 class="card-title">Liste des pièces de {{personnel?.nom}}</h4>
-              </div>
-            </div>
-            <div class="card-body">
-              <ng-container [ngSwitch]="response.dataState" *ngIf="pieces | async as response">
-                <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
-                  <div class="alert alert-info" role="alert">
-                    {{ dataStateEnum.CHARGEMENT }}
-                  </div>
-                </ng-container>
-                <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
-                  <div class="alert alert-info" role="alert">
-                    {{ response.dataState }}
-                  </div>
-                </ng-container>
-                <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
-                  <div class="table-responsive">
-                    <table class="table table-bordered align-middle nowrap">
-                      <thead style="text-align: center">
-                        <tr>
-                          <th scope="col">#</th>
-                          <th scope="col">Type de Dossier</th>
-                          <th scope="col">Type de Piece</th>
-                          <th scope="col">Fichier</th>
-                          <th scope="col">Commentaire</th>
-                          <th scope="col">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody style="text-align: center">
-                        <tr *ngFor="let piece of listePiecesPersonnel ?? []
-                 ; let i=index">
-                          <th scope="row">{{i+1}}</th>
-                          <th scope="row">{{piece?.typeDossier?.designation}}</th>
-                          <th scope="row">{{piece?.typePiece?.nom}}</th>
-                          <ng-container *ngIf="piece?.fichier != null; else templateA">
-                            <th class="text-center"><a target="_blank" href="{{ telechargerFichePiece(piece) }}"
-                                (click)="showPopOnDownloadFichePiece()" class="btn btn-secondary btn-label btn-sm"
-                                style="font-size: 10px;">
-                                <i class="mdi mdi-download label-icon"></i>
-                                Télécharger
-                              </a></th>
-                          </ng-container>
-                          <ng-template #templateA>
-                            <th class="text-center">Aucun Fichier</th>
-                          </ng-template>
-                          <th>{{ (piece?.commentaire ?? '').length <= 30 ? (piece?.commentaire ?? '') :(piece?.commentaire ?? '').substring(0, 27) + "..."
-                              }}</th>
-                          <th>
-                            <button (click)="openModalPieceDetail(piece, detailPiece)" placement="top"
-                              ngbToolTip="Visualiser les détails" class="btn btn-primary mx-1 mt-1 btn-sm">
-                              <i class="mdi mdi-eye"></i>
-                            </button>
-                            <button placement="top" ngbToolTip="Modifier" class="btn btn-info mx-1 mt-1 btn-sm"
-                              (click)="openModalPiece(piecesContente, piece)">
-                              <i class="bx bx-pencil"></i>
-                            </button>
-                            <button placement="top" ngbToolTip="Supprimer" class="btn btn-danger mx-1 mt-1 btn-sm"
-                              (click)="supprimerPieces(piece.id)">
-                              <i class="bx bx-trash-alt"></i>
-                            </button>
-                          </th>
-                        </tr>
-
-                        <tr *ngIf="response.data?.length == 0">
-                          <td colspan="6" class="text-center"><i style="color: #d9534f;font-size: xxx-large"
-                              class='bx bxs-data btn btn-lg'></i><br>Aucune Pièce pour {{personnel?.nom}}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <div class="row justify-content-between align-items-center mb-3" *ngIf="totalPieces > 5">
-                      <div class="col-auto me-auto"></div>
-                      <div class="col-auto">
-                        <div class="d-flex align-items-center">
-                          <button class="btn btn-primary mr-2 mx-3 btn-sm"
-                            (click)="currentPage = currentPage - 1; chargerListePiecesPersonnel()"
-                            [disabled]="currentPage === 0">
-                            Précédent
-                          </button>
-                          <ng-container *ngIf="pages.length > 1">
-                            <ng-container *ngIf="pages.length <= 11">
-                              <ng-container *ngFor="let page of pages">
-                                <button class="btn btn-primary btn-sm mx-1"
-                                  (click)="currentPage = page; chargerListePiecesPersonnel()"
-                                  [disabled]="currentPage === page">
-                                  {{ page +1}}
-                                </button>
-                              </ng-container>
-                            </ng-container>
-                            <ng-container *ngIf="pages.length > 11">
-                              <ng-container *ngIf="currentPage <= 6">
-                                <ng-container *ngFor="let page of pages.slice(0, 5)">
-                                  <button class="btn btn-primary btn-sm mx-1"
-                                    (click)="currentPage = page; chargerListePiecesPersonnel()"
-                                    [disabled]="currentPage === page">
-                                    {{ page + 1 }}
-                                  </button>
-                                </ng-container>
-                                <button class="btn btn-primary btn-sm mx-1" disabled>
-                                  ...
-                                </button>
-                                <ng-container *ngFor="let page of pages.slice(-5)">
-                                  <button class="btn btn-primary btn-sm mx-1"
-                                    (click)="currentPage = page; chargerListePiecesPersonnel()"
-                                    [disabled]="currentPage === page">
-                                    {{ page + 1 }}
-                                  </button>
-                                </ng-container>
-                              </ng-container>
-                              <ng-container *ngIf="currentPage > 6 && currentPage < pages.length - 5">
-                                <ng-container *ngFor="
-                      let page of pages.slice(currentPage - 4, currentPage)
-                    ">
-                                  <button class="btn btn-primary btn-sm mx-1"
-                                    (click)="currentPage = page; chargerListePiecesPersonnel()"
-                                    [disabled]="currentPage === page">
-                                    {{ page + 1 }}
-                                  </button>
-                                </ng-container>
-                                <button class="btn btn-primary btn-sm mx-1" disabled>
-                                  ...
-                                </button>
-                                <ng-container *ngFor="
-                      let page of pages.slice(currentPage, currentPage + 4)
-                    ">
-                                  <button class="btn btn-primary btn-sm mx-1"
-                                    (click)="currentPage = page; chargerListePiecesPersonnel()"
-                                    [disabled]="currentPage === page">
-                                    {{ page + 1 }}
-                                  </button>
-                                </ng-container>
-                              </ng-container>
-
-
-                              <ng-container *ngIf="currentPage >= pages.length - 5">
-                                <ng-container *ngFor="let page of pages.slice(0, 5)">
-                                  <button class="btn btn-primary btn-sm mx-1"
-                                    (click)="currentPage = page; chargerListePiecesPersonnel()"
-                                    [disabled]="currentPage === page">
-                                    {{ page + 1 }}
-                                  </button>
-                                </ng-container>
-                                <button class="btn btn-primary btn-sm mx-1" disabled>
-                                  ...
-                                </button>
-                                <ng-container *ngFor="let page of pages.slice(-5)">
-                                  <button class="btn btn-primary btn-sm mx-1"
-                                    (click)="currentPage = page; chargerListePiecesPersonnel()"
-                                    [disabled]="currentPage === page">
-                                    {{ page + 1 }}
-                                  </button>
-                                </ng-container>
-                              </ng-container>
-                            </ng-container>
-                          </ng-container>
-                          <button class="btn btn-primary btn-sm mx-3"
-                            (click)="currentPage = currentPage + 1; chargerListePiecesPersonnel()"
-                            [disabled]="currentPage+1 === totalPages">
-                            Suivant
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </ng-container>
-              </ng-container>
-            </div>
-          </div>
-
-          <div class="col-lg-12 d-flex">
-            <h2 class="mb-3">Intérims</h2>
-            <div class="ms-auto">
-              <button type="button" (click)="openModalInterim(interimContente)" placement="top"
-                ngbTooltip="Intérimer cette personne" class="btn btn-primary btn-md">
-                Intérimer
-                <i class="mdi mdi-checkbox-intermediate align-baseline ms-1"></i>
-              </button>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-body border-bottom">
-              <div class="d-flex align-items-center">
-                <h4 class="card-title">Liste des intérims de {{personnel?.nom}}</h4>
-              </div>
-            </div>
-            <div class="card-body">
-              <ng-container [ngSwitch]="response.dataState" *ngIf="interims | async as response">
-                <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
-                  <div class="alert alert-info" role="alert">
-                    {{ dataStateEnum.CHARGEMENT }}
-                  </div>
-                </ng-container>
-                <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
-                  <div class="alert alert-info" role="alert">
-                    {{ response.dataState }}
-                  </div>
-                </ng-container>
-                <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
-                  <div class="table-responsive">
-                    <table class="table table-bordered align-middle nowrap">
-                      <thead style="text-align: center">
-                        <tr>
-                          <th scope="col">#</th>
-                          <th scope="col">Date de Debut</th>
-                          <th scope="col">Date de Fin</th>
-                          <th scope="col">Poste</th>
-                          <th scope="col">Commentaire</th>
-                          <th scope="col">Action</th>
-                        </tr>
-                      </thead>
-                      <tbody style="text-align: center">
-                        <tr *ngFor="let interim of listeInterimesPersonnel ?? []
-                 ; let i=index">
-                          <th scope="row">{{i+1}}</th>
-                          <th>{{interim?.dateDebut| date:'dd MMMM yyyy':'':'fr-FR'}}</th>
-                          <th>{{interim?.dateFin| date:'dd MMMM yyyy':'':'fr-FR'}}</th>
-                          <th>{{interim?.poste?.designation}}</th>
-                          <th>{{ (interim?.commentaire ?? '').length <= 30 ? (interim?.commentaire ?? '') :(interim?.commentaire ?? '').substring(0, 27)
-                              + "..." }}</th>
-                          <th>
-                            <button (click)="openModalInterimeDetail(interim, detailInterim)" placement="top"
-                              ngbToolTip="Visualiser les détails" class="btn btn-primary mx-1 mt-1 btn-sm">
-                              <i class="mdi mdi-eye"></i>
-                            </button>
-                            <button placement="top" ngbToolTip="Modifier" class="btn btn-info mx-1 mt-1 btn-sm"
-                              (click)="openModalInterim(interimContente, interim)">
-                              <i class="bx bx-pencil"></i>
-                            </button>
-                            <button placement="top" ngbToolTip="Supprimer" class="btn btn-danger mx-1 mt-1 btn-sm"
-                              (click)="supprimerInterime(interim.id)">
-                              <i class="bx bx-trash-alt"></i>
-                            </button>
-                          </th>
-                        </tr>
-
-                        <tr *ngIf="response.data?.length == 0">
-                          <td colspan="6" class="text-center"><i style="color: #d9534f;font-size: xxx-large"
-                              class='bx bxs-data btn btn-lg'></i><br>Aucun intérim pour {{personnel?.nom}}</td>
-                        </tr>
-                      </tbody>
-                    </table>
-                    <div class="row justify-content-between align-items-center mb-3" *ngIf="totalInterims > 5">
-                      <div class="col-auto me-auto"></div>
-                      <div class="col-auto">
-                        <div class="d-flex align-items-center">
-                          <button class="btn btn-primary mr-2 mx-3 btn-sm"
-                            (click)="currentPage = currentPage - 1; chargerListeInterimesPersonnel()"
-                            [disabled]="currentPage === 0">
-                            Précédent
-                          </button>
-                          <ng-container *ngIf="pages.length > 1">
-                            <ng-container *ngIf="pages.length <= 11">
-                              <ng-container *ngFor="let page of pages">
-                                <button class="btn btn-primary btn-sm mx-1"
-                                  (click)="currentPage = page; chargerListeInterimesPersonnel()"
-                                  [disabled]="currentPage === page">
-                                  {{ page +1}}
-                                </button>
-                              </ng-container>
-                            </ng-container>
-                            <ng-container *ngIf="pages.length > 11">
-                              <ng-container *ngIf="currentPage <= 6">
-                                <ng-container *ngFor="let page of pages.slice(0, 5)">
-                                  <button class="btn btn-primary btn-sm mx-1"
-                                    (click)="currentPage = page; chargerListeInterimesPersonnel()"
-                                    [disabled]="currentPage === page">
-                                    {{ page + 1 }}
-                                  </button>
-                                </ng-container>
-                                <button class="btn btn-primary btn-sm mx-1" disabled>
-                                  ...
-                                </button>
-                                <ng-container *ngFor="let page of pages.slice(-5)">
-                                  <button class="btn btn-primary btn-sm mx-1"
-                                    (click)="currentPage = page; chargerListeInterimesPersonnel()"
-                                    [disabled]="currentPage === page">
-                                    {{ page + 1 }}
-                                  </button>
-                                </ng-container>
-                              </ng-container>
-                              <ng-container *ngIf="currentPage > 6 && currentPage < pages.length - 5">
-                                <ng-container *ngFor="
-                      let page of pages.slice(currentPage - 4, currentPage)
-                    ">
-                                  <button class="btn btn-primary btn-sm mx-1"
-                                    (click)="currentPage = page; chargerListeInterimesPersonnel()"
-                                    [disabled]="currentPage === page">
-                                    {{ page + 1 }}
-                                  </button>
-                                </ng-container>
-                                <button class="btn btn-primary btn-sm mx-1" disabled>
-                                  ...
-                                </button>
-                                <ng-container *ngFor="
-                      let page of pages.slice(currentPage, currentPage + 4)
-                    ">
-                                  <button class="btn btn-primary btn-sm mx-1"
-                                    (click)="currentPage = page; chargerListeInterimesPersonnel()"
-                                    [disabled]="currentPage === page">
-                                    {{ page + 1 }}
-                                  </button>
-                                </ng-container>
-                              </ng-container>
-
-
-                              <ng-container *ngIf="currentPage >= pages.length - 5">
-                                <ng-container *ngFor="let page of pages.slice(0, 5)">
-                                  <button class="btn btn-primary btn-sm mx-1"
-                                    (click)="currentPage = page; chargerListeInterimesPersonnel()"
-                                    [disabled]="currentPage === page">
-                                    {{ page + 1 }}
-                                  </button>
-                                </ng-container>
-                                <button class="btn btn-primary btn-sm mx-1" disabled>
-                                  ...
-                                </button>
-                                <ng-container *ngFor="let page of pages.slice(-5)">
-                                  <button class="btn btn-primary btn-sm mx-1"
-                                    (click)="currentPage = page; chargerListeInterimesPersonnel()"
-                                    [disabled]="currentPage === page">
-                                    {{ page + 1 }}
-                                  </button>
-                                </ng-container>
-                              </ng-container>
-                            </ng-container>
-                          </ng-container>
-                          <button class="btn btn-primary btn-sm mx-3"
-                            (click)="currentPage = currentPage + 1; chargerListeInterimesPersonnel()"
-                            [disabled]="currentPage+1 === totalPages">
-                            Suivant
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </ng-container>
-              </ng-container>
-            </div>
-          </div>
+         
 
           <div class="col-lg-12 d-flex">
             <h2 class="mb-3">Affectations</h2>
@@ -1371,231 +1046,6 @@
           </div>
         </div>
 
-        <div class="col-lg-12 d-flex">
-  <h2 class="mb-3">Demande</h2>
-</div>
-
-<div class="card">
-  <div class="card-body border-bottom">
-    <div class="d-flex align-items-center">
-      <h4 class="card-title">Liste des demandes de {{ personnel?.nom }}</h4>
-    </div>
-  </div>
-
-  <div class="card-body">
-    <ng-container [ngSwitch]="response?.dataState" *ngIf="demandes | async as response">
-      <!-- ÉTAT : Chargement -->
-      <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
-        <div class="alert alert-info" role="alert">
-          {{ dataStateEnum.CHARGEMENT }}
-        </div>
-      </ng-container>
-
-      <!-- ÉTAT : Erreur -->
-      <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
-        <div class="alert alert-info" role="alert">
-          {{ response.dataState }}
-        </div>
-      </ng-container>
-
-      <!-- ÉTAT : Chargé -->
-      <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
-        <div class="table-responsive">
-          <table class="table table-bordered align-middle nowrap">
-            <thead>
-              <tr>
-                <th scope="col">#</th>
-                <th scope="col">Statut demande</th>
-                <!-- <th scope="col">Type de demande</th> -->
-                <th scope="col">Date de Début</th>
-                <th scope="col">Date de Fin</th>
-                <th scope="col">Fichier</th>
-                <th scope="col">Commentaire</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              <tr
-                *ngFor="let demande of listeDemandePersonnel ?? []; let i = index"
-                [ngClass]="getDemandeRowClass(demande)"
-              >
-                <th scope="row">{{ i + 1 }}</th>
-
-                <!-- Statut (fallbacks + compat) -->
-               <th scope="row">
-  {{
-    ($any(demande)._statutLabel)
-    || demande?.statutDemande?.nom
-    || ($any(demande).statutDemande?.libelle)
-    || ($any(demande).statut)
-    || ($any(demande).statutLibelle)
-    || ($any(demande).etat)
-    || '—'
-  }}
-</th>
-
-
-                <!-- Dates -->
-                <th>{{ demande?.dateDebut | date:'dd MMMM yyyy':'':'fr-FR' }}</th>
-                <th>{{ demande?.dateFin   | date:'dd MMMM yyyy':'':'fr-FR' }}</th>
-
-                <!-- Fichier (détecte plusieurs clés possibles) -->
-               <ng-container *ngIf="hasFichier(demande); else noFileTpl">
-  <th class="text-center">
-    <a
-      target="_blank"
-      [href]="telechargerFicheDemande(demande)"
-      (click)="showPopOnDownloadFicheDemande()"
-      class="btn btn-secondary btn-label btn-sm"
-      style="font-size: 10px;"
-    >
-      <i class="mdi mdi-download label-icon"></i>
-      Télécharger
-    </a>
-  </th>
-</ng-container>
-
-               <ng-template #noFileTpl>
-  <th class="text-center">Aucun Fichier</th>
-</ng-template>
-
-                <!-- Commentaire / motif (fallbacks) -->
-                <th scope="row" style="text-align: justify">
-  {{
-    ($any(demande)._commentaire)
-    || demande?.commentaire
-    || ($any(demande).message)
-    || ($any(demande).motif)
-    || ($any(demande).observations)
-    || ''
-  }}
-</th>
-
-              </tr>
-
-              <!-- Aucune demande -->
-              <tr *ngIf="(listeDemandePersonnel?.length || 0) === 0">
-                <td colspan="7" class="text-center">
-                  <i style="color: #d9534f;font-size: xxx-large" class="bx bxs-data btn btn-lg"></i><br>
-                  Aucune demande pour {{ personnel?.nom }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-
-          <!-- Pagination (sur totalDemande, pas totalMission) -->
-          <div class="row justify-content-between align-items-center mb-3" *ngIf="totalDemande > 5">
-            <div class="col-auto me-auto"></div>
-            <div class="col-auto">
-              <div class="d-flex align-items-center">
-                <button
-                  class="btn btn-primary mr-2 mx-3 btn-sm"
-                  (click)="currentPage = currentPage - 1; chargerListeDemandesPersonnel()"
-                  [disabled]="currentPage === 0"
-                >
-                  Précédent
-                </button>
-
-                <ng-container *ngIf="pages.length > 1">
-                  <ng-container *ngIf="pages.length <= 11; else longPager">
-                    <ng-container *ngFor="let page of pages">
-                      <button
-                        class="btn btn-primary btn-sm mx-1"
-                        (click)="currentPage = page; chargerListeDemandesPersonnel()"
-                        [disabled]="currentPage === page"
-                      >
-                        {{ page + 1 }}
-                      </button>
-                    </ng-container>
-                  </ng-container>
-
-                  <ng-template #longPager>
-                    <ng-container *ngIf="currentPage <= 6; else middleOrEndPager">
-                      <ng-container *ngFor="let page of pages.slice(0, 5)">
-                        <button
-                          class="btn btn-primary btn-sm mx-1"
-                          (click)="currentPage = page; chargerListeDemandesPersonnel()"
-                          [disabled]="currentPage === page"
-                        >
-                          {{ page + 1 }}
-                        </button>
-                      </ng-container>
-                      <button class="btn btn-primary btn-sm mx-1" disabled>...</button>
-                      <ng-container *ngFor="let page of pages.slice(-5)">
-                        <button
-                          class="btn btn-primary btn-sm mx-1"
-                          (click)="currentPage = page; chargerListeDemandesPersonnel()"
-                          [disabled]="currentPage === page"
-                        >
-                          {{ page + 1 }}
-                        </button>
-                      </ng-container>
-                    </ng-container>
-
-                    <ng-template #middleOrEndPager>
-                      <ng-container *ngIf="currentPage > 6 && currentPage < pages.length - 5; else endPager">
-                        <ng-container *ngFor="let page of pages.slice(currentPage - 4, currentPage)">
-                          <button
-                            class="btn btn-primary btn-sm mx-1"
-                            (click)="currentPage = page; chargerListeDemandesPersonnel()"
-                            [disabled]="currentPage === page"
-                          >
-                            {{ page + 1 }}
-                          </button>
-                        </ng-container>
-                        <button class="btn btn-primary btn-sm mx-1" disabled>...</button>
-                        <ng-container *ngFor="let page of pages.slice(currentPage, currentPage + 4)">
-                          <button
-                            class="btn btn-primary btn-sm mx-1"
-                            (click)="currentPage = page; chargerListeDemandesPersonnel()"
-                            [disabled]="currentPage === page"
-                          >
-                            {{ page + 1 }}
-                          </button>
-                        </ng-container>
-                      </ng-container>
-
-                      <ng-template #endPager>
-                        <ng-container *ngFor="let page of pages.slice(0, 5)">
-                          <button
-                            class="btn btn-primary btn-sm mx-1"
-                            (click)="currentPage = page; chargerListeDemandesPersonnel()"
-                            [disabled]="currentPage === page"
-                          >
-                            {{ page + 1 }}
-                          </button>
-                        </ng-container>
-                        <button class="btn btn-primary btn-sm mx-1" disabled>...</button>
-                        <ng-container *ngFor="let page of pages.slice(-5)">
-                          <button
-                            class="btn btn-primary btn-sm mx-1"
-                            (click)="currentPage = page; chargerListeDemandesPersonnel()"
-                            [disabled]="currentPage === page"
-                          >
-                            {{ page + 1 }}
-                          </button>
-                        </ng-container>
-                      </ng-template>
-                    </ng-template>
-                  </ng-template>
-                </ng-container>
-
-                <button
-                  class="btn btn-primary btn-sm mx-3"
-                  (click)="currentPage = currentPage + 1; chargerListeDemandesPersonnel()"
-                  [disabled]="currentPage + 1 === totalPages"
-                >
-                  Suivant
-                </button>
-              </div>
-            </div>
-          </div>
-          <!-- /Pagination -->
-        </div>
-      </ng-container>
-    </ng-container>
-  </div>
-</div>
 
 
         <div class="col-lg-12 d-flex">

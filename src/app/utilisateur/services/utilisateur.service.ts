@@ -44,9 +44,10 @@ export class UtilisateurService {
       .pipe(map(list => (list || []).map(u => this.normalize(u))));
   }
 
-  afficherLesStatistiquesUtilisateurs(): Observable<Statistique[]> {
-    return this.http.get<Statistique[]>(join(this.base, 'statistiques'));
-  }
+  afficherLesStatistiquesUtilisateurs(): Observable<Statistique> {
+  return this.http.get<Statistique>(join(this.base, 'statistiques'));
+}
+
 
   getByEmail(email: string): Observable<{
     id: number; email: string; estAdmin: boolean; estActif: boolean; roles: string[];

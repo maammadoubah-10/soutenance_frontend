@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { DomSanitizer } from "@angular/platform-browser";
-import { catchError, map, startWith } from "rxjs/operators";
-import { DataStateEnum, ModelDataState } from "../../state/state";
-import { HttpErrorResponse } from "@angular/common/http";
-import { Observable } from "rxjs";
-import { UtilisateurAuthentifie } from "../../authentification/models/utilisateur-authentifie";
-import { UtilisateurService } from "../services/utilisateur.service";
+import { DomSanitizer } from '@angular/platform-browser';
+import { catchError, map, startWith } from 'rxjs/operators';
+import { DataStateEnum, ModelDataState } from '../../state/state';
+import { HttpErrorResponse } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { UtilisateurAuthentifie } from '../../authentification/models/utilisateur-authentifie';
+import { UtilisateurService } from '../services/utilisateur.service';
 import { AuthentificationService } from '../../authentification/services/authentication.service';
 
 import {
@@ -24,7 +24,6 @@ import {
   ApexResponsive
 } from 'ng-apexcharts';
 
-/** === Types (toutes les props liées dans le template sont REQUISES) === **/
 export type AreaChartOptions = {
   series: ApexAxisChartSeries;
   chart: ApexChart;
@@ -45,7 +44,7 @@ export type DonutChartOptions = {
   labels: string[];
   legend: ApexLegend;
   tooltip: ApexTooltip;
-  responsive: ApexResponsive[];   // ✅ plus “?” → toujours défini
+  responsive: ApexResponsive[];
 };
 
 export type RadialChartOptions = {
@@ -93,7 +92,7 @@ export class TableaudebordComponent implements OnInit {
   constructor(
     private sanitizer: DomSanitizer,
     private utilisateurService: UtilisateurService,
-    private authenficationSerice: AuthentificationService,
+    private authenficationSerice: AuthentificationService
   ) {}
 
   ngOnInit(): void {
@@ -102,9 +101,65 @@ export class TableaudebordComponent implements OnInit {
       { label: 'Tableau de bord', active: true }
     ];
 
-    this.initCharts();                 // valeurs par défaut
+    this.initCharts();
     this.obtenirUnUtilisateurParEmail();
-    this.obtenunirStatistique();       // puis on met à jour
+    this.obtenunirStatistique();
+  }
+
+  /** ====== Getters pour l’affichage propre du header ====== */
+  get displayName(): string {
+    const u = this.utilisateurAuthentifie;
+    const first = u?.personnel?.prenom || u?.prenom || '';
+    const last = u?.personnel?.nom || u?.nom || '';
+    const full = (first + ' ' + last).trim();
+    // Si aucun nom/prénom → on affiche l’email, sinon "Utilisateur"
+    return full || u?.email || 'Utilisateur';
+  }
+
+  get jobTitle(): string {
+    return (
+      this.utilisateurAuthentifie?.personnel?.poste?.designation ||
+      'Compte administrateur'
+    );
+  }
+
+  get serviceName(): string {
+    return (
+      this.utilisateurAuthentifie?.personnel?.poste?.service?.designation ||
+      'Service non renseigné'
+    );
+  }
+
+  get emailDisplay(): string {
+    return this.utilisateurAuthentifie?.email || '';
+  }
+
+  /** Initiales de l’avatar (2 lettres) */
+  get avatarInitials(): string {
+    const base =
+      this.utilisateurAuthentifie?.personnel?.prenom ||
+      this.utilisateurAuthentifie?.prenom ||
+      this.utilisateurAuthentifie?.email ||
+      'U';
+    return base.substring(0, 2).toUpperCase();
+  }
+
+  /** Normalisation des données utilisateur (nom/prénom depuis etatCivil si besoin) */
+  private normalizeUserAuth(u: any): any {
+    const pers = u?.personnel ?? {};
+    const ec = pers?.etatCivil ?? {};
+
+    const persoNom = pers?.nom ?? ec?.nom ?? null;
+    const persoPrenom = pers?.prenom ?? ec?.prenom ?? null;
+
+    return {
+      ...u,
+      personnel: {
+        ...pers,
+        nom: persoNom,
+        prenom: persoPrenom
+      }
+    };
   }
 
   // -------- DATA --------
@@ -122,7 +177,7 @@ export class TableaudebordComponent implements OnInit {
 
     obs.subscribe({
       next: (blob: Blob) => this.creationImage(blob),
-      error: () => {},
+      error: () => {}
     });
   }
 
@@ -130,22 +185,27 @@ export class TableaudebordComponent implements OnInit {
     this.utilisateurAuthentifieState$ = this.authenficationSerice
       .obtenirUnUtilisateurParEmail('')
       .pipe(
-        map(data => {
-          this.utilisateurAuthentifie = data;
-          this.afficherImageDeProfil(this.utilisateurAuthentifie?.image_de_profil);
-          return { data, dataState: DataStateEnum.CHARGE };
+        map((data) => {
+          const normalise = this.normalizeUserAuth(data);
+          this.utilisateurAuthentifie = normalise;
+          this.afficherImageDeProfil(normalise?.image_de_profil);
+          return { data: normalise, dataState: DataStateEnum.CHARGE };
         }),
         startWith({ dataState: DataStateEnum.CHARGEMENT }),
-        catchError((error: HttpErrorResponse) => this.authenficationSerice.gestionnaireDerreur(error)),
+        catchError((error: HttpErrorResponse) =>
+          this.authenficationSerice.gestionnaireDerreur(error)
+        )
       );
   }
 
-  obtenunirStatistique() {
-    this.utilisateurService.afficherLesStatistiquesUtilisateurs().subscribe((response) => {
-      this.statistiqueTb = response;
+ obtenunirStatistique() {
+  this.utilisateurService.afficherLesStatistiquesUtilisateurs()
+    .subscribe((response) => {
+      this.statistiqueTb = response;      // plus besoin de Array.isArray(...)
       this.updateChartsFromStats();
     });
-  }
+}
+
 
   // -------- CHARTS --------
   private initCharts() {
@@ -153,7 +213,6 @@ export class TableaudebordComponent implements OnInit {
     const actifs = 95;
     const taux = total ? Math.round((actifs / total) * 100) : 0;
 
-    // Area
     this.usersAreaChart = {
       series: [
         { name: 'Actifs', data: [12, 14, 15, 16, 17, 18, 19] },
@@ -163,13 +222,12 @@ export class TableaudebordComponent implements OnInit {
       dataLabels: { enabled: false },
       stroke: { curve: 'smooth', width: 2 },
       fill: { type: 'gradient', gradient: { opacityFrom: 0.5, opacityTo: 0.2 } },
-      xaxis: { categories: ['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'] },
+      xaxis: { categories: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'] },
       grid: { strokeDashArray: 4 },
       tooltip: { theme: 'light' },
       legend: { position: 'top' }
     };
 
-    // Radial
     this.activationRadialChart = {
       series: [taux],
       chart: { type: 'radialBar', height: 320 },
@@ -187,7 +245,6 @@ export class TableaudebordComponent implements OnInit {
       tooltip: { enabled: true }
     };
 
-    // Donut (✅ responsive toujours présent)
     this.rolesDonutChart = {
       series: [50, 30, 20],
       chart: { type: 'donut', height: 320 },
@@ -199,7 +256,6 @@ export class TableaudebordComponent implements OnInit {
       tooltip: { y: { formatter: (val: number) => `${val}` } }
     };
 
-    // Bar
     this.permissionsBarChart = {
       series: [{ name: 'Permissions', data: [12, 9, 15, 6, 10] }],
       chart: { type: 'bar', height: 320, toolbar: { show: false } },
@@ -238,7 +294,7 @@ export class TableaudebordComponent implements OnInit {
       ...this.rolesDonutChart,
       series: [admin, manager, user],
       labels: ['Admin', 'Manager', 'Utilisateur'],
-      responsive: this.rolesDonutChart.responsive ?? []   // ✅ garde un array
+      responsive: this.rolesDonutChart.responsive ?? []
     };
 
     const repartitionPerm = this.distributeNumberAcross(5, perms);
@@ -260,7 +316,11 @@ export class TableaudebordComponent implements OnInit {
     const arr = Array(n).fill(base);
     let rest = total - base * n;
     let i = 0;
-    while (rest > 0) { arr[i % n]++; rest--; i++; }
+    while (rest > 0) {
+      arr[i % n]++;
+      rest--;
+      i++;
+    }
     return arr;
   }
 }

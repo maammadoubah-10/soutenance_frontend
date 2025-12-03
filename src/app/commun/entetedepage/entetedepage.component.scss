@@ -7,31 +7,32 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 70px;
-  z-index: 1050;               /* au-dessus du contenu */
-  background: #fff;
+  height: 80px;                        /* entête un peu plus grande */
+  z-index: 1050;
+  background: #ffffff;
   border-bottom: 1px solid #e5e5e5;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
   display: flex;
-  align-items: stretch;
-  padding: 0;                  /* AUCUN padding gauche => logo vraiment collé au bord */
+  align-items: center;
+  padding: 0;
 }
 
-/* Rangée principale du header */
+/* Rangée principale */
 .navbar-header {
   display: flex;
   align-items: center;
   width: 100%;
-  padding-right: 16px;         /* juste un peu d’air à droite */
+  padding-right: 18px;
 }
 
-/* Groupe de gauche (logo + burger + recherche) */
+/* Bloc gauche : logo + burger + recherche */
 .navbar-header > .d-flex:first-child {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 14px;
 }
 
-/* Groupe de droite (fullscreen, notif, profil) poussé totalement à droite */
+/* Bloc droit : notif + thème + profil */
 .navbar-header > .d-flex:last-child {
   margin-left: auto;
   display: flex;
@@ -39,54 +40,41 @@
   gap: 16px;
 }
 
-/* pousse légèrement le logo à droite */
+/* Logo : légèrement décalé vers la recherche + plus grand */
 .navbar-brand-box {
-  margin-left: 26px;   /* augmente si tu veux plus d’espace */
-}
-
-.brand-logo {
-  height: 42px;
-  display: block;
-}
-
-
-/* LOGO totalement à gauche, sans marge ni padding parasite */
-.navbar-brand-box,
-.navbar-brand-box.parent {
   display: flex;
   align-items: center;
-  margin: 0;
-  padding: 0;
+  margin-left: 24px;
+  margin-right: 8px;
 }
 
 .navbar-brand-box a {
   display: flex;
   align-items: center;
-  margin: 0;
-  padding: 0;
   line-height: 0;
 }
 
-.navbar-brand-box img {
+.brand-logo {
   display: block;
-  max-height: 50px;
+  max-height: 56px;                    /* taille du logo */
 }
 
-/* Burger collé au logo avec un léger espace */
+/* Burger */
 #vertical-menu-btn {
-  margin-left: 8px;
+  margin-left: 6px;
 }
 
 /* Recherche desktop */
 .app-search {
   position: relative;
-  margin-left: 12px;
+  margin-left: 16px;
 }
 
 .app-search input {
-  height: 36px;
+  height: 38px;
   border-radius: 20px;
-  padding-left: 35px;
+  padding-left: 36px;
+  font-size: 0.9rem;
 }
 
 .app-search .bx {
@@ -94,10 +82,10 @@
   left: 12px;
   top: 50%;
   transform: translateY(-50%);
-  color: #999;
+  color: #9ca3af;
 }
 
-/* Icônes (fullscreen, cloche, etc.) */
+/* Icônes (cloche, plein écran, thème, etc.) */
 .header-item {
   cursor: pointer;
   display: flex;
@@ -105,18 +93,10 @@
   font-size: 18px;
 }
 
-/* Badge de notif (scope uniquement dans le header) */
-.fixed-header .badge {
-  font-size: 12px;
-  position: relative;
-  top: -6px;
-  left: -8px;
-}
-
 /* Avatar utilisateur */
 .avatar-user-profil {
-  width: 36px;
-  height: 36px;
+  width: 38px;
+  height: 38px;
   border-radius: 50%;
   display: inline-flex;
   align-items: center;
@@ -128,12 +108,36 @@
 /* Nom utilisateur */
 #page-header-user-dropdown span {
   font-weight: 500;
-  color: #333;
+  color: #111827;
+}
+
+/* Badge notif dans le header */
+.fixed-header .badge {
+  font-size: 12px;
+  position: relative;
+  top: -6px;
+  left: -8px;
 }
 
 /* --- RESPONSIVE --- */
 @media (max-width: 991px) {
-  .app-search { display: none; }     /* cache la recherche sur mobile */
-  .navbar-header { padding-right: 8px; }
-  .navbar-header > .d-flex:last-child { gap: 10px; }
+  .fixed-header {
+    height: 64px;
+  }
+
+  .navbar-header {
+    padding-right: 10px;
+  }
+
+  .navbar-brand-box {
+    margin-left: 14px;
+  }
+
+  .app-search {
+    display: none;        /* pas de recherche sur mobile */
+  }
+
+  .navbar-header > .d-flex:last-child {
+    gap: 10px;
+  }
 }

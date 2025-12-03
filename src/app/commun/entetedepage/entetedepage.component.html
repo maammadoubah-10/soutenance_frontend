@@ -5,10 +5,12 @@
       <!-- LOGO -->
       <div class="navbar-brand-box">
         <a routerLink="/espacedetravail" class="brand">
-          <img src="/assets/groupe_isi.png" alt="Groupe ISI" class="brand-logo">
+          <!-- Mets ici ton nouveau logo GROUPE ISI RH -->
+          <img src="/assets/groupe_isi.png" alt="GROUPE ISI RH" class="brand-logo">
         </a>
       </div>
 
+      <!-- Bouton menu -->
       <button
         type="button"
         class="btn btn-sm px-3 font-size-16 header-item"
@@ -17,7 +19,7 @@
         <i class="fa fa-fw fa-bars"></i>
       </button>
 
-      <!-- App Search-->
+      <!-- Recherche -->
       <form class="app-search d-none d-xl-block">
         <div class="position-relative">
           <input type="text" class="form-control" placeholder="Rechercher">
@@ -27,10 +29,19 @@
     </div>
 
     <div class="d-flex">
-      <!-- 🔔 Cloche standalone -->
+      <!-- 🔔 Cloche notifications -->
       <app-notification-bell></app-notification-bell>
 
-      <!-- Fullscreen button -->
+      <!-- Thème clair/sombre -->
+      <button
+        type="button"
+        class="btn header-item noti-icon ms-1"
+        (click)="toggleTheme()"
+        [attr.aria-label]="isDarkMode ? 'Passer en mode clair' : 'Passer en mode sombre'">
+        <i [ngClass]="isDarkMode ? 'bx bx-sun' : 'bx bx-moon'"></i>
+      </button>
+
+      <!-- Plein écran -->
       <div class="dropdown d-none d-lg-inline-block ms-1">
         <button
           type="button"
@@ -99,22 +110,14 @@
         </div>
       </div>
 
-      <!-- Gestion des états de chargement de l’utilisateur -->
+      <!-- États de chargement utilisateur -->
       <ng-container
         *ngIf="utilisateurAuthentifieState$ | async as reponse"
         [ngSwitch]="$any(reponse).dataState">
 
-        <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT">
-          <!-- loading -->
-        </ng-container>
-
-        <ng-container *ngSwitchCase="dataStateEnum.ERREUR">
-          <!-- erreur -->
-        </ng-container>
-
-        <ng-container *ngSwitchCase="dataStateEnum.CHARGE">
-          <!-- ok -->
-        </ng-container>
+        <ng-container *ngSwitchCase="dataStateEnum.CHARGEMENT"></ng-container>
+        <ng-container *ngSwitchCase="dataStateEnum.ERREUR"></ng-container>
+        <ng-container *ngSwitchCase="dataStateEnum.CHARGE"></ng-container>
       </ng-container>
     </div>
   </div>

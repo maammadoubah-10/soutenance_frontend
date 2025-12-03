@@ -1,5 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, OnInit, AfterViewInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit, OnDestroy } from '@angular/core';
+import { interval, Subscription } from 'rxjs';
+
 import { Router, NavigationEnd } from '@angular/router';
 import { EventService } from '../commun/services/event.service';
 import { DataStateEnum, ModelDataState } from '../state/state';
@@ -19,7 +21,8 @@ export const SIDEBAR_TYPE = 'red';
   templateUrl: './espacedetravail.component.html',
   styleUrls: ['./espacedetravail.component.scss']
 })
-export class EspacedetravailComponent implements OnInit, AfterViewInit {
+export class EspacedetravailComponent implements OnInit, AfterViewInit, OnDestroy {
+
   year: number = new Date().getFullYear();
 
   isHolidayToday: boolean = false;
@@ -96,8 +99,11 @@ export class EspacedetravailComponent implements OnInit, AfterViewInit {
     }
   }
 
-  greeting = '';
-  today = new Date();
+   greeting = '';
+  today: Date = new Date();
+  now: Date = new Date();           // ➜ utilisé dans le template {{ now | date:'HH:mm:ss' }}
+  private clockSub?: Subscription;  // ➜ pour le timer en temps réel
+
 
   quickLinks = [
     { label: 'Utilisateurs', route: '/utilisateur', icon: 'bx bx-user-circle' },
@@ -192,10 +198,20 @@ export class EspacedetravailComponent implements OnInit, AfterViewInit {
           }
         : s
     );
-
+  
     document.body.setAttribute('data-layout', 'vertical');
+        // Horloge temps réel
+    this.clockSub = interval(1000).subscribe(() => {
+      this.now = new Date();
+    });
+
     // ⚠️ NE PAS ACCÉDER À this.utilisateurAuthentifie ICI : il n’est pas encore chargé
   }
+
+    ngOnDestroy(): void {
+    this.clockSub?.unsubscribe();
+  }
+
 
   creationImage(image: Blob) {
     if (image && image.size > 0) {
@@ -317,12 +333,12 @@ export class EspacedetravailComponent implements OnInit, AfterViewInit {
 
   getRandomMotivationMessage(): string {
     const motivationMessages = [
-      "Restez motivé et continuez votre excellent travail ! 💪",
-      "Chaque petit pas compte. Continuez à avancer vers vos objectifs ! 🚀",
+      "Restez motivé et continuez votre excellent travail ! ",
+      "Chaque petit pas compte. Continuez à avancer vers vos objectifs ! ",
       // … (toutes tes phrases de motivation, inchangées)
-      "Le succès est le résultat d'un travail acharné, d'une vision claire et de la volonté de persévérer lorsque les temps sont difficiles. Gardez votre vision vivante, restez motivé et les portes s'ouvriront devant vous ! 💪",
-      "Le succès est un voyage personnel. Ce qui compte, c'est le progrès que vous réalisez chaque jour et la personne que vous devenez tout au long de votre parcours. Profitez de l'aventure et appréciez le processus ! 🌈",
-      "La clé pour atteindre vos objectifs est de vous entourer de personnes qui vous encouragent, vous soutiennent et croient en vous. Votre environnement peut avoir un impact énorme sur votre réussite, alors choisissez judicieusement vos compagnons de route ! 🤝",
+      "Le succès est le résultat d'un travail acharné, d'une vision claire et de la volonté de persévérer lorsque les temps sont difficiles. Gardez votre vision vivante, restez motivé et les portes s'ouvriront devant vous ! ",
+      "Le succès est un voyage personnel. Ce qui compte, c'est le progrès que vous réalisez chaque jour et la personne que vous devenez tout au long de votre parcours. Profitez de l'aventure et appréciez le processus ! ",
+      "La clé pour atteindre vos objectifs est de vous entourer de personnes qui vous encouragent, vous soutiennent et croient en vous. Votre environnement peut avoir un impact énorme sur votre réussite, alors choisissez judicieusement vos compagnons de route ! ",
     ];
 
     const randomIndex = Math.floor(Math.random() * motivationMessages.length);

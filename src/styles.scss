@@ -1,7 +1,11 @@
-/* Importing Bootstrap SCSS file. */
+/* ===============================
+   Import Bootstrap & base styles
+   =============================== */
 @import 'styles-onip.scss';
 
-/* You can add global styles to this file, and also import other style files */
+/* ===============================
+   Animations modale
+   =============================== */
 .modal-holder {
   animation-name: example;
   animation-duration: 0.3s;
@@ -9,13 +13,17 @@
 
 @keyframes example {
   0% {
-    transform: scale(0.5)
+    transform: scale(0.5);
   }
 
   100% {
-    transform: scale(1)
+    transform: scale(1);
   }
 }
+
+/* ===============================
+   Footer fixe
+   =============================== */
 :root {
   --footer-h: 56px; /* hauteur du footer */
 }
@@ -36,11 +44,21 @@
   z-index: 1040; /* au-dessus du contenu */
 }
 
-/* Reset de base */
-html, body { height: 100%; }
-body { margin: 0; }
+/* ===============================
+   Reset de base
+   =============================== */
+html,
+body {
+  height: 100%;
+}
 
+body {
+  margin: 0;
+}
 
+/* ===============================
+   Carousel custom
+   =============================== */
 .carousel-item {
   transition: opacity 0.7s ease !important;
   position: absolute !important;
@@ -52,117 +70,290 @@ body { margin: 0; }
   position: relative !important;
   opacity: 1;
 }
-// regular style toast
+
+/* ===============================
+   🎨 Système de thème global
+   - body.theme-light / body.theme-dark
+   - Variables CSS utilisées partout
+   =============================== */
+/* Thème clair (par défaut) */
+body.theme-light {
+  /* Fond & surfaces */
+  --bg-body: #f6f9ff;      /* fond type Socium */
+  --bg-surface: #ffffff;   /* cartes, panels */
+  --bg-header: #ffffff;
+  --bg-sidebar: #ffffff;   /* ⬅️ ICI : rendre la sidebar claire */
+  --bg-input: #ffffff;
+
+  /* Texte & bordures */
+  --text-primary: #0b1f44;
+  --text-muted: #6b7280;
+  --border-subtle: #e6eaf0;
+  --shadow-soft: 0 10px 15px -3px rgba(15, 23, 42, 0.08);
+
+  /* Liens */
+  --link-color: #2563eb;
+  --link-hover: #1d4ed8;
+
+  /* Palette Socium existante */
+  --sj-primary: #2563eb;
+  --sj-primary-600: #1d4ed8;
+  --sj-primary-50: #eff6ff;
+  --sj-bg: #ffffff;
+  --sj-text: #0f172a;
+  --sj-muted: #64748b;
+  --sj-border: #e2e8f0;
+  --sj-row: #f8fafc;
+}
 
 
-/* --------- global design tokens --------- */
-:root{
-  --bg:#f6f9ff;     /* fond type Socium */
-  --panel:#ffffff;
-  --primary:#1f6fff;
-  --muted:#6b7280;
-  --border:#e6eaf0;
-  --sidebar-text:#0b1f44;
+/* Thème sombre */
+body.theme-dark {
+  /* Fond & surfaces */
+  --bg-body: #020617;
+  --bg-surface: #020617;
+  --bg-header: #020617;
+  --bg-sidebar: #020617;
+  --bg-input: #020617;
+
+  /* Texte & bordures */
+  --text-primary: #e5e7eb;
+  --text-muted: #9ca3af;
+  --border-subtle: #1f2937;
+  --shadow-soft: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+
+  /* Liens */
+  --link-color: #60a5fa;
+  --link-hover: #93c5fd;
+
+  /* Palette Socium adaptée en sombre */
+  --sj-primary: #60a5fa;
+  --sj-primary-600: #3b82f6;
+  --sj-primary-50: #0b1120;
+  --sj-bg: #020617;
+  --sj-text: #e5e7eb;
+  --sj-muted: #9ca3af;
+  --sj-border: #1f2937;
+  --sj-row: #020617;
 }
 
-html,body{ height:100%; }
-body{ margin:0; background:var(--bg); color:var(--sidebar-text); }
-
-.shell{ display:grid; grid-template-columns:260px 1fr; min-height:100vh; }
-.main{ display:flex; flex-direction:column; min-width:0; background:var(--bg); }  /* <— fond page */
-.page{ padding:16px 20px 24px; background:transparent; }                          /* <— pas de blanc ici */
-/* ===== Socium-like blue/white theme ===== */
-:root{
-  --sj-primary:#2563eb;      /* bleu */
-  --sj-primary-600:#1d4ed8;
-  --sj-primary-50:#eff6ff;
-  --sj-bg:#ffffff;
-  --sj-text:#0f172a;         /* gris très foncé */
-  --sj-muted:#64748b;        /* gris moyen */
-  --sj-border:#e2e8f0;       /* gris clair */
-  --sj-row:#f8fafc;
+/* Appliquer le fond & couleur de texte par défaut */
+body {
+  background-color: var(--bg-body);
+  color: var(--text-primary);
 }
 
-.sj-btn-primary{
-  background:var(--sj-primary);
-  border:1px solid var(--sj-primary);
-  color:#fff;
-  border-radius:.6rem;
-  padding:.55rem .9rem;
-  font-weight:600;
-}
-.sj-btn-primary:hover{ background:var(--sj-primary-600); border-color:var(--sj-primary-600); }
+/* ===============================
+   📦 Layout global (toute l’app)
+   =============================== */
 
-.sj-card{
-  background:var(--sj-bg);
-  border:1px solid var(--sj-border);
-  border-radius:1rem;
-  box-shadow:0 2px 10px rgba(15,23,42,.06);
+/* Grille principale si tu l’utilises */
+.shell {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100vh;
 }
 
-.sj-input{
-  border:1px solid var(--sj-border);
-  border-radius:.6rem;
-  padding:.55rem .8rem;
-  width:100%;
-}
-.sj-input:focus{
-  outline:none;
-  border-color:var(--sj-primary);
-  box-shadow:0 0 0 3px color-mix(in srgb, var(--sj-primary) 20%, transparent);
+.main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background: var(--bg-body);
 }
 
-.sj-table{
-  width:100%;
-  border-collapse:separate;
-  border-spacing:0;
-}
-.sj-table thead th{
-  position:sticky; top:0;
-  background:#fff;
-  z-index:1;
-  font-weight:600;
-  color:var(--sj-muted);
-  border-bottom:1px solid var(--sj-border);
-  padding:.75rem .75rem;
-}
-.sj-table tbody td{
-  border-bottom:1px solid var(--sj-border);
-  padding:.75rem .75rem;
-}
-.sj-table tbody tr:hover{ background:var(--sj-row); }
-
-.sj-badge{
-  background:var(--sj-primary-50);
-  color:var(--sj-primary-600);
-  border:1px solid var(--sj-border);
-  border-radius:999px;
-  font-size:.8rem;
-  padding:.25rem .6rem;
-  font-weight:600;
+.page {
+  padding: 16px 20px 24px;
+  background: transparent;
 }
 
-.sj-toolbar{
-  display:flex; gap:.75rem; align-items:center; flex-wrap:wrap;
-}
-.sj-toolbar .spacer{ flex:1; }
-
-.sj-search{
-  position:relative; min-width:260px; flex:1;
-}
-.sj-search i{
-  position:absolute; left:.6rem; top:50%; transform:translateY(-50%); color:var(--sj-muted);
-}
-.sj-search input{ padding-left:2rem; }
-
-/* --- fond admin réutilisable --- */
+/* Fond global pour les wrappers courants */
+#layout-wrapper,
+.content-page,
+.main-content,
+.page-content,
+.wrapper,
 .page-with-bg {
-  background-image: url('/assets/Groupe 786.png'); /* chemin ABSOLU, fiable */
+  background-color: var(--bg-body) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Header / topbar */
+.fixed-header,
+#page-topbar {
+  background-color: var(--bg-header) !important;
+  border-bottom: 1px solid var(--border-subtle) !important;
+  box-shadow: var(--shadow-soft);
+}
+
+/* Sidebar (si utilisée) */
+.vertical-menu,
+.side-menu,
+.sidebar {
+  background-color: var(--bg-sidebar) !important;
+  color: var(--text-primary) !important;
+}
+
+/* Cartes / panels */
+.card,
+.panel,
+.box,
+.sj-card {
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-subtle) !important;
+  box-shadow: var(--shadow-soft);
+}
+
+/* Tables */
+.table,
+.sj-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background-color: var(--bg-surface) !important;
+  color: var(--text-primary) !important;
+}
+
+.table thead th,
+.sj-table thead th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-surface) !important;
+  z-index: 1;
+  font-weight: 600;
+  color: var(--text-muted);
+  border-bottom: 1px solid var(--border-subtle) !important;
+  padding: 0.75rem 0.75rem;
+}
+
+.table tbody td,
+.sj-table tbody td {
+  border-bottom: 1px solid var(--border-subtle) !important;
+  padding: 0.75rem 0.75rem;
+}
+
+.table tbody tr:hover,
+.sj-table tbody tr:hover {
+  background: var(--sj-row);
+}
+
+/* Inputs / selects */
+input.form-control,
+select.form-select,
+textarea.form-control,
+.sj-input {
+  background-color: var(--bg-input) !important;
+  color: var(--text-primary) !important;
+  border-color: var(--border-subtle) !important;
+}
+
+.sj-input {
+  border-radius: .6rem;
+  padding: .55rem .8rem;
+  width: 100%;
+}
+
+.sj-input:focus {
+  outline: none;
+  border-color: var(--sj-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--sj-primary) 20%, transparent);
+}
+
+/* Liens */
+a {
+  color: var(--link-color);
+}
+
+a:hover {
+  color: var(--link-hover);
+}
+
+/* Boutons du header */
+.header-item {
+  color: var(--text-primary) !important;
+}
+
+.header-item .bx {
+  color: inherit;
+}
+
+/* ===============================
+   Composants Socium existants
+   =============================== */
+
+.sj-btn-primary {
+  background: var(--sj-primary);
+  border: 1px solid var(--sj-primary);
+  color: #fff;
+  border-radius: .6rem;
+  padding: .55rem .9rem;
+  font-weight: 600;
+}
+
+.sj-btn-primary:hover {
+  background: var(--sj-primary-600);
+  border-color: var(--sj-primary-600);
+}
+
+.sj-badge {
+  background: var(--sj-primary-50);
+  color: var(--sj-primary-600);
+  border: 1px solid var(--sj-border);
+  border-radius: 999px;
+  font-size: .8rem;
+  padding: .25rem .6rem;
+  font-weight: 600;
+}
+
+.sj-toolbar {
+  display: flex;
+  gap: .75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.sj-toolbar .spacer {
+  flex: 1;
+}
+
+.sj-search {
+  position: relative;
+  min-width: 260px;
+  flex: 1;
+}
+
+.sj-search i {
+  position: absolute;
+  left: .6rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+}
+
+.sj-search input {
+  padding-left: 2rem;
+}
+
+/* ===============================
+   Fond admin avec image de fond
+   =============================== */
+
+.page-with-bg {
+  background-image: url('/assets/Groupe 786.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  background-attachment: fixed;   /* effet "admin" */
-  min-height: 100vh;              /* couvre l’écran */
-  /* Optionnel: léger voile pour la lisibilité */
-  /* position: relative; */
+  background-attachment: fixed;
+  min-height: 100vh;
 }
+
+/* ===============================
+   (Optionnel) Ajustements spécifiques
+   =============================== */
+/* Si tu veux forcer le header un peu plus foncé en sombre, tu peux rajouter : */
+/*
+body.theme-dark .fixed-header,
+body.theme-dark #page-topbar {
+  background-color: #020617 !important;
+}
+*/

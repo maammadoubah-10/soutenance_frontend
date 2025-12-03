@@ -12,3 +12,11 @@
 .btn-darkblue:hover {
   background-color: #08306b; /* Encore plus foncé au survol */
 }
+
+
+.avatar-photo img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 50%;
+}

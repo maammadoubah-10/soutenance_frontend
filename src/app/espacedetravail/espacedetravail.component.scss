@@ -1,175 +1,529 @@
-:root{
-  --blue-900:#0b1a5c;
-  --blue-800:#10257e;
-  --blue-700:#1232a0;
-  --blue-600:#1a47d0;
-  --blue-300:#bcd1ff;
-  --blue-100:#eef3ff;
-  --white:#ffffff;
-  --glass: rgba(255,255,255,.14);
-  --glass-border: rgba(255,255,255,.25);
-  --radius: 16px;
+:root {
+  --blue-900: #0b1a5c;
+  --blue-800: #10257e;
+  --blue-700: #1232a0;
+  --blue-600: #1a47d0;
+  --blue-300: #bcd1ff;
+  --blue-100: #eef3ff;
+  --white: #ffffff;
+  --radius: 14px;
 }
 
-.main{ background:#f5f8ff; }
+/* FOND GÉNÉRAL – style landing */
+.main {
+  background: radial-gradient(circle at top left, #e0f2ff 0, #f5f8ff 40%, #ffffff 100%);
+  padding-top: 64px;           /* moins d’espace sous l’entête */
+}
 
-/* HERO */
-.hero-landing{
+.page-content {
+  padding-bottom: 24px;
+}
+
+/* on occupe TOUTE la largeur, plus de max-width 1200px */
+.page-content > .container-fluid {
+  width: 100%;
+  padding-left: 3.5rem;
+  padding-right: 3.5rem;
+}
+
+/* Wrapper */
+.ws-layout {
+  width: 100%;
+  margin: 0 0 1.5rem 0;
+}
+
+/* =========================
+   HERO STYLE MYScol
+   ========================= */
+
+.workspace-hero {
   position: relative;
-  min-height: 62vh;
+  padding-top: 12px;           /* réduit */
+  padding-bottom: 20px;
+  overflow: hidden;
+}
+
+
+/* GROS TITRE ISI RH façon MyScol */
+.hero-brand-outline {
+  display: inline-flex;
+  align-items: baseline;
+  font-size: clamp(3.6rem, 2.6rem + 3vw, 5rem);
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 0.2rem;
+}
+
+/* ISI en bleu plein */
+.hero-brand-outline .brand-isi {
+  color: var(--blue-700);
+  -webkit-text-stroke: 0;
+  text-stroke: 0;
+}
+
+/* RH en blanc avec contour bleu */
+.hero-brand-outline .brand-rh {
+  color: #ffffff;
+  -webkit-text-stroke: 3px var(--blue-700);
+  text-stroke: 3px var(--blue-700);
+}
+
+
+/* vague à gauche */
+.workspace-hero::before {
+  content: "";
+  position: absolute;
+  inset: -140px auto auto -140px;
+  width: 440px;
+  height: 440px;
+  background: radial-gradient(circle at center, #cbe2ff 0, #f5f8ff 70%, transparent 72%);
+  z-index: -1;
+}
+
+/* petits motifs décor */
+.workspace-hero::after {
+  content: "";
+  position: absolute;
+  top: 40px;
+  left: 240px;
+  width: 90px;
+  height: 90px;
+  background:
+    radial-gradient(circle, #4f8cff 3px, transparent 4px) 0 0/20px 20px,
+    radial-gradient(circle, #ffd45a 3px, transparent 4px) 10px 10px/24px 24px;
+  opacity: 0.45;
+  z-index: -1;
+}
+
+.hero-left {
+  padding-right: 16px;
+  text-align: left;
+}
+
+/* petit chip au-dessus */
+.hero-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  background: var(--blue-100);
+  color: var(--blue-700);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+/* GROS MOT COMME MYScol */
+/* GROS TITRE ISI RH */
+.hero-brand-outline {
+  display: inline-flex;
+  align-items: baseline;
+  font-size: clamp(3.8rem, 2.6rem + 3vw, 5.3rem);
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 0.2rem;
+
+  /* ⚠️ très important : on NE met PAS de color ici */
+  color: inherit;
+}
+
+/* ISI = même bleu que le bouton primaire */
+.hero-brand-outline .brand-isi {
+  /* OPTION 1 : si ton thème a une variable Bootstrap */
+  color: var(--bs-primary);
+
+  /* OPTION 2 : si ça ne marche pas, mets directement le code couleur
+     du bouton, par ex. :
+     color: #556ee6;
+     ou
+     color: #0d6efd;
+  */
+  -webkit-text-stroke: 0;
+  text-stroke: 0;
+}
+
+/* RH = blanc avec contour bleu ISI (ici j’utilise ton blue-600) */
+.hero-brand-outline .brand-rh {
+  color: #ffffff;
+  -webkit-text-stroke: 3px var(--blue-600);
+  text-stroke: 3px var(--blue-600);
+}
+
+.hero-main-subtitle strong {
+  font-weight: 1000;
+  color: #1b2438;
+}
+
+/* infos utilisateur */
+.hero-user-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+  margin-bottom: 0.8rem;
+  font-size: 0.9rem;
+  color: #4c5673;
+}
+
+.hero-user-pill {
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  background: var(--blue-100);
+  color: var(--blue-800);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.8rem;
+}
+
+/* boutons */
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+/* Colonne droite : illustration */
+.hero-illustration-card {
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 16px 16px 20px;
+  box-shadow: 0 10px 30px rgba(11, 26, 92, 0.12);
+}
+
+.hero-illustration-wrapper {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+  background: #e6f0ff;
+}
+
+.hero-illustration-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* bouton play posé sur l’illustration */
+.hero-play-btn {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 74px;
+  height: 74px;
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+
+.hero-play-circle {
+  width: 74px;
+  height: 74px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.25);
   display: grid;
-  align-items: end;
-  border-radius: var(--radius);
-  overflow: hidden;
-}
-.hero-bg{
-  position:absolute; inset:0;
-  background-position:center; background-size:cover; background-repeat:no-repeat;
-  transform: scale(1.05);
-  filter: saturate(1.1) brightness(.9);
-}
-.hero-overlay{
-  position:absolute; inset:0;
-  background: linear-gradient(120deg, rgba(16,37,126,.85), rgba(11,26,92,.65) 60%, rgba(11,26,92,.25));
-}
-.hero-content{ position:relative; padding-top:3rem; padding-bottom:2rem; }
-
-/* Glass card */
-.glass{
-  background: var(--glass);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius);
-  backdrop-filter: blur(6px);
-  color: var(--white);
-}
-.text-primary-300{ color: var(--blue-300) !important; }
-.text-white-75{ color: rgba(255,255,255,.85); }
-
-/* Tiles (stats) */
-.grid-tiles{
-  display:grid;
-  gap: 12px;
-  grid-template-columns: repeat(2, minmax(0,1fr));
-}
-.tile{
-  display:flex; gap:12px; align-items:center;
-  padding:12px 14px; border-radius: 14px;
-  background: rgba(255,255,255,.12);
-  border: 1px solid rgba(255,255,255,.22);
-  color:#fff; transition: transform .18s ease, box-shadow .18s ease;
-}
-.tile:hover{ transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,.18); }
-.tile-icon{
-  width:42px; height:42px; display:grid; place-items:center; border-radius:12px;
-  background: rgba(255,255,255,.22); font-size:22px;
-}
-.tile-label{ font-size:.8rem; opacity:.9; display:block; }
-.tile-value{ font-weight:700; }
-
-/* Annonces carousel */
-.announcements{ border-radius: var(--radius); padding: 12px 14px; }
-
-/* Section title */
-.section-title{
-  font-size:1rem; font-weight:800; letter-spacing:.02em;
+  place-items: center;
+  font-size: 2rem;
+  color: var(--blue-700);
 }
 
-/* Quick links */
-.quick-link{
-  background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: 0 6px 18px rgba(16,37,126,.08);
-  transition: transform .18s ease, box-shadow .18s ease;
+/* bouton “En savoir plus” sous l’illustration */
+.hero-more-btn {
+  border-radius: 999px;
+  padding-inline: 1.9rem;
+}
+
+/* =========================
+   BANDE DATE + MOTIVATION
+   ========================= */
+
+.ws-top-strip {
+  margin-top: -4px;
+  margin-bottom: 8px;
+}
+
+.ws-info-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 0.6rem 1rem;
+  border: 1px solid rgba(11, 26, 92, 0.06);
+  box-shadow: 0 4px 12px rgba(11, 26, 92, 0.04);
+}
+
+.ws-info-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--blue-700);
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.ws-info-value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--blue-900);
+}
+
+.ws-info-extra {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+/* =========================
+   SECTIONS GÉNÉRALES
+   ========================= */
+
+.ws-section-header {
+  margin-top: 0.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.ws-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--blue-900);
+}
+
+.ws-section-subtitle {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+/* Accès rapides */
+.ws-quicklinks-row {
+  margin-top: 0.2rem;
+}
+
+.ws-quick-tile {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-decoration: none;
-}
-.quick-link:hover{
-  transform: translateY(-3px);
-  box-shadow: 0 12px 28px rgba(16,37,126,.16);
-}
-.quick-link-icon{
-  width:58px; height:58px; border-radius: 14px;
-  background: var(--blue-100); color: var(--blue-800);
-  display:grid; place-items:center; font-size:28px; margin-bottom:.5rem;
-}
-.quick-link-label{ color: var(--blue-900); font-weight:600; }
-
-/* KPI band */
-.kpi-band{
-  background: linear-gradient(90deg, var(--blue-800), var(--blue-900));
-  padding: 12px 0;
-}
-.kpi-item{
-  background: rgba(255,255,255,.12);
-  border: 1px solid rgba(255,255,255,.25);
-  color:#fff; text-align:center; border-radius: 12px; padding: 14px 10px;
-}
-.kpi-value{ font-size: clamp(1rem,.8rem + .8vw,1.4rem); font-weight:800; line-height:1; }
-.kpi-label{ font-size:.8rem; opacity:.9; }
-
-/* Feature cards */
-.feature-card{
+  background: #ffffff;
   border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: 0 6px 18px rgba(16,37,126,.08);
-  transition: transform .18s ease, box-shadow .18s ease;
-}
-.feature-card:hover{
-  transform: translateY(-3px);
-  box-shadow: 0 12px 30px rgba(16,37,126,.18);
-}
-.feature-img{
-  width:100%; height:160px;
-  background-size:cover; background-position:center;
+  padding: 0.9rem 0.5rem;
+  box-shadow: 0 4px 12px rgba(16, 37, 126, 0.06);
+  border: 1px solid rgba(11, 26, 92, 0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
-/* Masonry gallery */
-.masonry{
-  column-count: 1;
-  column-gap: 12px;
+.ws-quick-tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(16, 37, 126, 0.12);
+  border-color: rgba(11, 26, 92, 0.25);
 }
-@media (min-width: 576px){ .masonry{ column-count: 2; } }
-@media (min-width: 992px){ .masonry{ column-count: 3; } }
-.masonry-item{
-  break-inside: avoid;
-  margin-bottom:12px;
-}
-.masonry-img{
-  width:100%; height: 220px; border-radius: 14px;
-  background-size:cover; background-position:center;
-  box-shadow: 0 6px 18px rgba(16,37,126,.12);
-  transition: transform .2s ease;
-}
-.masonry-img:hover{ transform: scale(1.02); }
 
-/* Testimonials */
-.testimonial{
+.ws-quick-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: var(--blue-100);
+  color: var(--blue-800);
+  display: grid;
+  place-items: center;
+  font-size: 1.3rem;
+  margin-bottom: 0.4rem;
+}
+
+.ws-quick-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--blue-900);
+  text-align: center;
+}
+
+/* Annonces internes */
+.ws-panel {
+  background: #ffffff;
   border-radius: var(--radius);
-  box-shadow: 0 6px 18px rgba(16,37,126,.08);
+  border: 1px solid rgba(11, 26, 92, 0.06);
+  box-shadow: 0 4px 12px rgba(11, 26, 92, 0.04);
+  padding: 0.6rem 0.75rem;
 }
 
-/* News */
-.news-card{
-  border-radius: var(--radius);
-  box-shadow: 0 6px 18px rgba(16,37,126,.08);
-  transition: transform .18s ease, box-shadow .18s ease;
+.ws-panel-empty {
+  font-size: 0.9rem;
+  color: #6c757d;
+  padding: 0.4rem 0.25rem;
 }
-.news-card:hover{ transform: translateY(-3px); box-shadow: 0 12px 30px rgba(16,37,126,.18); }
-.news-img{ width:100%; height:140px; background-size:cover; background-position:center; }
 
-/* CTA */
-.cta-card{
-  position: relative;
-  border-radius: var(--radius);
-  overflow: hidden;
-  min-height: 200px;
-  display:grid; place-items:center;
+.ws-panel-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.4rem 0.3rem;
+  border-bottom: 1px dashed rgba(11, 26, 92, 0.06);
 }
-.cta-bg{ position:absolute; inset:0; background-size:cover; background-position:center; filter: brightness(.7); }
-.cta-overlay{ position:absolute; inset:0; background: linear-gradient(120deg, rgba(16,37,126,.8), rgba(11,26,92,.6)); }
-.cta-body{ position:relative; text-align:center; padding: 36px 20px; }
+
+.ws-panel-item:last-child {
+  border-bottom: none;
+}
+
+.ws-panel-main {
+  flex: 1;
+}
+
+.ws-panel-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--blue-900);
+  margin-bottom: 0.05rem;
+}
+
+.ws-panel-text {
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.ws-panel-cta .btn {
+  white-space: nowrap;
+  font-size: 0.8rem;
+}
 
 /* Footer */
-.footer-dashboard{
+.footer-dashboard {
   background: var(--blue-900);
-  color:#fff; padding: 12px 0; margin-top: 24px;
+  color: #ffffff;
+  padding: 0.6rem 0;
+  margin-top: 1.5rem;
+  font-size: 0.8rem;
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+  .page-content > .container-fluid {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  .workspace-hero::before,
+  .workspace-hero::after {
+    display: none;
+  }
+
+  .hero-illustration-card {
+    margin-top: 12px;
+  }
+
+
+
+}
+/* Carte “Aujourd’hui” plus moderne */
+.ws-info-card.ws-info-card-live {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 0.75rem 1.1rem;
+  border: 1px solid rgba(11, 26, 92, 0.06);
+  box-shadow: 0 6px 18px rgba(11, 26, 92, 0.05);
+}
+
+/* Ligne du haut : date à gauche, heure à droite */
+.ws-info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+/* Bloc titre + date */
+.ws-info-title-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+/* Petit badge “Aujourd’hui” */
+.ws-info-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.18rem 0.65rem;
+  border-radius: 999px;
+  background: var(--blue-100);
+  color: var(--blue-700);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.ws-info-pill i {
+  font-size: 0.95rem;
+}
+
+/* Date lisible et pro */
+.ws-info-date {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--blue-900);
+}
+
+/* Bloc heure à droite */
+.ws-info-time {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.25rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(11, 26, 92, 0.04);
+  color: var(--blue-900);
+  font-size: 0.8rem;
+}
+
+.ws-info-time i {
+  font-size: 1rem;
+  color: var(--blue-700);
+}
+
+.ws-info-time-label {
+  font-weight: 500;
+  opacity: 0.8;
+}
+
+.ws-info-time-value {
+  font-family: "SF Mono", ui-monospace, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-weight: 600;
+}
+
+/* Ligne motivation */
+.ws-info-extra {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.45rem;
+  margin-top: 0.2rem;
+  font-size: 0.85rem;
+  color: #6c757d;
+}
+
+.ws-info-extra i {
+  margin-top: 0.1rem;
+  font-size: 1rem;
+  color: var(--blue-600);
+}
+
+/* Responsive */
+@media (max-width: 575.98px) {
+  .ws-info-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .ws-info-time {
+    align-self: stretch;
+    justify-content: flex-start;
+  }
 }

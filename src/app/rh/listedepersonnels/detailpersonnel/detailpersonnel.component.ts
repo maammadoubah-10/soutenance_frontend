@@ -1213,68 +1213,73 @@ chargerListeMissionsPersonnel() {
   }
 
   /** Aplatis les champs utiles pour le template */
-  private flattenPersonnel(p: any) {
-    const ec = p?.etatCivil ?? {};
-    const co = p?.coordonnee ?? {};
-    const ind = p?.indice ?? {};
-    const pg = p?.posteGeneral ?? {};
-    const ent = p?.entite ?? {};
-    const sp = p?.statutPersonnel ?? {};
+private flattenPersonnel(p: any) {
+  const ec = p?.etatCivil ?? {};
+  const co = p?.coordonnee ?? {};
+  const ind = p?.indice ?? {};
+  const pg = p?.posteGeneral ?? {};
+  const ent = p?.entite ?? {};
+  const sp = p?.statutPersonnel ?? {};
 
-    const nomContact =
-      p?.nomContact ?? co?.nomContact ?? co?.contactNom ?? co?.nomUrgence ?? co?.nomPersonneAContacter ?? null;
+  const nomContact =
+    p?.nomContact ?? co?.nomContact ?? co?.contactNom ?? co?.nomUrgence ?? co?.nomPersonneAContacter ?? null;
 
-    const prenomContact =
-      p?.prenomContact ??
-      co?.prenomContact ??
-      co?.contactPrenom ??
-      co?.prenomUrgence ??
-      co?.prenomPersonneAContacter ??
-      null;
+  const prenomContact =
+    p?.prenomContact ??
+    co?.prenomContact ??
+    co?.contactPrenom ??
+    co?.prenomUrgence ??
+    co?.prenomPersonneAContacter ??
+    null;
 
-    const telephoneContact =
-      p?.telephoneContact ??
-      co?.telephoneContact ??
-      co?.telContact ??
-      co?.telephoneUrgence ??
-      co?.mobileUrgence ??
-      co?.numeroTelephonePrimaire ??
-      null;
+  const telephoneContact =
+    p?.telephoneContact ??
+    co?.telephoneContact ??
+    co?.telContact ??
+    co?.telephoneUrgence ??
+    co?.mobileUrgence ??
+    co?.numeroTelephonePrimaire ??
+    null;
 
-    return {
-      ...p,
+  return {
+    ...p,
 
-      // Identité
-      dateDeNaissance: p?.dateDeNaissance ?? ec?.dateDeNaissance ?? null,
-      civilite: p?.civilite ?? ec?.civilite ?? null,
-      situationMatrimoniale: p?.situationMatrimoniale ?? ec?.situationMatrimoniale ?? null,
-      nombreEnfant: p?.nombreEnfant ?? ec?.nombreEnfant ?? null,
-      pieceIdentite: p?.pieceIdentite ?? ec?.pieceIdentite ?? null,
-      matricule: p?.matricule ?? ec?.matricule ?? null,
+    // 🔹 Nom / prénom normalisés comme dans la liste
+    nom: p?.nom ?? ec?.nom ?? '',
+    prenom: p?.prenom ?? ec?.prenom ?? '',
+    matricule: p?.matricule ?? ec?.matricule ?? null,
 
-      // Coordonnées
-      telephone: p?.telephone ?? co?.telephone ?? co?.mobile ?? null,
-      adresse: p?.adresse ?? co?.adresse ?? null,
+    // Identité
+    dateDeNaissance: p?.dateDeNaissance ?? ec?.dateDeNaissance ?? null,
+    civilite: p?.civilite ?? ec?.civilite ?? null,
+    situationMatrimoniale: p?.situationMatrimoniale ?? ec?.situationMatrimoniale ?? null,
+    nombreEnfant: p?.nombreEnfant ?? ec?.nombreEnfant ?? null,
+    pieceIdentite: p?.pieceIdentite ?? ec?.pieceIdentite ?? null,
 
-      // Personne à contacter (aliases)
-      nomContact,
-      prenomContact,
-      telephoneContact,
+    // Coordonnées
+    telephone: p?.telephone ?? co?.telephone ?? co?.mobile ?? null,
+    adresse: p?.adresse ?? co?.adresse ?? null,
 
-      // Autres objets
-      statutPersonnel: p?.statutPersonnel ?? sp ?? null,
-      indice: p?.indice ?? ind ?? null,
-      poste: p?.poste ?? pg ?? null,
-      entite: p?.entite ?? ent ?? null,
+    // Personne à contacter (aliases)
+    nomContact,
+    prenomContact,
+    telephoneContact,
 
-      // Dates RH
-      dateEmbauchage: p?.dateEmbauchage ?? null,
-      dateDebauchage: p?.dateDebauchage ?? null,
-      dateRetraite: p?.dateRetraite ?? null,
-      debaucher: p?.debaucher ?? false,
-      retraiter: p?.retraiter ?? false,
-    };
-  }
+    // Autres objets
+    statutPersonnel: p?.statutPersonnel ?? sp ?? null,
+    indice: p?.indice ?? ind ?? null,
+    poste: p?.poste ?? pg ?? null,
+    entite: p?.entite ?? ent ?? null,
+
+    // Dates RH
+    dateEmbauchage: p?.dateEmbauchage ?? null,
+    dateDebauchage: p?.dateDebauchage ?? null,
+    dateRetraite: p?.dateRetraite ?? null,
+    debaucher: p?.debaucher ?? false,
+    retraiter: p?.retraiter ?? false,
+  };
+}
+
 
   supprimerPresence(id: number) {
     Swal.fire({

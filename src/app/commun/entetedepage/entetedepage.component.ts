@@ -34,7 +34,7 @@ import { CurrentUserStore } from '../../store/current-user.store';
 })
 export class EntetedepageComponent implements OnInit, OnDestroy {
   dataStateEnum = DataStateEnum;
-
+  isDarkMode = false;
   element: any;
   cookieValue: any;
   flagvalue: any;
@@ -110,29 +110,33 @@ private buildProfilSrcFromUtilisateur(user: UtilisateurAuthentifie): SafeUrl | n
   }
 
   ngOnInit(): void {
-    this.openMobileMenu = false;
-    this.element = document.documentElement;
+  this.openMobileMenu = false;
+  this.element = document.documentElement;
 
-    const user = this.userStore.value;
-    if (user) {
-      this.utilisateurAuthentifie = this.utilisateurAuthentifie ?? user;
-    }
-
-    const val = this.listLang.filter(x => x.lang === this.cookieValue);
-    this.countryName = val.map(element => element.text);
-    if (val.length === 0) {
-      if (this.flagvalue === undefined) {
-        this.valueset = 'assets/images/flags/us.jpg';
-      }
-    } else {
-      this.flagvalue = val.map(element => element.flag);
-    }
-
-    // init notifs + websocket quand possible
-    this.initNotificationsAndWebSocket();
-
-    this.updatePageTitle(this.totalNotificationCountUnread);
+  const user = this.userStore.value;
+  if (user) {
+    this.utilisateurAuthentifie = this.utilisateurAuthentifie ?? user;
   }
+
+  const val = this.listLang.filter(x => x.lang === this.cookieValue);
+  this.countryName = val.map(element => element.text);
+  if (val.length === 0) {
+    if (this.flagvalue === undefined) {
+      this.valueset = 'assets/images/flags/us.jpg';
+    }
+  } else {
+    this.flagvalue = val.map(element => element.flag);
+  }
+
+  // init notifs + websocket
+  this.initNotificationsAndWebSocket();
+
+  this.updatePageTitle(this.totalNotificationCountUnread);
+
+  // ✅ Initialiser le thème au chargement
+  this.initTheme();
+}
+
 
   /**
    * Initialise le compteur de notifications + WebSocket
@@ -309,6 +313,36 @@ private buildProfilSrcFromUtilisateur(user: UtilisateurAuthentifie): SafeUrl | n
       this.profilSrc = this.sanitizer.bypassSecurityTrustUrl(objectURL);
     }
   }
+
+  // ✅ Charge le thème depuis le localStorage au démarrage
+private initTheme(): void {
+  const storedTheme = localStorage.getItem('theme'); // 'dark' ou 'light'
+  this.isDarkMode = storedTheme === 'dark';
+
+  this.applyTheme();
+}
+
+// ✅ Toggle quand on clique sur le bouton
+toggleTheme(): void {
+  this.isDarkMode = !this.isDarkMode;
+  const theme = this.isDarkMode ? 'dark' : 'light';
+  localStorage.setItem('theme', theme);
+  this.applyTheme();
+}
+
+// ✅ Applique physiquement la classe sur le <body>
+private applyTheme(): void {
+  const body: HTMLElement = this.document.body as HTMLElement;
+
+  if (this.isDarkMode) {
+    body.classList.add('theme-dark');
+    body.classList.remove('theme-light');
+  } else {
+    body.classList.add('theme-light');
+    body.classList.remove('theme-dark');
+  }
+}
+
 
   obtenirUnUtilisateurParEmail(): void {
     const email = sessionStorage.getItem('email');
